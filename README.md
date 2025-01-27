@@ -1,12 +1,8 @@
 # Statamic Livewire
 <!-- statamic:hide -->
 ![Statamic 4.0+](https://img.shields.io/badge/Statamic-4.0+-FF269E?style=for-the-badge&link=https://statamic.com)
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/jonassiewertsen/statamic-livewire.svg?style=for-the-badge)](https://packagist.org/packages/jonassiewertsen/statamic-livewire)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/marcorieser/statamic-livewire.svg?style=for-the-badge)](https://packagist.org/packages/marcorieser/statamic-livewire)
 <!-- /statamic:hide -->
-
-## Wanna learn Statamic?
-Visit my newest project Statamictutorials.com. Many tutorials are free.
-[<img src="https://statamictutorials.com/images/seo/statamictutorials.png" width="600" />](https://statamictutorials.com)
 
 ## Description
 A third-party [Laravel Livewire](https://laravel-livewire.com/) integration for Statamic.
@@ -17,7 +13,7 @@ It's as easy as it gets to get started with Livewire if using Statamic.
 Pull in the Livewire package with composer
 
 ```bash
-composer require jonassiewertsen/statamic-livewire
+composer require marcorieser/statamic-livewire
 ```
 
 ### Manually including Livewire's frontend assets
@@ -355,7 +351,7 @@ Did I miss a link? Let me know!
 ## Credits
 
 Thanks to:
-- [Marco Rieser](https://github.com/marcorieser) to help maintaining this package
+- [Jonas Siewertsen](https://jonassiewertsen.com/) for building the addon and give me the permission to take it over
 - [Caleb](https://github.com/calebporzio) and the community for building [Livewire](https://laravel-livewire.com/)
 - [Austenc](https://github.com/austenc) for the Statamic marketplace preview image
 
@@ -367,7 +363,7 @@ Thanks to:
 # Support
 I love to share with the community. Nevertheless, it does take a lot of work, time and effort.
 
-[Sponsor me on GitHub](https://github.com/sponsors/jonassiewertsen/) to support my work and the support for this addon.
+[Sponsor me on GitHub](https://github.com/sponsors/marcorieser/) to support my work and the support for this addon.
 
 # License
 This plugin is published under the MIT license. Feel free to use it and remember to spread love.

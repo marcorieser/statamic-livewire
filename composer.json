@@ -1,5 +1,5 @@
 {
-    "name": "jonassiewertsen/statamic-livewire",
+    "name": "marcorieser/statamic-livewire",
     "description": "A Laravel Livewire integration for Statamics Antlers engine.",
     "keywords": [
         "Statamic",
@@ -16,13 +16,17 @@
     },
     "authors": [
         {
+            "name": "Marco Rieser",
+            "homepage": "https://rieser.dev"
+        },
+        {
             "name": "Jonas Siewertsen",
             "homepage": "https://jonassiewertsen.com"
         }
     ],
     "support": {
-        "issues": "https://github.com/jonassiewertsen/statamic-livewire/issues",
-        "docs": "https://github.com/jonassiewertsen/statamic-livewire"
+        "issues": "https://github.com/marcorieser/statamic-livewire/issues",
+        "docs": "https://github.com/marcorieser/statamic-livewire"
     },
     "require": {
         "php": "^8.1",
