@@ -1,6 +1,6 @@
 <?php
 
-namespace Jonassiewertsen\Livewire\Replacers;
+namespace MarcoRieser\Livewire\Replacers;
 
 use Illuminate\Http\Response;
 use Livewire\Features\SupportAutoInjectedAssets\SupportAutoInjectedAssets;

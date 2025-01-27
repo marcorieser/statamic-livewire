@@ -1,6 +1,6 @@
 <?php
 
-namespace Jonassiewertsen\Livewire\Synthesizers;
+namespace MarcoRieser\Livewire\Synthesizers;
 
 use Illuminate\Support\Carbon;
 use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Jonassiewertsen\Livewire;
+namespace MarcoRieser\Livewire;
 
 use Livewire\Livewire;
 use Statamic\Providers\AddonServiceProvider;
@@ -10,7 +10,7 @@ class ServiceProvider extends AddonServiceProvider
     protected $publishAfterInstall = false;
 
     protected $tags = [
-        'Jonassiewertsen\Livewire\Tags\Livewire',
+        'MarcoRieser\Livewire\Tags\Livewire',
     ];
 
     public function bootAddon(): void

@@ -1,6 +1,6 @@
 <?php
 
-namespace Jonassiewertsen\Livewire;
+namespace MarcoRieser\Livewire;
 
 trait WithPagination
 {

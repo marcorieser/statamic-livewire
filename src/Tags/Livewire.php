@@ -1,6 +1,6 @@
 <?php
 
-namespace Jonassiewertsen\Livewire\Tags;
+namespace MarcoRieser\Livewire\Tags;
 
 use Statamic\Tags\Tags;
 

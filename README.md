@@ -69,7 +69,7 @@ This addon adds an `AssetsReplacer` class to make Livewire compatible with half 
 
 ```php
 'replacers' => [
-    \Jonassiewertsen\Livewire\Replacers\AssetsReplacer::class,
+    \MarcoRieser\Livewire\Replacers\AssetsReplacer::class,
 ],
 ```
 
@@ -204,11 +204,11 @@ Livewire components are automatically keyed by default. If you want to manually 
 The [Official Livewire documentation](https://livewire.laravel.com/docs/components#adding-wirekey-to-foreach-loops) provides more information.
 
 ### Multi-Site
-When using Livewire in a Multi-Site context, the current site gets lost between requests. There is a trait (`\Jonassiewertsen\Livewire\RestoreCurrentSite`) to solve that. Just include it in your component and use `Site::current()` as you normally do.
+When using Livewire in a Multi-Site context, the current site gets lost between requests. There is a trait (`\MarcoRieser\Livewire\RestoreCurrentSite`) to solve that. Just include it in your component and use `Site::current()` as you normally do.
 ```php
 class ShowArticles extends Component
 {
-    use \Jonassiewertsen\Livewire\RestoreCurrentSite;
+    use \MarcoRieser\Livewire\RestoreCurrentSite;
 
     protected function entries()
     {
@@ -232,7 +232,7 @@ You can paginate results by using the WithPagination trait.
 To use pagination with Blade, please use the `Livewire\WithPagination` namespace for your trait as described in the [Livewire docs](https://livewire.laravel.com/docs/pagination#basic-usage).
 
 ### Antlers
-Pagination with Antlers does work similar. Make sure to use the `Jonassiewertsen\Livewire\WithPagination` namespace for your trait if working with Antlers.
+Pagination with Antlers does work similar. Make sure to use the `MarcoRieser\Livewire\WithPagination` namespace for your trait if working with Antlers.
 
 In your Livewire component view:
 ```html
@@ -244,7 +244,7 @@ In your Livewire component view:
 ```
 
 ```php
-use Jonassiewertsen\Livewire\WithPagination;
+use MarcoRieser\Livewire\WithPagination;
 
 class ShowArticles extends Component
 {

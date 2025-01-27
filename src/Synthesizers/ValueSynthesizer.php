@@ -1,6 +1,6 @@
 <?php
 
-namespace Jonassiewertsen\Livewire\Synthesizers;
+namespace MarcoRieser\Livewire\Synthesizers;
 
 use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
 use Statamic\Fields\Value;

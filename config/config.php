@@ -25,11 +25,11 @@ return [
         'enabled' => false,
 
         'classes' => [
-            \Jonassiewertsen\Livewire\Synthesizers\EntryCollectionSynthesizer::class,
-            \Jonassiewertsen\Livewire\Synthesizers\EntrySynthesizer::class,
-            \Jonassiewertsen\Livewire\Synthesizers\FieldSynthesizer::class,
-            \Jonassiewertsen\Livewire\Synthesizers\FieldtypeSynthesizer::class,
-            \Jonassiewertsen\Livewire\Synthesizers\ValueSynthesizer::class,
+            \MarcoRieser\Livewire\Synthesizers\EntryCollectionSynthesizer::class,
+            \MarcoRieser\Livewire\Synthesizers\EntrySynthesizer::class,
+            \MarcoRieser\Livewire\Synthesizers\FieldSynthesizer::class,
+            \MarcoRieser\Livewire\Synthesizers\FieldtypeSynthesizer::class,
+            \MarcoRieser\Livewire\Synthesizers\ValueSynthesizer::class,
         ],
     ],
 
@@ -44,6 +44,6 @@ return [
     */
 
     'replacers' => [
-        \Jonassiewertsen\Livewire\Replacers\AssetsReplacer::class,
+        \MarcoRieser\Livewire\Replacers\AssetsReplacer::class,
     ],
 ];

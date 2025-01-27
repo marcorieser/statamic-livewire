@@ -11,7 +11,7 @@
     "type": "statamic-addon",
     "autoload": {
         "psr-4": {
-            "Jonassiewertsen\\Livewire\\": "src"
+            "MarcoRieser\\Livewire\\": "src"
         }
     },
     "authors": [
@@ -41,7 +41,7 @@
         },
         "laravel": {
             "providers": [
-                "Jonassiewertsen\\Livewire\\ServiceProvider"
+                "MarcoRieser\\Livewire\\ServiceProvider"
             ]
         }
     }

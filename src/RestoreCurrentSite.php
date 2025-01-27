@@ -1,6 +1,6 @@
 <?php
 
-namespace Jonassiewertsen\Livewire;
+namespace MarcoRieser\Livewire;
 
 use Illuminate\Support\Facades\Date;
 use Livewire\Attributes\Locked;
