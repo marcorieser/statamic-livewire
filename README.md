@@ -10,6 +10,11 @@ A third-party [Laravel Livewire](https://laravel-livewire.com/) integration for 
 It's as easy as it gets to get started with Livewire if using Statamic.
 
 ## Migrate from `jonassiewertsen/statamic-livewire`
+### Without breaking changes (v3)
+1. Replace `jonassiewertsen/statamic-livewire` with `marcorieser/statamic-livewire` in your `composer.json`
+2. Run `composer update marcorieser/statamic-livewire`
+
+### With breaking changes (v4)
 1. Replace `"jonassiewertsen/statamic-livewire": "^3.0"` with `"marcorieser/statamic-livewire": "^4.0"` in your `composer.json`
 2. Replace the namespace `Jonassiewertsen\Livewire` with `MarcoRieser\Livewire` in your code
 3. Run `composer update marcorieser/statamic-livewire`
