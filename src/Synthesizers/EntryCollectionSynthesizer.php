@@ -2,21 +2,22 @@
 
 namespace MarcoRieser\Livewire\Synthesizers;
 
+use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
-use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection as StatamicEntryCollection;
+use Statamic\Facades\Entry;
 
 class EntryCollectionSynthesizer extends Synth
 {
-    public static $key = 'statamic-entry-collection';
+    public static string $key = 'statamic-entry-collection';
 
-    public static function match($target)
+    public static function match($target): bool
     {
         return $target instanceof StatamicEntryCollection;
     }
 
-    public function dehydrate($target)
+    public function dehydrate($target): array
     {
         $data = [];
 
@@ -33,7 +34,7 @@ class EntryCollectionSynthesizer extends Synth
         return [$data, []];
     }
 
-    public function hydrate($values)
+    public function hydrate($values): StatamicEntryCollection
     {
         $items = [];
 
@@ -47,11 +48,11 @@ class EntryCollectionSynthesizer extends Synth
             if ($value['date']) {
                 $date = $value['date'];
 
-                if (! $date instanceof \Carbon\CarbonInterface) {
+                if (! $date instanceof CarbonInterface) {
                     $date = Carbon::parse($date);
                 }
 
-                $entry->date($date ?? null);
+                $entry->date($date);
             }
 
             $items[] = $entry;

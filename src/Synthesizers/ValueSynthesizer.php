@@ -9,14 +9,14 @@ use function Livewire\invade;
 
 class ValueSynthesizer extends Synth
 {
-    public static $key = 'statamic-value';
+    public static string $key = 'statamic-value';
 
-    public static function match($target)
+    public static function match($target): bool
     {
         return $target instanceof Value;
     }
 
-    public function dehydrate($target, $dehydrateChild)
+    public function dehydrate($target, $dehydrateChild): array
     {
         $value = invade($target);
 
@@ -35,7 +35,7 @@ class ValueSynthesizer extends Synth
         return [$data, []];
     }
 
-    public function hydrate($value, $meta, $hydrateChild)
+    public function hydrate($value, $meta, $hydrateChild): Value
     {
         foreach ($value as $key => $child) {
             $value[$key] = $hydrateChild($key, $child);

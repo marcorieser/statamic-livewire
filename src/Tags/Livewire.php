@@ -2,7 +2,10 @@
 
 namespace MarcoRieser\Livewire\Tags;
 
+use Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets;
+use Livewire\Mechanisms\FrontendAssets\FrontendAssets;
 use Statamic\Tags\Tags;
+use function Livewire\store;
 
 class Livewire extends Tags
 {
@@ -37,13 +40,13 @@ class Livewire extends Tags
         $modifier = $this->params->get('modifier');
         $instanceId = $this->context['__livewire']->getId();
 
-        $expression = ".entangle('{$property}')";
+        $expression = ".entangle('$property')";
 
         if ($modifier) {
-            $expression .= ".{$modifier}";
+            $expression .= ".$modifier";
         }
 
-        return "window.Livewire.find('$instanceId'){$expression}";
+        return "window.Livewire.find('$instanceId')$expression";
     }
 
     /**
@@ -57,14 +60,14 @@ class Livewire extends Tags
         $instanceId = $this->context['__livewire']->getId();
 
         if (! count($this->params)) {
-            return "window.Livewire.find('{$instanceId}')";
+            return "window.Livewire.find('$instanceId')";
         }
 
         $action = $this->params->take(1)->toArray();
         $method = key($action);
         $parameters = reset($action);
 
-        return "window.Livewire.find('{$instanceId}').{$method}{$parameters}";
+        return "window.Livewire.find('$instanceId').$method$parameters";
     }
 
     /**
@@ -74,7 +77,7 @@ class Livewire extends Tags
      */
     public function styles(): string
     {
-        return \Livewire\Mechanisms\FrontendAssets\FrontendAssets::styles();
+        return FrontendAssets::styles();
     }
 
     /**
@@ -84,7 +87,7 @@ class Livewire extends Tags
      */
     public function scripts(): string
     {
-        return \Livewire\Mechanisms\FrontendAssets\FrontendAssets::scripts();
+        return FrontendAssets::scripts();
     }
 
     /**
@@ -94,7 +97,7 @@ class Livewire extends Tags
      */
     public function scriptConfig(): string
     {
-        return \Livewire\Mechanisms\FrontendAssets\FrontendAssets::scriptConfig();
+        return FrontendAssets::scriptConfig();
     }
 
     /**
@@ -108,11 +111,11 @@ class Livewire extends Tags
 
         $key = md5($html);
 
-        if (in_array($key, \Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets::$alreadyRunAssetKeys)) {
+        if (in_array($key, SupportScriptsAndAssets::$alreadyRunAssetKeys)) {
             // Skip it...
         } else {
-            \Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets::$alreadyRunAssetKeys[] = $key;
-            \Livewire\store($this->context['__livewire'])->push('assets', $html, $key);
+            SupportScriptsAndAssets::$alreadyRunAssetKeys[] = $key;
+            store($this->context['__livewire'])->push('assets', $html, $key);
         }
     }
 
@@ -127,6 +130,6 @@ class Livewire extends Tags
 
         $key = md5($html);
 
-        \Livewire\store($this->context['__livewire'])->push('scripts', $html, $key);
+        store($this->context['__livewire'])->push('scripts', $html, $key);
     }
 }
