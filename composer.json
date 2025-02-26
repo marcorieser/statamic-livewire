@@ -49,5 +49,8 @@
         "allow-plugins": {
             "pixelfear/composer-dist-plugin": true
         }
+    },
+    "require-dev": {
+        "laravel/pint": "^1.21"
     }
 }
