@@ -7,14 +7,14 @@ use Statamic\Fields\Fieldtype;
 
 class FieldtypeSynthesizer extends Synth
 {
-    public static $key = 'statamic-fieldtype';
+    public static string $key = 'statamic-fieldtype';
 
-    public static function match($target)
+    public static function match($target): bool
     {
         return $target instanceof Fieldtype;
     }
 
-    public function dehydrate($target, $dehydrateChild)
+    public function dehydrate($target, $dehydrateChild): array
     {
         $data = [
             'field' => $target->field(),

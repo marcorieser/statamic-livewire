@@ -2,20 +2,22 @@
 
 namespace MarcoRieser\Livewire\Synthesizers;
 
+use Carbon\CarbonInterface;
+use Illuminate\Support\Carbon;
 use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
-use Statamic\Entries\Entry as StatamicEntry;
-use Statamic\Facades\Entry;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Facades\Entry as EntryFacade;
 
 class EntrySynthesizer extends Synth
 {
-    public static $key = 'statamic-entry';
+    public static string $key = 'statamic-entry';
 
-    public static function match($target)
+    public static function match($target): bool
     {
-        return $target instanceof StatamicEntry;
+        return $target instanceof Entry;
     }
 
-    public function dehydrate($entry)
+    public function dehydrate(Entry $entry): array
     {
         return [
             [
@@ -27,16 +29,22 @@ class EntrySynthesizer extends Synth
             ], []];
     }
 
-    public function hydrate($value)
+    public function hydrate($value): Entry
     {
-        $entry = Entry::make()
+        $entry = EntryFacade::make()
             ->id($value['id'])
             ->slug($value['slug'] ?? null)
             ->collection($value['collection'] ?? null)
             ->data($value['data']);
 
         if ($value['date']) {
-            $entry->date($value['date'] ?? null);
+            $date = $value['date'];
+
+            if (! $date instanceof CarbonInterface) {
+                $date = Carbon::parse($date);
+            }
+
+            $entry->date($date);
         }
 
         return $entry;

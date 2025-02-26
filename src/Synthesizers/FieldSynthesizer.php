@@ -7,14 +7,14 @@ use Statamic\Fields\Field;
 
 class FieldSynthesizer extends Synth
 {
-    public static $key = 'statamic-field';
+    public static string $key = 'statamic-field';
 
-    public static function match($target)
+    public static function match($target): bool
     {
         return $target instanceof Field;
     }
 
-    public function dehydrate($target, $dehydrateChild)
+    public function dehydrate($target, $dehydrateChild): array
     {
         $data = [
             'handle' => $target->handle(),
@@ -28,7 +28,7 @@ class FieldSynthesizer extends Synth
         return [$data, []];
     }
 
-    public function hydrate($value, $meta, $hydrateChild)
+    public function hydrate($value, $meta, $hydrateChild): Field
     {
         foreach ($value as $key => $child) {
             $value[$key] = $hydrateChild($key, $child);

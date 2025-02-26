@@ -14,7 +14,7 @@ return [
     | It's recommended to remove or uncomment those synthesizers that are
     | not used in your application, to avoid overhead by loading those.
     |
-    | This features is experimental. It's ment to be tested and to played
+    | This features is experimental. It's meant to be tested and to played
     | with. As long as it is experimental, it can be changed and removed
     | at any point without a warning.
     |

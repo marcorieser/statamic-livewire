@@ -12,13 +12,13 @@ use Statamic\StaticCaching\Replacer;
 
 class AssetsReplacer implements Replacer
 {
-    public function prepareResponseToCache(Response $responseToBeCached, Response $initialResponse)
+    public function prepareResponseToCache(Response $response, Response $initial): void
     {
-        if (! $content = $responseToBeCached->getContent()) {
+        if (! $content = $response->getContent()) {
             return;
         }
 
-        // Don't disturb Livewire's assets injection when caching is off.
+        // Don't disturb Livewires assets injection when caching is off.
         if (app(Cacher::class) instanceof NullCacher) {
             return;
         }
@@ -47,19 +47,21 @@ class AssetsReplacer implements Replacer
             app(FrontendAssets::class)->hasRenderedScripts = false;
         }
 
-        $responseToBeCached->setContent(
+        $response->setContent(
             SupportAutoInjectedAssets::injectAssets($content, $assetsHead, $assetsBody)
         );
     }
 
-    protected function shouldInjectLivewireAssets()
+    protected function shouldInjectLivewireAssets(): bool
     {
         if (! SupportAutoInjectedAssets::$forceAssetInjection && config('livewire.inject_assets', true) === false) {
             return false;
         }
+
         if ((! SupportAutoInjectedAssets::$hasRenderedAComponentThisRequest) && (! SupportAutoInjectedAssets::$forceAssetInjection)) {
             return false;
         }
+
         if (app(FrontendAssets::class)->hasRenderedScripts) {
             return false;
         }
