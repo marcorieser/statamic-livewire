@@ -19,7 +19,7 @@ return [
 
     'localization' => [
 
-        'enabled' => true,
+        'enabled' => false,
 
     ],
 
