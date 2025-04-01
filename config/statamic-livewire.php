@@ -4,6 +4,27 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | EXPERIMENTAL: Localization
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, the Localize Middleware from Statamic gets applied to
+    | Livewire requests and the configured locales per site are handled
+    | automatically. This makes the `RestoreCurrentSite` obsolete.
+    |
+    | This features is experimental. It's meant to be tested and to played
+    | with. As long as it is experimental, it can be changed and removed
+    | at any point without a warning.
+    |
+    */
+
+    'localization' => [
+
+        'enabled' => true,
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | EXPERIMENTAL: Livewire Synthesizers
     |--------------------------------------------------------------------------
     |

@@ -2,7 +2,10 @@
 
 namespace MarcoRieser\Livewire;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Route;
 use Livewire\Livewire;
+use Statamic\Facades\Site;
 use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
@@ -13,8 +16,26 @@ class ServiceProvider extends AddonServiceProvider
 
     public function bootAddon(): void
     {
+        $this->bootLocalization();
         $this->bootReplacers();
         $this->bootSyntesizers();
+    }
+
+    protected function bootLocalization(): void
+    {
+        if (! config('statamic-livewire.localization.enabled', false)) {
+            return;
+        }
+
+        Site::resolveCurrentUrlUsing(fn () => Livewire::originalUrl());
+
+        Livewire::setUpdateRoute(function ($handle) {
+            return Route::post('/livewire/update', $handle)
+                ->middleware(array_merge(
+                    Arr::get(Route::getMiddlewareGroups(), 'web', []),
+                    [\Statamic\Http\Middleware\Localize::class]
+                ));
+        });
     }
 
     protected function bootReplacers(): void
