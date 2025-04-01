@@ -7,22 +7,12 @@ use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
 {
-    protected $publishAfterInstall = false;
-
     protected $tags = [
         'MarcoRieser\Livewire\Tags\Livewire',
     ];
 
     public function bootAddon(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/statamic-livewire.php', 'statamic-livewire');
-
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__.'/../config/statamic-livewire.php' => config_path('statamic-livewire.php'),
-            ], 'statamic-livewire');
-        }
-
         $this->bootReplacers();
         $this->bootSyntesizers();
     }
