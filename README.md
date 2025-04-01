@@ -372,7 +372,7 @@ Thanks to:
 
 ## Requirements
 - PHP 8.1
-- Laravel 10 or 11
+- Laravel 10, 11, 12
 - Statamic 4 or 5
 
 # Support
