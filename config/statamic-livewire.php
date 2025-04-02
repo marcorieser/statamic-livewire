@@ -67,4 +67,8 @@ return [
     'replacers' => [
         \MarcoRieser\Livewire\Replacers\AssetsReplacer::class,
     ],
+
+    'routes' => [
+        'update' => 'livewire/update',
+    ],
 ];

@@ -2,10 +2,11 @@
 
 namespace MarcoRieser\Livewire;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Routing\Route;
+use Illuminate\Routing\Router;
 use Livewire\Livewire;
-use Statamic\Facades\Site;
+use MarcoRieser\Livewire\Http\Middleware\ResolveCurrentSiteByLivewireUrl;
+use Statamic\Http\Middleware\Localize;
 use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
@@ -27,15 +28,15 @@ class ServiceProvider extends AddonServiceProvider
             return;
         }
 
-        Site::resolveCurrentUrlUsing(fn () => Livewire::originalUrl());
+        $router = $this->app->make(Router::class);
+        $updateUri = config('statamic-livewire.routes.update', 'livewire/update');
 
-        Livewire::setUpdateRoute(function ($handle) {
-            return Route::post('/livewire/update', $handle)
-                ->middleware(array_merge(
-                    Arr::get(Route::getMiddlewareGroups(), 'web', []),
-                    [\Statamic\Http\Middleware\Localize::class]
-                ));
-        });
+        collect($router->getRoutes()->getRoutes())
+            ->filter(fn (Route $route) => $route->uri() === $updateUri)
+            ->each(fn (Route $route) => $route->middleware([
+                ResolveCurrentSiteByLivewireUrl::class,
+                Localize::class,
+            ]));
     }
 
     protected function bootReplacers(): void
