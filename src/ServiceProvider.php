@@ -28,11 +28,8 @@ class ServiceProvider extends AddonServiceProvider
             return;
         }
 
-        $router = $this->app->make(Router::class);
-        $updateUri = config('statamic-livewire.routes.update', 'livewire/update');
-
-        collect($router->getRoutes()->getRoutes())
-            ->filter(fn (Route $route) => $route->uri() === $updateUri)
+        collect($this->app->make(Router::class)->getRoutes()->getRoutes())
+            ->filter(fn (Route $route) => $route->named('*livewire.update'))
             ->each(fn (Route $route) => $route->middleware([
                 ResolveCurrentSiteByLivewireUrl::class,
                 Localize::class,
