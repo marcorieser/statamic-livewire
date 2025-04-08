@@ -198,6 +198,13 @@ class ShowContact extends Component
 
 The [Official Livewire documentation](https://livewire.laravel.com/docs/components#rendering-components) provides more information.
 
+### Computed Properties
+The addon provides a tag for interacting with Computed Properties. Read more about [Computed Properties in the Livewire Docs](https://livewire.laravel.com/docs/computed-properties).
+
+```antlers
+{{ livewire:computed property="user" /}}
+```
+
 ### Keying Components
 Livewire components are automatically keyed by default. If you want to manually key a component, you can use the `key` attribute.
 ```html
@@ -238,7 +245,7 @@ class ShowArticles extends Component
 ```
 
 #### Automatic localization handling (experimental)
-You can set `localization.enabled` to `true` in your published `config/statamic-livewire.php` config. This enables automatic localization handling, and you can omit the above-mentioned trait entirely. 
+You can set `localization.enabled` to `true` in your published `config/statamic-livewire.php` config. This enables automatic localization handling, and you can omit the above-mentioned trait entirely.
 
 ### Paginating Data
 You can paginate results by using the WithPagination trait.
