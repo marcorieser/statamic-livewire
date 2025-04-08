@@ -5,10 +5,13 @@ namespace MarcoRieser\Livewire\Tags;
 use Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets;
 use Livewire\Mechanisms\FrontendAssets\FrontendAssets;
 use Statamic\Tags\Tags;
+
 use function Livewire\store;
 
 class Livewire extends Tags
 {
+    protected static $aliases = ['lw'];
+
     /**
      * This will load your Livewire component in the Antlers view
      *
@@ -27,6 +30,20 @@ class Livewire extends Tags
     public function component(): string
     {
         return $this->wildcard($this->params->pull('name'));
+    }
+
+    /**
+     * This will return the value of a computed property.
+     *
+     * {{ livewire:computed property="my-component" }}
+     */
+    public function computed()
+    {
+        if (! ($property = $this->params->get(['property', 'prop']))) {
+            return null;
+        }
+
+        return \Livewire\Livewire::current()?->$property;
     }
 
     /**
