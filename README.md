@@ -205,7 +205,7 @@ The addon provides a tag for interacting with Computed Properties. Read more abo
 {{# Access a computed property #}}
 {{ livewire:computed property="user" /}}
     
-{{# Access nested data with from a computed property by using the dot or colon notation. #}}
+{{# Access nested data from a computed property by using the dot or colon notation. #}}
 {{ livewire:computed property="user.first_name" /}}
 {{ livewire:computed property="user:last_name" /}}
     
