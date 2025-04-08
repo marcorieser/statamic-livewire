@@ -202,7 +202,15 @@ The [Official Livewire documentation](https://livewire.laravel.com/docs/componen
 The addon provides a tag for interacting with Computed Properties. Read more about [Computed Properties in the Livewire Docs](https://livewire.laravel.com/docs/computed-properties).
 
 ```antlers
+{{# Access a computed property #}}
 {{ livewire:computed property="user" /}}
+    
+{{# Access nested data with from a computed property by using the dot or colon notation. #}}
+{{ livewire:computed property="user.first_name" /}}
+{{ livewire:computed property="user:last_name" /}}
+    
+{{# You can mix and match the notation and even call methods on objects. #}}
+{{ livewire:computed property="user:latestArticle().title" /}}
 ```
 
 ### Keying Components

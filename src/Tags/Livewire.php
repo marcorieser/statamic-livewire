@@ -2,8 +2,11 @@
 
 namespace MarcoRieser\Livewire\Tags;
 
+use Illuminate\Support\Collection;
 use Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets;
 use Livewire\Mechanisms\FrontendAssets\FrontendAssets;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Tags\Tags;
 
 use function Livewire\store;
@@ -43,7 +46,40 @@ class Livewire extends Tags
             return null;
         }
 
-        return \Livewire\Livewire::current()?->$property;
+        $property = Str::replace([':', '.'], '.', $property);
+
+        if (! Str::contains($property, '.')) {
+            return \Livewire\Livewire::current()?->$property;
+        }
+
+        return collect(explode('.', $property))
+            ->reduce(function ($carry, string $property) {
+                if ($carry === null) {
+                    return $carry;
+                }
+
+                if (is_array($carry)) {
+                    return Arr::get($carry, $property);
+                }
+
+                if ($carry instanceof Collection) {
+                    return $carry->get($property);
+                }
+
+                if (is_object($carry)) {
+                    $property = Str::before($property, '(');
+
+                    if (method_exists($carry, $property)) {
+                        return $carry->{$property}();
+                    }
+
+                    if (property_exists($carry, $property)) {
+                        return $carry->{$property};
+                    }
+                }
+
+                return null;
+            }, \Livewire\Livewire::current());
     }
 
     /**
