@@ -20,9 +20,31 @@ class Livewire extends Tags
      *
      * {{ livewire:your-component-name }}
      */
-    public function wildcard($expression): string
+    public function wildcard($expression)
     {
-        return \Livewire\Livewire::mount($expression, $this->params->except('key')->toArray(), $this->params->only('key')->first());
+        if (Str::startsWith($expression, 'computed:')) {
+            $this->params->put('property', Str::after($expression, 'computed:'));
+
+            return $this->computed();
+        }
+
+        $this->params->put('component', $expression);
+
+        return $this->index();
+    }
+
+    /**
+     * This will load your Livewire component in the Antlers view
+     *
+     * {{ livewire component="your-component-name" }}
+     */
+    public function index()
+    {
+        if (! ($component = $this->params->get('component'))) {
+            return null;
+        }
+
+        return \Livewire\Livewire::mount($component, $this->params->except('key')->toArray(), $this->params->only('key')->first());
     }
 
     /**
@@ -32,7 +54,9 @@ class Livewire extends Tags
      */
     public function component(): string
     {
-        return $this->wildcard($this->params->pull('name'));
+        $this->params->put('component', $this->params->pull('name'));
+
+        return $this->index();
     }
 
     /**
@@ -46,13 +70,16 @@ class Livewire extends Tags
             return null;
         }
 
-        $property = Str::replace([':', '.'], '.', $property);
+        $property = Str::replace([':', '.'], ':', $property);
 
-        if (! Str::contains($property, '.')) {
+        if (! Str::contains($property, ':')) {
             return \Livewire\Livewire::current()?->$property;
         }
 
-        return collect(explode('.', $property))
+        $path = collect(explode(':', $property));
+        $property = $path->shift();
+
+        return $path
             ->reduce(function ($carry, string $property) {
                 if ($carry === null) {
                     return $carry;
@@ -79,7 +106,7 @@ class Livewire extends Tags
                 }
 
                 return null;
-            }, \Livewire\Livewire::current());
+            }, \Livewire\Livewire::current()->$property);
     }
 
     /**
