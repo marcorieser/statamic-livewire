@@ -210,10 +210,9 @@ The addon provides a tag for interacting with Computed Properties. Read more abo
 {{ livewire:computed:user:first_name /}}
 {{ livewire:computed property="user:first_name" /}}
 {{ livewire:computed property="user.first_name" /}}
-    
-{{# You can mix and match the notation and even call methods on objects. #}}
-{{ livewire:computed property="user:latestArticle().title" /}}
-{{ livewire:computed:user.latestArticle:title /}}
+
+{{# You can run modifiers on the result as well. #}}
+{{ {livewire:computed:nested:data:users} | pluck('email') | join(', ') /}}
 ```
 
 ### Keying Components

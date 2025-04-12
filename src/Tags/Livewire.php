@@ -2,7 +2,6 @@
 
 namespace MarcoRieser\Livewire\Tags;
 
-use Illuminate\Support\Collection;
 use Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets;
 use Livewire\Mechanisms\FrontendAssets\FrontendAssets;
 use Statamic\Support\Arr;
@@ -62,7 +61,7 @@ class Livewire extends Tags
     /**
      * This will return the value of a computed property.
      *
-     * {{ livewire:computed property="my-component" }}
+     * {{ livewire:computed:my_computed_property }}
      */
     public function computed()
     {
@@ -71,42 +70,20 @@ class Livewire extends Tags
         }
 
         $property = Str::replace([':', '.'], ':', $property);
-
-        if (! Str::contains($property, ':')) {
-            return \Livewire\Livewire::current()?->$property;
-        }
-
         $path = collect(explode(':', $property));
         $property = $path->shift();
 
-        return $path
-            ->reduce(function ($carry, string $property) {
-                if ($carry === null) {
-                    return $carry;
-                }
+        $property = collect([$property, Str::camel($property), Str::snake($property)])
+            ->filter(fn (string $property) => method_exists(\Livewire\Livewire::current(), $property))
+            ->first();
 
-                if (is_array($carry)) {
-                    return Arr::get($carry, $property);
-                }
+        if (! $property) {
+            return null;
+        }
 
-                if ($carry instanceof Collection) {
-                    return $carry->get($property);
-                }
+        // TODO[mr]: support public properties or methods on objects in nested data (12.04.2025 mr)
 
-                if (is_object($carry)) {
-                    $property = Str::before($property, '(');
-
-                    if (method_exists($carry, $property)) {
-                        return $carry->{$property}();
-                    }
-
-                    if (property_exists($carry, $property)) {
-                        return $carry->{$property};
-                    }
-                }
-
-                return null;
-            }, \Livewire\Livewire::current()->$property);
+        return Arr::get(\Livewire\Livewire::current()->$property, $path->join(':'));
     }
 
     /**
