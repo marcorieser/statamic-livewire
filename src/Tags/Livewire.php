@@ -4,7 +4,7 @@ namespace MarcoRieser\Livewire\Tags;
 
 use Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets;
 use Livewire\Mechanisms\FrontendAssets\FrontendAssets;
-use Statamic\Support\Arr;
+use MarcoRieser\Livewire\Helpers\DataFetcher;
 use Statamic\Support\Str;
 use Statamic\Tags\Tags;
 
@@ -81,9 +81,9 @@ class Livewire extends Tags
             return null;
         }
 
-        // TODO[mr]: support public properties or methods on objects in nested data (12.04.2025 mr)
+        $path->prepend($property);
 
-        return Arr::get(\Livewire\Livewire::current()->$property, $path->join(':'));
+        return DataFetcher::getValue($path->join(':'), [$property => \Livewire\Livewire::current()->$property]);
     }
 
     /**
