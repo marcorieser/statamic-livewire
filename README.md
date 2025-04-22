@@ -1,6 +1,6 @@
 # Statamic Livewire
 <!-- statamic:hide -->
-![Statamic 4.0+](https://img.shields.io/badge/Statamic-4.0+-FF269E?style=for-the-badge&link=https://statamic.com)
+![Statamic 5.17+](https://img.shields.io/badge/Statamic-5.17+-FF269E?style=for-the-badge&link=https://statamic.com)
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/marcorieser/statamic-livewire.svg?style=for-the-badge)](https://packagist.org/packages/marcorieser/statamic-livewire)
 <!-- /statamic:hide -->
 
