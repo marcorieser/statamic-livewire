@@ -2,12 +2,11 @@
 
 namespace MarcoRieser\Livewire\Synthesizers;
 
-use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
 use Statamic\Fields\Value;
 
 use function Livewire\invade;
 
-class ValueSynthesizer extends Synth
+class ValueSynthesizer extends AbstractSynthesizer
 {
     public static string $key = 'statamic-value';
 
@@ -42,5 +41,10 @@ class ValueSynthesizer extends Synth
         }
 
         return new Value(...$value);
+    }
+
+    public static function transform($target): mixed
+    {
+        return $target;
     }
 }

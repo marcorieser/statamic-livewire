@@ -52,6 +52,8 @@ return [
             \MarcoRieser\Livewire\Synthesizers\FieldtypeSynthesizer::class,
             \MarcoRieser\Livewire\Synthesizers\ValueSynthesizer::class,
         ],
+
+        'transform' => true,
     ],
 
     /*

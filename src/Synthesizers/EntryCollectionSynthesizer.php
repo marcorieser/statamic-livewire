@@ -4,11 +4,10 @@ namespace MarcoRieser\Livewire\Synthesizers;
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
-use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
 use Statamic\Entries\EntryCollection as StatamicEntryCollection;
 use Statamic\Facades\Entry;
 
-class EntryCollectionSynthesizer extends Synth
+class EntryCollectionSynthesizer extends AbstractSynthesizer
 {
     public static string $key = 'statamic-entry-collection';
 
@@ -59,5 +58,10 @@ class EntryCollectionSynthesizer extends Synth
         }
 
         return new StatamicEntryCollection($items);
+    }
+
+    public static function transform($target): mixed
+    {
+        return $target->toAugmentedArray();
     }
 }

@@ -4,11 +4,10 @@ namespace MarcoRieser\Livewire\Synthesizers;
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
-use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Entry as EntryFacade;
 
-class EntrySynthesizer extends Synth
+class EntrySynthesizer extends AbstractSynthesizer
 {
     public static string $key = 'statamic-entry';
 
@@ -48,5 +47,10 @@ class EntrySynthesizer extends Synth
         }
 
         return $entry;
+    }
+
+    public static function transform($target): mixed
+    {
+        return $target->toAugmentedArray();
     }
 }

@@ -5,6 +5,7 @@ namespace MarcoRieser\Livewire;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Livewire\Livewire;
+use MarcoRieser\Livewire\Hooks\TransformSynthesizers;
 use MarcoRieser\Livewire\Http\Middleware\ResolveCurrentSiteByLivewireUrl;
 use Statamic\Http\Middleware\Localize;
 use Statamic\Providers\AddonServiceProvider;
@@ -14,6 +15,13 @@ class ServiceProvider extends AddonServiceProvider
     protected $tags = [
         'MarcoRieser\Livewire\Tags\Livewire',
     ];
+
+    public function register(): void
+    {
+        parent::register();
+
+        $this->registerSynthesizerTransformations();
+    }
 
     public function bootAddon(): void
     {
@@ -55,5 +63,10 @@ class ServiceProvider extends AddonServiceProvider
         foreach ($synthesizers as $synthesizer) {
             Livewire::propertySynthesizer($synthesizer);
         }
+    }
+
+    protected function registerSynthesizerTransformations(): void
+    {
+        Livewire::componentHook(TransformSynthesizers::class);
     }
 }

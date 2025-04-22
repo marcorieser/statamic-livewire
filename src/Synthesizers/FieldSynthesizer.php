@@ -2,10 +2,9 @@
 
 namespace MarcoRieser\Livewire\Synthesizers;
 
-use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
 use Statamic\Fields\Field;
 
-class FieldSynthesizer extends Synth
+class FieldSynthesizer extends AbstractSynthesizer
 {
     public static string $key = 'statamic-field';
 
@@ -35,5 +34,10 @@ class FieldSynthesizer extends Synth
         }
 
         return new Field(...$value);
+    }
+
+    public static function transform($target): mixed
+    {
+        return $target->augment();
     }
 }
