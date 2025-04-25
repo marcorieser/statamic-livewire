@@ -5,6 +5,7 @@ namespace MarcoRieser\Livewire;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Livewire\Livewire;
+use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
 use MarcoRieser\Livewire\Hooks\TransformSynthesizers;
 use MarcoRieser\Livewire\Http\Middleware\ResolveCurrentSiteByLivewireUrl;
 use Statamic\Http\Middleware\Localize;
@@ -58,11 +59,9 @@ class ServiceProvider extends AddonServiceProvider
             return;
         }
 
-        $synthesizers = config('statamic-livewire.synthesizers.classes', []);
-
-        foreach ($synthesizers as $synthesizer) {
-            Livewire::propertySynthesizer($synthesizer);
-        }
+        collect(config('statamic-livewire.synthesizers.classes', []))
+            ->filter(fn (string $synthesizer) => is_subclass_of($synthesizer, Synth::class))
+            ->each(fn (string $synthesizer) => Livewire::propertySynthesizer($synthesizer));
     }
 
     protected function registerSynthesizerTransformations(): void
