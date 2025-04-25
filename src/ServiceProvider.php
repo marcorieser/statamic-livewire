@@ -27,7 +27,7 @@ class ServiceProvider extends AddonServiceProvider
     {
         $this->bootLocalization();
         $this->bootReplacers();
-        $this->bootSyntesizers();
+        $this->bootSynthesizers();
     }
 
     protected function bootLocalization(): void
@@ -52,7 +52,7 @@ class ServiceProvider extends AddonServiceProvider
         ));
     }
 
-    protected function bootSyntesizers(): void
+    protected function bootSynthesizers(): void
     {
         if (! config('statamic-livewire.synthesizers.enabled', false)) {
             return;
