@@ -42,9 +42,4 @@ class ValueSynthesizer extends AbstractSynthesizer
 
         return new Value(...$value);
     }
-
-    public static function transform($target): mixed
-    {
-        return $target;
-    }
 }

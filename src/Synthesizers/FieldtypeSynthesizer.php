@@ -37,9 +37,4 @@ class FieldtypeSynthesizer extends AbstractSynthesizer
 
         return app($meta['class'])->setField($value['field']);
     }
-
-    public static function transform($target): mixed
-    {
-        return $target;
-    }
 }
