@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 use Statamic\Entries\EntryCollection as StatamicEntryCollection;
 use Statamic\Facades\Entry;
 
-class EntryCollectionSynthesizer extends AbstractSynthesizer
+class EntryCollectionSynthesizer extends TransformableSynthesizer
 {
     public static string $key = 'statamic-entry-collection';
 

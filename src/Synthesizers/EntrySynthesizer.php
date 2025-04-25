@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Entry as EntryFacade;
 
-class EntrySynthesizer extends AbstractSynthesizer
+class EntrySynthesizer extends TransformableSynthesizer
 {
     public static string $key = 'statamic-entry';
 

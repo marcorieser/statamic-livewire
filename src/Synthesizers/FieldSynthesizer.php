@@ -4,7 +4,7 @@ namespace MarcoRieser\Livewire\Synthesizers;
 
 use Statamic\Fields\Field;
 
-class FieldSynthesizer extends AbstractSynthesizer
+class FieldSynthesizer extends TransformableSynthesizer
 {
     public static string $key = 'statamic-field';
 

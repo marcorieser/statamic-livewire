@@ -6,7 +6,7 @@ use Statamic\Fields\Value;
 
 use function Livewire\invade;
 
-class ValueSynthesizer extends AbstractSynthesizer
+class ValueSynthesizer extends TransformableSynthesizer
 {
     public static string $key = 'statamic-value';
 

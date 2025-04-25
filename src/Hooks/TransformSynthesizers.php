@@ -3,7 +3,7 @@
 namespace MarcoRieser\Livewire\Hooks;
 
 use Livewire\ComponentHook;
-use MarcoRieser\Livewire\Synthesizers\AbstractSynthesizer;
+use MarcoRieser\Livewire\Synthesizers\TransformableSynthesizer;
 
 class TransformSynthesizers extends ComponentHook
 {
@@ -25,7 +25,7 @@ class TransformSynthesizers extends ComponentHook
     protected function getMatchingSynthesizer($value): ?string
     {
         return collect(config('statamic-livewire.synthesizers.classes', []))
-            ->filter(fn (string $synthesizer) => is_subclass_of($synthesizer, AbstractSynthesizer::class) && call_user_func([$synthesizer, 'match'], $value))
+            ->filter(fn (string $synthesizer) => is_subclass_of($synthesizer, TransformableSynthesizer::class) && call_user_func([$synthesizer, 'match'], $value))
             ->first();
     }
 }
