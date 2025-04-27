@@ -13,13 +13,7 @@ class TransformSynthesizers extends ComponentHook
             return;
         }
 
-        collect($data)
-            ->map(function ($value) {
-                $synthesizer = $this->getMatchingSynthesizer($value);
-
-                return $synthesizer ? call_user_func([$synthesizer, 'transform'], $value) : $value;
-            })
-            ->each(fn ($value, $key) => $view->with($key, $value));
+        $view->with($this->transformData($data));
     }
 
     protected function getMatchingSynthesizer($value): ?string
@@ -27,5 +21,16 @@ class TransformSynthesizers extends ComponentHook
         return collect(config('statamic-livewire.synthesizers.classes', []))
             ->filter(fn (string $synthesizer) => is_subclass_of($synthesizer, TransformableSynthesizer::class) && call_user_func([$synthesizer, 'match'], $value))
             ->first();
+    }
+
+    protected function transformData(array $data): array
+    {
+        return collect($data)
+            ->map(function ($value) {
+                $synthesizer = $this->getMatchingSynthesizer($value);
+
+                return $synthesizer ? call_user_func([$synthesizer, 'transform'], $value) : $value;
+            })
+            ->all();
     }
 }
