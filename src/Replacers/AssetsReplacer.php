@@ -54,7 +54,7 @@ class AssetsReplacer implements Replacer
 
     protected function shouldInjectLivewireAssets(): bool
     {
-        if (! SupportAutoInjectedAssets::$forceAssetInjection && config('livewire.inject_assets', true) === false) {
+        if (! SupportAutoInjectedAssets::$forceAssetInjection && config()->boolean('livewire.inject_assets', true) === false) {
             return false;
         }
 

@@ -33,7 +33,7 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootLocalization(): void
     {
-        if (! config('statamic-livewire.localization.enabled', false)) {
+        if (! config()->boolean('statamic-livewire.localization.enabled', false)) {
             return;
         }
 
@@ -48,8 +48,8 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootReplacers(): void
     {
         config()->set('statamic.static_caching.replacers', array_merge(
-            config('statamic-livewire.replacers'),
-            config('statamic.static_caching.replacers')
+            config()->array('statamic-livewire.replacers', []),
+            config()->array('statamic.static_caching.replacers', [])
         ));
     }
 
@@ -59,7 +59,7 @@ class ServiceProvider extends AddonServiceProvider
             return;
         }
 
-        collect(config('statamic-livewire.synthesizers.classes', []))
+        collect(config()->array('statamic-livewire.synthesizers.classes', []))
             ->filter(fn (string $synthesizer) => is_subclass_of($synthesizer, Synth::class))
             ->each(fn (string $synthesizer) => Livewire::propertySynthesizer($synthesizer));
     }

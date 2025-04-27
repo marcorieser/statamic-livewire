@@ -9,7 +9,11 @@ class TransformSynthesizers extends ComponentHook
 {
     public function render($view, $data): void
     {
-        if (! config('statamic-livewire.synthesizers.enabled', false) || ! config('statamic-livewire.synthesizers.transform', true)) {
+        if (! config()->boolean('statamic-livewire.synthesizers.enabled', false)) {
+            return;
+        }
+
+        if (! config()->boolean('statamic-livewire.synthesizers.transform', true)) {
             return;
         }
 
@@ -18,7 +22,7 @@ class TransformSynthesizers extends ComponentHook
 
     protected function getMatchingSynthesizer($value): ?string
     {
-        return collect(config('statamic-livewire.synthesizers.classes', []))
+        return collect(config()->array('statamic-livewire.synthesizers.classes', []))
             ->filter(fn (string $synthesizer) => is_subclass_of($synthesizer, TransformableSynthesizer::class) && call_user_func([$synthesizer, 'match'], $value))
             ->first();
     }
