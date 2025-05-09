@@ -35,6 +35,7 @@
     },
     "require": {
         "php": "^8.2",
+        "laravel/framework": "^11.0 || ^12.0",
         "statamic/cms": "^5.17.0",
         "livewire/livewire": "^3.0"
     },
