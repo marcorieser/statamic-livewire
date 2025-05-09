@@ -8,7 +8,7 @@ jobs:
   php_tests:
     strategy:
       matrix:
-        php: [8.2, 8.3, 8.3]
+        php: [8.2, 8.3, 8.4]
         laravel: [11.*, 12.*]
         os: [ubuntu-latest]
 
