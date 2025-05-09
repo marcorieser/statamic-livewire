@@ -21,4 +21,12 @@ abstract class TestCase extends AddonTestCase
             parent::getPackageProviders($app)
         );
     }
+
+    protected function enableSynthesizers($app): void
+    {
+        $config = (require __DIR__.'/../config/statamic-livewire.php')['synthesizers'];
+        $config['enabled'] = true;
+
+        $app['config']->set('statamic-livewire.synthesizers', $config);
+    }
 }
