@@ -393,9 +393,9 @@ Thanks to:
 - [Austenc](https://github.com/austenc) for the Statamic marketplace preview image
 
 ## Requirements
-- PHP 8.1
-- Laravel 10, 11, 12
-- Statamic 4 or 5
+- PHP 8.2
+- Laravel 11, 12
+- Statamic 5
 
 # Support
 I love to share with the community. Nevertheless, it does take a lot of work, time and effort.
