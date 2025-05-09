@@ -298,34 +298,39 @@ class ShowArticles extends Component
 }
 ```
 
-### EXPERIMENTAL: Statamic Support
-As a little experiment, support for an Entry or EntryCollection has been added, so you can make an entry or a entry collection simply a public property and it just works.
-
-Supported types:
-- Statamic\Entries\EntryCollection;
-- Statamic\Entries\Entry;
+### Synthesizers (experimental)
+You can use the built-in Synthesizers to make your Livewire components aware of Statamic specific data types.
 
 ```php
-namespace App\Livewire;
-
-use Livewire\Component;
 use Statamic\Entries\EntryCollection;
 use Statamic\Entries\Entry;
 
 class Foo extends Component
 {
     public EntryCollection $entries;
-    public Entry $entry;
 
-    // normal livewire stuff
+    public function mount(){
+        $this->entries = \Statamic\Facades\Entry::all();
+    }
 }
 ```
 
+
+Currently, the following types are supported:
+- `Statamic\Entries\EntryCollection`;
+- `Statamic\Entries\Entry`;
+- `Statamic\Fields\Field`;
+- `Statamic\Fields\Fieldtype`;
+- `Statamic\Fields\Value`;
+
 To make it work, you need to enable that feature first.
 
-1. php artisan vendor:publish
-2. Select statamic-livewire in the list
+1. Run `php artisan vendor:publish`
+2. Select `statamic-livewire` in the list
 3. Enable synthesizers
+
+#### Transformation
+By default, the Synthesizers transform (augment) the data before it gets passed into the view. You can disable this by setting `synthesizers.transform` to `false` in your published `config/statamic-livewire.php` config.
 
 ### Entangle: Sharing State Between Livewire And Alpine
 In case you want to share state between Livewire and Alpine, there is a Blade directive called `@entangle`. To be usable with Antlers, we do provide a dedicated tag:

@@ -5,6 +5,8 @@ namespace MarcoRieser\Livewire;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Livewire\Livewire;
+use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
+use MarcoRieser\Livewire\Hooks\TransformSynthesizers;
 use MarcoRieser\Livewire\Http\Middleware\ResolveCurrentSiteByLivewireUrl;
 use Statamic\Http\Middleware\Localize;
 use Statamic\Providers\AddonServiceProvider;
@@ -15,16 +17,23 @@ class ServiceProvider extends AddonServiceProvider
         'MarcoRieser\Livewire\Tags\Livewire',
     ];
 
+    public function register(): void
+    {
+        parent::register();
+
+        $this->registerSynthesizerTransformations();
+    }
+
     public function bootAddon(): void
     {
         $this->bootLocalization();
         $this->bootReplacers();
-        $this->bootSyntesizers();
+        $this->bootSynthesizers();
     }
 
     protected function bootLocalization(): void
     {
-        if (! config('statamic-livewire.localization.enabled', false)) {
+        if (! config()->boolean('statamic-livewire.localization.enabled', false)) {
             return;
         }
 
@@ -39,21 +48,24 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootReplacers(): void
     {
         config()->set('statamic.static_caching.replacers', array_merge(
-            config('statamic-livewire.replacers'),
-            config('statamic.static_caching.replacers')
+            config()->array('statamic-livewire.replacers', []),
+            config()->array('statamic.static_caching.replacers', [])
         ));
     }
 
-    protected function bootSyntesizers(): void
+    protected function bootSynthesizers(): void
     {
         if (! config('statamic-livewire.synthesizers.enabled', false)) {
             return;
         }
 
-        $synthesizers = config('statamic-livewire.synthesizers.classes', []);
+        collect(config()->array('statamic-livewire.synthesizers.classes', []))
+            ->filter(fn (string $synthesizer) => is_subclass_of($synthesizer, Synth::class))
+            ->each(fn (string $synthesizer) => Livewire::propertySynthesizer($synthesizer));
+    }
 
-        foreach ($synthesizers as $synthesizer) {
-            Livewire::propertySynthesizer($synthesizer);
-        }
+    protected function registerSynthesizerTransformations(): void
+    {
+        Livewire::componentHook(TransformSynthesizers::class);
     }
 }
