@@ -2,6 +2,7 @@
 
 namespace MarcoRieser\Livewire\Tests;
 
+use Illuminate\Support\Arr;
 use Livewire\LivewireServiceProvider;
 use MarcoRieser\Livewire\ServiceProvider;
 use Spatie\LaravelRay\RayServiceProvider;
@@ -22,11 +23,12 @@ abstract class TestCase extends AddonTestCase
         );
     }
 
-    protected function enableSynthesizers($app): void
+    protected function setConfigValue(string $key, $value): void
     {
-        $config = (require __DIR__.'/../config/statamic-livewire.php')['synthesizers'];
-        $config['enabled'] = true;
+        $config = config()->array('statamic-livewire', require __DIR__.'/../config/statamic-livewire.php');
 
-        $app['config']->set('statamic-livewire.synthesizers', $config);
+        Arr::set($config, $key, $value);
+
+        config()->set('statamic-livewire', $config);
     }
 }
