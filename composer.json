@@ -56,6 +56,7 @@
     },
     "require-dev": {
         "laravel/pint": "^1.21",
-        "orchestra/testbench": "^10.2"
+        "orchestra/testbench": "^10.2",
+        "spatie/laravel-ray": "^1.0"
     }
 }
