@@ -10,7 +10,7 @@ use Statamic\Facades\Entry;
 
 class EntrySynthesizer extends TransformableSynthesizer
 {
-    public static string $key = 'statamic-entry';
+    public static string $key = 'slw_entry';
 
     public static function match($target): bool
     {

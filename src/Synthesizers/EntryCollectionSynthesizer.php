@@ -2,15 +2,20 @@
 
 namespace MarcoRieser\Livewire\Synthesizers;
 
-use Statamic\Entries\EntryCollection as StatamicEntryCollection;
+use Statamic\Entries\EntryCollection;
 
 class EntryCollectionSynthesizer extends TransformableSynthesizer
 {
-    public static string $key = 'statamic-entry-collection';
+    public static string $key = 'slw_entryco';
 
     public static function match($target): bool
     {
-        return $target instanceof StatamicEntryCollection;
+        return $target instanceof EntryCollection;
+    }
+
+    public static function transform($target): mixed
+    {
+        return $target->toAugmentedArray();
     }
 
     public function dehydrate($target, $dehydrateChild): array
@@ -24,18 +29,13 @@ class EntryCollectionSynthesizer extends TransformableSynthesizer
         return [$data, []];
     }
 
-    public function hydrate($value, $meta, $hydrateChild): StatamicEntryCollection
+    public function hydrate($value, $meta, $hydrateChild): EntryCollection
     {
         foreach ($value as $key => $child) {
             $value[$key] = $hydrateChild($key, $child);
         }
 
-        return new StatamicEntryCollection($value);
-    }
-
-    public static function transform($target): mixed
-    {
-        return $target->toAugmentedArray();
+        return new EntryCollection($value);
     }
 
     public function &get(&$target, $key)

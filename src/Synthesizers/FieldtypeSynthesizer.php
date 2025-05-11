@@ -6,7 +6,7 @@ use Statamic\Fields\Fieldtype;
 
 class FieldtypeSynthesizer extends TransformableSynthesizer
 {
-    public static string $key = 'statamic-fieldtype';
+    public static string $key = 'slw_fieldtype';
 
     public static function match($target): bool
     {

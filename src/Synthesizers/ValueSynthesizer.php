@@ -8,7 +8,7 @@ use function Livewire\invade;
 
 class ValueSynthesizer extends TransformableSynthesizer
 {
-    public static string $key = 'statamic-value';
+    public static string $key = 'slw_value';
 
     public static function match($target): bool
     {

@@ -6,11 +6,16 @@ use Statamic\Fields\Field;
 
 class FieldSynthesizer extends TransformableSynthesizer
 {
-    public static string $key = 'statamic-field';
+    public static string $key = 'slw_field';
 
     public static function match($target): bool
     {
         return $target instanceof Field;
+    }
+
+    public static function transform($target): mixed
+    {
+        return $target->augment();
     }
 
     public function dehydrate($target, $dehydrateChild): array
@@ -34,10 +39,5 @@ class FieldSynthesizer extends TransformableSynthesizer
         }
 
         return new Field(...$value);
-    }
-
-    public static function transform($target): mixed
-    {
-        return $target->augment();
     }
 }
