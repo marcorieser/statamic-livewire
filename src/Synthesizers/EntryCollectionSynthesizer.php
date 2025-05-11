@@ -2,10 +2,7 @@
 
 namespace MarcoRieser\Livewire\Synthesizers;
 
-use Carbon\CarbonInterface;
-use Illuminate\Support\Carbon;
 use Statamic\Entries\EntryCollection as StatamicEntryCollection;
-use Statamic\Facades\Entry;
 
 class EntryCollectionSynthesizer extends TransformableSynthesizer
 {
@@ -16,52 +13,46 @@ class EntryCollectionSynthesizer extends TransformableSynthesizer
         return $target instanceof StatamicEntryCollection;
     }
 
-    public function dehydrate($target): array
+    public function dehydrate($target, $dehydrateChild): array
     {
-        $data = [];
+        $data = $target->all();
 
-        foreach ($target->all() as $entry) {
-            $data[] = [
-                'collection' => $entry->collection()->handle() ?? null,
-                'data' => $entry->data()->all(),
-                'date' => $entry->collection()->dated() ? $entry->date() : null,
-                'id' => $entry->id(),
-                'slug' => $entry->slug() ?? null,
-            ];
+        foreach ($data as $key => $child) {
+            $data[$key] = $dehydrateChild($key, $child);
         }
 
         return [$data, []];
     }
 
-    public function hydrate($values): StatamicEntryCollection
+    public function hydrate($value, $meta, $hydrateChild): StatamicEntryCollection
     {
-        $items = [];
-
-        foreach ($values as $value) {
-            $entry = Entry::make()
-                ->id($value['id'])
-                ->slug($value['slug'] ?? null)
-                ->collection($value['collection'] ?? null)
-                ->data($value['data']);
-
-            if ($value['date']) {
-                $date = $value['date'];
-
-                if (! $date instanceof CarbonInterface) {
-                    $date = Carbon::parse($date);
-                }
-
-                $entry->date($date);
-            }
-
-            $items[] = $entry;
+        foreach ($value as $key => $child) {
+            $value[$key] = $hydrateChild($key, $child);
         }
 
-        return new StatamicEntryCollection($items);
+        return new StatamicEntryCollection($value);
     }
 
     public static function transform($target): mixed
     {
         return $target->toAugmentedArray();
+    }
+
+    public function &get(&$target, $key)
+    {
+        // We need this "$reader" callback to get a reference to
+        // the items property inside collections. Otherwise,
+        // we'd receive a copy instead of the reference.
+        $reader = function &($object, $property) {
+            $value = &\Closure::bind(function &() use ($property) {
+                return $this->$property;
+            }, $object, $object)->__invoke();
+
+            return $value;
+        };
+
+        $items = &$reader($target, 'items');
+
+        return $items[$key];
     }
 }
