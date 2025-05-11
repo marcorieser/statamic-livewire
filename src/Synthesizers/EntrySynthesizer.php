@@ -20,20 +20,24 @@ class EntrySynthesizer extends TransformableSynthesizer
     {
         return [
             [
-                'collection' => $entry->collection()->handle() ?? null,
-                'data' => $entry->data()->all(),
-                'date' => $entry->collection()->dated() ? $entry->date() : null,
                 'id' => $entry->id(),
                 'slug' => $entry->slug() ?? null,
+                'collection' => $entry->collection()?->handle() ?? null,
+                'blueprint' => $entry->blueprint()?->handle() ?? null,
+                'locale' => $entry->locale(),
+                'data' => $entry->data()->all(),
+                'date' => $entry->collection()->dated() ? $entry->date() : null,
             ], []];
     }
 
     public function hydrate($value): Entry
     {
         $entry = EntryFacade::make()
-            ->id($value['id'])
+            ->id($value['id'] ?? null)
             ->slug($value['slug'] ?? null)
             ->collection($value['collection'] ?? null)
+            ->blueprint($value['blueprint'] ?? null)
+            ->locale($value['locale'] ?? null)
             ->data($value['data']);
 
         if ($value['date']) {
