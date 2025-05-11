@@ -3,9 +3,10 @@
 namespace MarcoRieser\Livewire\Synthesizers;
 
 use Carbon\CarbonInterface;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades\Entry as EntryFacade;
+use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Facades\Entry;
 
 class EntrySynthesizer extends TransformableSynthesizer
 {
@@ -13,36 +14,46 @@ class EntrySynthesizer extends TransformableSynthesizer
 
     public static function match($target): bool
     {
-        return $target instanceof Entry;
+        return $target instanceof EntryContract;
     }
 
-    public function dehydrate(Entry $entry): array
+    public static function transform($target): mixed
+    {
+        return $target->toAugmentedArray();
+    }
+
+    public function dehydrate(EntryContract $entry): array
     {
         return [
             [
                 'id' => $entry->id(),
-                'slug' => $entry->slug() ?? null,
-                'collection' => $entry->collection()?->handle() ?? null,
-                'blueprint' => $entry->blueprint()?->handle() ?? null,
+                'collection' => $entry->collection()?->handle(),
+                'origin' => $entry->origin()?->id(),
+                'blueprint' => $entry->blueprint()?->handle(),
                 'locale' => $entry->locale(),
+                'initial_path' => $entry->initialPath(),
+                'published' => $entry->published(),
                 'data' => $entry->data()->all(),
+                'slug' => $entry->slug(),
                 'date' => $entry->collection()->dated() ? $entry->date() : null,
-            ], []];
+            ], [],
+        ];
     }
 
-    public function hydrate($value): Entry
+    public function hydrate($value): EntryContract
     {
-        $entry = EntryFacade::make()
-            ->id($value['id'] ?? null)
-            ->slug($value['slug'] ?? null)
-            ->collection($value['collection'] ?? null)
-            ->blueprint($value['blueprint'] ?? null)
-            ->locale($value['locale'] ?? null)
-            ->data($value['data']);
+        $entry = Entry::make()
+            ->id(Arr::get($value, 'id'))
+            ->collection(Arr::get($value, 'collection'))
+            ->origin(Arr::get($value, 'origin'))
+            ->blueprint(Arr::get($value, 'blueprint'))
+            ->locale(Arr::get($value, 'locale'))
+            ->initialPath(Arr::get($value, 'initial_path'))
+            ->published(Arr::get($value, 'published'))
+            ->data(Arr::get($value, 'data'))
+            ->slug(Arr::get($value, 'slug'));
 
-        if ($value['date']) {
-            $date = $value['date'];
-
+        if ($date = Arr::get($value, 'date')) {
             if (! $date instanceof CarbonInterface) {
                 $date = Carbon::parse($date);
             }
@@ -51,10 +62,5 @@ class EntrySynthesizer extends TransformableSynthesizer
         }
 
         return $entry;
-    }
-
-    public static function transform($target): mixed
-    {
-        return $target->toAugmentedArray();
     }
 }
