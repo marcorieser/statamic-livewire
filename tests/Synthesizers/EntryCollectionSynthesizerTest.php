@@ -18,7 +18,7 @@ class EntryCollectionSynthesizerTest extends SynthesizerTestCase
 
     #[Test]
     #[DefineEnvironment('enableSynthesizers')]
-    public function entries_collection_is_supported_as_property_type()
+    public function entry_collection_is_supported_as_property_type()
     {
         $component = $this->getLivewireComponent();
 
@@ -28,7 +28,7 @@ class EntryCollectionSynthesizerTest extends SynthesizerTestCase
 
     #[Test]
     #[DefineEnvironment('disableSynthesizers')]
-    public function entries_collection_is_not_supported_as_property_type()
+    public function entry_collection_is_not_supported_as_property_type()
     {
         $component = $this->getLivewireComponent();
 
@@ -41,7 +41,7 @@ class EntryCollectionSynthesizerTest extends SynthesizerTestCase
     #[Test]
     #[DefineEnvironment('enableSynthesizers')]
     #[DefineEnvironment('enableSynthesizerTransform')]
-    public function entries_collection_gets_augmented_in_view()
+    public function entry_collection_gets_augmented_in_view()
     {
         $component = $this->getLivewireComponent();
 
@@ -52,7 +52,7 @@ class EntryCollectionSynthesizerTest extends SynthesizerTestCase
     #[Test]
     #[DefineEnvironment('enableSynthesizers')]
     #[DefineEnvironment('disableSynthesizerTransform')]
-    public function entries_collection_gets_not_augmented_in_view()
+    public function entry_collection_gets_not_augmented_in_view()
     {
         $component = $this->getLivewireComponent();
 
@@ -60,7 +60,18 @@ class EntryCollectionSynthesizerTest extends SynthesizerTestCase
             ->assertViewHas('entries', Entry::all());
     }
 
-    // TODO[mr]: test de-/rehydration (09.05.2025 mr)
+    #[Test]
+    #[DefineEnvironment('enableSynthesizers')]
+    public function entry_collection_gets_dehydrated_and_rehydrated_correctly()
+    {
+        $component = $this->getLivewireComponent();
+
+        $testable = Livewire::test($component)->refresh();
+
+        $this->assertInstanceOf(EntryCollection::class, $testable->entries);
+        $this->assertInstanceOf(\Statamic\Contracts\Entries\Entry::class, $testable->entries->first());
+        $this->assertSame(Entry::all()->first()->id(), $testable->entries->first()->id());
+    }
 
     protected function setUp(): void
     {
