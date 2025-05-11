@@ -5,10 +5,12 @@ namespace MarcoRieser\Livewire\Synthesizers;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
+use MarcoRieser\Livewire\Contracts\TransformableSynthesizer;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Entry;
 
-class EntrySynthesizer extends TransformableSynthesizer
+class EntrySynthesizer extends Synth implements TransformableSynthesizer
 {
     public static string $key = 'slw_entry';
 

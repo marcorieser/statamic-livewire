@@ -3,7 +3,7 @@
 namespace MarcoRieser\Livewire\Hooks;
 
 use Livewire\ComponentHook;
-use MarcoRieser\Livewire\Synthesizers\TransformableSynthesizer;
+use MarcoRieser\Livewire\Contracts\TransformableSynthesizer;
 
 class TransformSynthesizers extends ComponentHook
 {

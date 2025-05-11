@@ -2,9 +2,10 @@
 
 namespace MarcoRieser\Livewire\Synthesizers;
 
+use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
 use Statamic\Fields\Fieldtype;
 
-class FieldtypeSynthesizer extends TransformableSynthesizer
+class FieldtypeSynthesizer extends Synth
 {
     public static string $key = 'slw_fieldtype';
 

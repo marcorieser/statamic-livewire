@@ -2,9 +2,11 @@
 
 namespace MarcoRieser\Livewire\Synthesizers;
 
+use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
+use MarcoRieser\Livewire\Contracts\TransformableSynthesizer;
 use Statamic\Entries\EntryCollection;
 
-class EntryCollectionSynthesizer extends TransformableSynthesizer
+class EntryCollectionSynthesizer extends Synth implements TransformableSynthesizer
 {
     public static string $key = 'slw_entryco';
 

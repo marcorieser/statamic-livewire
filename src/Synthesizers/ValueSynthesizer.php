@@ -2,11 +2,12 @@
 
 namespace MarcoRieser\Livewire\Synthesizers;
 
+use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
 use Statamic\Fields\Value;
 
 use function Livewire\invade;
 
-class ValueSynthesizer extends TransformableSynthesizer
+class ValueSynthesizer extends Synth
 {
     public static string $key = 'slw_value';
 
