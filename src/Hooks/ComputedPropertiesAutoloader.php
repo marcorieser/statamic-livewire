@@ -9,7 +9,7 @@ use Livewire\ComponentHook;
 use Livewire\Features\SupportAttributes\Attribute;
 use Livewire\Livewire;
 use Statamic\Fields\Value;
-use Statamic\View\Antlers\Engine;
+use Statamic\View\Antlers\Engine as AntlersEngine;
 
 class ComputedPropertiesAutoloader extends ComponentHook
 {
@@ -34,6 +34,6 @@ class ComputedPropertiesAutoloader extends ComponentHook
 
     protected function isUsingAntlers(View $view): bool
     {
-        return $view->getEngine() instanceof Engine;
+        return $view->getEngine() instanceof AntlersEngine;
     }
 }
