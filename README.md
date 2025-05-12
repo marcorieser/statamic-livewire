@@ -204,7 +204,7 @@ Simply access them as you would access a regular variable in the cascade.
 Read more about [Computed Properties in the Livewire Docs](https://livewire.laravel.com/docs/computed-properties).
 
 ```php
-#[Computed(persist: true)]
+#[Computed]
 public function entries() {
     return Entry::all();
 }
