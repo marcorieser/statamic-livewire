@@ -210,9 +210,9 @@ public function entries() {
 }
 ```
 ```antlers
-{{ enries }}
+{{ entries }}
     {{ title }}
-{{ /enries }}
+{{ /entries }}
 ```
 
 ### Keying Components
