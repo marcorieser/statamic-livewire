@@ -5,6 +5,9 @@ namespace MarcoRieser\Livewire\Helpers;
 use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\PathDataManager;
 
+/**
+ * @deprecated
+ */
 class DataFetcher
 {
     public static function getValue(string $path, array $context)

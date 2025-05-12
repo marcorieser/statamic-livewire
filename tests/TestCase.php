@@ -8,6 +8,8 @@ use MarcoRieser\Livewire\ServiceProvider;
 use Spatie\LaravelRay\RayServiceProvider;
 use Statamic\Testing\AddonTestCase;
 
+use function Orchestra\Testbench\package_path;
+
 abstract class TestCase extends AddonTestCase
 {
     protected string $addonServiceProvider = ServiceProvider::class;
@@ -30,5 +32,12 @@ abstract class TestCase extends AddonTestCase
         Arr::set($config, $key, $value);
 
         config()->set('statamic-livewire', $config);
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        view()->addLocation(package_path().'/tests/__fixtures__/views');
     }
 }
