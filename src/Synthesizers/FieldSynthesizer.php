@@ -3,15 +3,21 @@
 namespace MarcoRieser\Livewire\Synthesizers;
 
 use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
+use MarcoRieser\Livewire\Contracts\TransformableSynthesizer;
 use Statamic\Fields\Field;
 
-class FieldSynthesizer extends Synth
+class FieldSynthesizer extends Synth implements TransformableSynthesizer
 {
-    public static string $key = 'statamic-field';
+    public static string $key = 'slw_field';
 
     public static function match($target): bool
     {
         return $target instanceof Field;
+    }
+
+    public static function transform($target): mixed
+    {
+        return $target->augment();
     }
 
     public function dehydrate($target, $dehydrateChild): array
