@@ -62,6 +62,8 @@ class Livewire extends Tags
      * This will return the value of a computed property.
      *
      * {{ livewire:computed:my_computed_property }}
+     *
+     * @deprecated
      */
     public function computed()
     {

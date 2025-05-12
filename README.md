@@ -199,20 +199,20 @@ class ShowContact extends Component
 The [Official Livewire documentation](https://livewire.laravel.com/docs/components#rendering-components) provides more information.
 
 ### Computed Properties
-The addon provides a tag for interacting with Computed Properties. Read more about [Computed Properties in the Livewire Docs](https://livewire.laravel.com/docs/computed-properties).
+When using Antlers, the computed properties are loaded automatically and only resolved when accessed. 
+Simply access them as you would access a regular variable in the cascade.
+Read more about [Computed Properties in the Livewire Docs](https://livewire.laravel.com/docs/computed-properties).
 
+```php
+#[Computed]
+public function entries() {
+    return Entry::all();
+}
+```
 ```antlers
-{{# Access a computed property #}}
-{{ livewire:computed:user /}}
-{{ livewire:computed property="user" /}}
-    
-{{# Access nested data from a computed property by using the dot or colon notation. #}}
-{{ livewire:computed:user:first_name /}}
-{{ livewire:computed property="user:first_name" /}}
-{{ livewire:computed property="user.first_name" /}}
-
-{{# You can run modifiers on the result as well. #}}
-{{ {livewire:computed:nested:data:users} | pluck('email') | join(', ') /}}
+{{ enries }}
+    {{ title }}
+{{ /enries }}
 ```
 
 ### Keying Components

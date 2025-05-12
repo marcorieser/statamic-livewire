@@ -6,6 +6,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Livewire\Livewire;
 use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
+use MarcoRieser\Livewire\Hooks\ComputedPropertiesAutoloader;
 use MarcoRieser\Livewire\Hooks\TransformSynthesizers;
 use MarcoRieser\Livewire\Http\Middleware\ResolveCurrentSiteByLivewireUrl;
 use Statamic\Http\Middleware\Localize;
@@ -22,6 +23,7 @@ class ServiceProvider extends AddonServiceProvider
         parent::register();
 
         $this->registerSynthesizerTransformations();
+        $this->registerComputedPropertiesAutoloader();
     }
 
     public function bootAddon(): void
@@ -67,5 +69,10 @@ class ServiceProvider extends AddonServiceProvider
     protected function registerSynthesizerTransformations(): void
     {
         Livewire::componentHook(TransformSynthesizers::class);
+    }
+
+    protected function registerComputedPropertiesAutoloader(): void
+    {
+        Livewire::componentHook(ComputedPropertiesAutoloader::class);
     }
 }
