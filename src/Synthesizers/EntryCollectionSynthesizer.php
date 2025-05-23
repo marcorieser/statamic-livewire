@@ -15,12 +15,12 @@ class EntryCollectionSynthesizer extends Synth implements TransformableSynthesiz
         return $target instanceof EntryCollection;
     }
 
-    public static function transform($target): mixed
+    public static function transform($target): array
     {
         return $target->toAugmentedArray();
     }
 
-    public function dehydrate($target, $dehydrateChild): array
+    public function dehydrate(EntryCollection $target, $dehydrateChild): array
     {
         $data = $target->all();
 

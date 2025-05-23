@@ -19,7 +19,7 @@ class EntrySynthesizer extends Synth implements TransformableSynthesizer
         return $target instanceof EntryContract;
     }
 
-    public static function transform($target): mixed
+    public static function transform($target): array
     {
         return $target->toAugmentedArray();
     }
