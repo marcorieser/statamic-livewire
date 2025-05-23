@@ -6,6 +6,8 @@ use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
 use MarcoRieser\Livewire\Contracts\TransformableSynthesizer;
 use Statamic\Fields\Field;
 
+use function Livewire\invade;
+
 class FieldSynthesizer extends Synth implements TransformableSynthesizer
 {
     public static string $key = 'slw_field';
@@ -20,12 +22,15 @@ class FieldSynthesizer extends Synth implements TransformableSynthesizer
         return $target->augment();
     }
 
-    public function dehydrate($target, $dehydrateChild): array
+    public function dehydrate(Field $target, $dehydrateChild): array
     {
-        $data = [
-            'handle' => $target->handle(),
-            'config' => $target->config(),
-        ];
+        $value = invade($target);
+
+        $data = collect($value->reflected->getProperties())
+            ->mapWithKeys(fn (\ReflectionProperty $property) => [
+                $property->getName() => $value->{$property->getName()},
+            ])
+            ->all();
 
         foreach ($data as $key => $child) {
             $data[$key] = $dehydrateChild($key, $child);
@@ -40,6 +45,16 @@ class FieldSynthesizer extends Synth implements TransformableSynthesizer
             $value[$key] = $hydrateChild($key, $child);
         }
 
-        return new Field(...$value);
+        $value = collect($value);
+
+        $field = new Field(...$value->only('handle', 'config')->all());
+
+        $field = invade($field);
+
+        $value
+            ->except('handle', 'config')
+            ->each(fn ($value, $key) => $field->{$key} = $value);
+
+        return $field->obj;
     }
 }
