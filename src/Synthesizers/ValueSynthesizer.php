@@ -9,14 +9,14 @@ use function Livewire\invade;
 
 class ValueSynthesizer extends Synth
 {
-    public static string $key = 'statamic-value';
+    public static string $key = 'slw_value';
 
     public static function match($target): bool
     {
         return $target instanceof Value;
     }
 
-    public function dehydrate($target, $dehydrateChild): array
+    public function dehydrate(Value $target, $dehydrateChild): array
     {
         $value = invade($target);
 
