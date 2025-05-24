@@ -56,10 +56,21 @@ class FieldtypeSynthesizer extends Synth
         $fieldtype = app($meta['class'])->setField($value->get('field'));
 
         $fieldtype = invade($fieldtype);
+        $reflection = $fieldtype->reflected;
 
         $value
             ->except('field')
-            ->each(fn ($value, $key) => $fieldtype->{$key} = $value);
+            ->each(function ($value, $key) use ($fieldtype, $reflection) {
+                $property = $reflection->getProperty($key);
+
+                if ($property->isStatic()) {
+                    $reflection->setStaticPropertyValue($key, $value);
+
+                    return;
+                }
+
+                $fieldtype->{$key} = $value;
+            });
 
         return $fieldtype->obj;
     }

@@ -16,7 +16,7 @@ class ValueSynthesizer extends Synth
         return $target instanceof Value;
     }
 
-    public function dehydrate($target, $dehydrateChild): array
+    public function dehydrate(Value $target, $dehydrateChild): array
     {
         $value = invade($target);
 
