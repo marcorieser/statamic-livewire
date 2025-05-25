@@ -32,9 +32,6 @@ return [
     | can be used to make Livewire aware of Statamic classes that you want
     | to work with, as it might make things easier.
     |
-    | It's recommended to remove or uncomment those synthesizers that are
-    | not used in your application to avoid overhead by loading those.
-    |
     | This feature is experimental. It's meant to be tested and to be played
     | with. As long as it is experimental, it can be changed and removed
     | at any point without a warning.
