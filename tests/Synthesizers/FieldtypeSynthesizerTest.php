@@ -5,6 +5,8 @@ namespace MarcoRieser\Livewire\Tests\Synthesizers;
 use Illuminate\View\ViewException;
 use Livewire\Component;
 use Livewire\Livewire;
+use MarcoRieser\Livewire\Testing\Concerns\CanManipulateAddonConfig;
+use MarcoRieser\Livewire\Tests\TestCase;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
@@ -12,8 +14,9 @@ use Statamic\Facades\Entry;
 use Statamic\Fields\Fieldtype;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-class FieldtypeSynthesizerTest extends SynthesizerTestCase
+class FieldtypeSynthesizerTest extends TestCase
 {
+    use CanManipulateAddonConfig;
     use PreventsSavingStacheItemsToDisk;
 
     #[Test]

@@ -1,10 +1,10 @@
 <?php
 
-namespace MarcoRieser\Livewire\Tests\Synthesizers;
+namespace MarcoRieser\Livewire\Testing\Concerns;
 
-use MarcoRieser\Livewire\Tests\TestCase;
+use Illuminate\Support\Arr;
 
-abstract class SynthesizerTestCase extends TestCase
+trait CanManipulateAddonConfig
 {
     protected function enableSynthesizers(): void
     {
@@ -24,5 +24,17 @@ abstract class SynthesizerTestCase extends TestCase
     protected function enableSynthesizerTransform(): void
     {
         $this->setConfigValue('synthesizers.transform', true);
+    }
+
+    protected function setConfigValue(string $key, $value): void
+    {
+        $config = config()->array(
+            'statamic-livewire',
+            require __DIR__.'/../../../config/statamic-livewire.php'
+        );
+
+        Arr::set($config, $key, $value);
+
+        config()->set('statamic-livewire', $config);
     }
 }

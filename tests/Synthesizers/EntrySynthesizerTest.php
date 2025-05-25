@@ -6,6 +6,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\View\ViewException;
 use Livewire\Component;
 use Livewire\Livewire;
+use MarcoRieser\Livewire\Testing\Concerns\CanManipulateAddonConfig;
+use MarcoRieser\Livewire\Tests\TestCase;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
@@ -13,8 +15,9 @@ use Statamic\Facades\Entry;
 use Statamic\Fields\Value;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-class EntrySynthesizerTest extends SynthesizerTestCase
+class EntrySynthesizerTest extends TestCase
 {
+    use CanManipulateAddonConfig;
     use PreventsSavingStacheItemsToDisk;
 
     #[Test]

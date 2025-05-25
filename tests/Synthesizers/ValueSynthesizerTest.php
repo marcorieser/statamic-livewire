@@ -5,6 +5,8 @@ namespace MarcoRieser\Livewire\Tests\Synthesizers;
 use Illuminate\View\ViewException;
 use Livewire\Component;
 use Livewire\Livewire;
+use MarcoRieser\Livewire\Testing\Concerns\CanManipulateAddonConfig;
+use MarcoRieser\Livewire\Tests\TestCase;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
@@ -14,8 +16,9 @@ use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 use function Livewire\invade;
 
-class ValueSynthesizerTest extends SynthesizerTestCase
+class ValueSynthesizerTest extends TestCase
 {
+    use CanManipulateAddonConfig;
     use PreventsSavingStacheItemsToDisk;
 
     #[Test]
