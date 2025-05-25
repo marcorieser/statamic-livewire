@@ -199,7 +199,7 @@ class ShowContact extends Component
 The [Official Livewire documentation](https://livewire.laravel.com/docs/components#rendering-components) provides more information.
 
 ### Computed Properties
-When using Antlers, the computed properties are loaded automatically and only resolved when accessed. 
+When using Antlers, the computed properties are loaded automatically and only resolve when accessed. 
 Simply access them as you would access a regular variable in the cascade.
 Read more about [Computed Properties in the Livewire Docs](https://livewire.laravel.com/docs/computed-properties).
 
