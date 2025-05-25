@@ -7,6 +7,13 @@ use Livewire\Attributes\Locked;
 use Statamic\Facades\Site;
 use Statamic\Statamic;
 
+/**
+ * In v5, this trait will be replaced by the new localization feature, which will be enabled by default.
+ * It currently sits behind a config flag and is still experimental.
+ * https://github.com/marcorieser/statamic-livewire/tree/main?tab=readme-ov-file#automatic-localization-handling-experimental
+ *
+ * @deprecated
+ */
 trait RestoreCurrentSite
 {
     #[Locked]
