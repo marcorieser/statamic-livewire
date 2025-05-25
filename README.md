@@ -302,16 +302,11 @@ class ShowArticles extends Component
 You can use the built-in Synthesizers to make your Livewire components aware of Statamic specific data types.
 
 ```php
-use Statamic\Entries\EntryCollection;
 use Statamic\Entries\Entry;
 
 class Foo extends Component
 {
-    public EntryCollection $entries;
-
-    public function mount(){
-        $this->entries = \Statamic\Facades\Entry::all();
-    }
+    public Entry $entries;
 }
 ```
 
