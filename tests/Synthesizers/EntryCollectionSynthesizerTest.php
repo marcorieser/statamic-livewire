@@ -73,7 +73,7 @@ class EntryCollectionSynthesizerTest extends TestCase
 
         $this->assertInstanceOf(EntryCollection::class, $testable->entries);
         $this->assertInstanceOf(\Statamic\Contracts\Entries\Entry::class, $testable->entries->first());
-        $this->assertSame(Entry::all()->first()->id(), $testable->entries->first()->id());
+        $this->assertEquals(Entry::all(), $testable->entries);
     }
 
     protected function setUp(): void
@@ -83,8 +83,10 @@ class EntryCollectionSynthesizerTest extends TestCase
         Collection::make('entries')->save();
 
         Entry::make()
-            ->collection('entries')
             ->id('1')
+            ->collection('entries')
+            ->blueprint('entry')
+            ->locale('default')
             ->data(['title' => 'Entry 1'])
             ->save();
     }

@@ -73,8 +73,10 @@ class ValueSynthesizerTest extends TestCase
         Collection::make('entries')->save();
 
         Entry::make()
-            ->collection('entries')
             ->id('1')
+            ->collection('entries')
+            ->blueprint('entry')
+            ->locale('default')
             ->data(['title' => 'Entry 1'])
             ->save();
     }

@@ -77,6 +77,7 @@ class EntrySynthesizerTest extends TestCase
         $expected = Entry::find('1');
 
         $this->assertInstanceOf(\Statamic\Contracts\Entries\Entry::class, $testable->entry);
+        $this->assertEquals($expected, $testable->entry);
         $this->assertSame($expected->id(), $testable->entry->id());
         $this->assertSame($expected->collection(), $testable->entry->collection());
         $this->assertSame($expected->origin(), $testable->entry->origin());

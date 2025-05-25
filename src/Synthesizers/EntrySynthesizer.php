@@ -63,6 +63,8 @@ class EntrySynthesizer extends Synth implements AugmentableSynthesizer
             $entry->date($date);
         }
 
+        $entry->syncOriginal();
+
         return $entry;
     }
 }
