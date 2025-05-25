@@ -43,7 +43,7 @@ class Livewire extends Tags
             return null;
         }
 
-        return \Livewire\Livewire::mount($component, $this->params->except('key')->toArray(), $this->params->only('key')->first());
+        return \Livewire\Livewire::mount($component, $this->params->except('key')->all(), $this->params->only('key')->first());
     }
 
     /**
