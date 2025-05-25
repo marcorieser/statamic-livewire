@@ -43,7 +43,7 @@ class EntryCollectionSynthesizerTest extends TestCase
 
     #[Test]
     #[DefineEnvironment('enableSynthesizers')]
-    #[DefineEnvironment('enableSynthesizerTransform')]
+    #[DefineEnvironment('enableSynthesizerAugmentation')]
     public function entry_collection_gets_augmented_in_view()
     {
         $component = $this->getLivewireComponent();
@@ -54,7 +54,7 @@ class EntryCollectionSynthesizerTest extends TestCase
 
     #[Test]
     #[DefineEnvironment('enableSynthesizers')]
-    #[DefineEnvironment('disableSynthesizerTransform')]
+    #[DefineEnvironment('disableSynthesizerAugmentation')]
     public function entry_collection_gets_not_augmented_in_view()
     {
         $component = $this->getLivewireComponent();

@@ -3,12 +3,12 @@
 namespace MarcoRieser\Livewire\Synthesizers;
 
 use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
-use MarcoRieser\Livewire\Contracts\TransformableSynthesizer;
+use MarcoRieser\Livewire\Contracts\Synthesizers\AugmentableSynthesizer;
 use Statamic\Fields\Field;
 
 use function Livewire\invade;
 
-class FieldSynthesizer extends Synth implements TransformableSynthesizer
+class FieldSynthesizer extends Synth implements AugmentableSynthesizer
 {
     public static string $key = 'slw_field';
 
@@ -17,7 +17,7 @@ class FieldSynthesizer extends Synth implements TransformableSynthesizer
         return $target instanceof Field;
     }
 
-    public static function transform($target): mixed
+    public static function augment($target): mixed
     {
         return $target->augment();
     }

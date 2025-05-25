@@ -3,9 +3,9 @@
 namespace MarcoRieser\Livewire\Hooks;
 
 use Livewire\ComponentHook;
-use MarcoRieser\Livewire\Contracts\TransformableSynthesizer;
+use MarcoRieser\Livewire\Contracts\Synthesizers\AugmentableSynthesizer;
 
-class TransformSynthesizers extends ComponentHook
+class SynthesizerAugmentor extends ComponentHook
 {
     public function render($view, $data): void
     {
@@ -13,27 +13,27 @@ class TransformSynthesizers extends ComponentHook
             return;
         }
 
-        if (! config()->boolean('statamic-livewire.synthesizers.transform', true)) {
+        if (! config()->boolean('statamic-livewire.synthesizers.augmentation', true)) {
             return;
         }
 
-        $view->with($this->transformData($data));
+        $view->with($this->augment($data));
     }
 
     protected function getMatchingSynthesizer($value): ?string
     {
         return collect(config()->array('statamic-livewire.synthesizers.classes', []))
-            ->filter(fn (string $synthesizer) => is_subclass_of($synthesizer, TransformableSynthesizer::class) && call_user_func([$synthesizer, 'match'], $value))
+            ->filter(fn (string $synthesizer) => is_subclass_of($synthesizer, AugmentableSynthesizer::class) && call_user_func([$synthesizer, 'match'], $value))
             ->first();
     }
 
-    protected function transformData(array $data): array
+    protected function augment(array $data): array
     {
         return collect($data)
             ->map(function ($value) {
                 $synthesizer = $this->getMatchingSynthesizer($value);
 
-                return $synthesizer ? call_user_func([$synthesizer, 'transform'], $value) : $value;
+                return $synthesizer ? call_user_func([$synthesizer, 'augment'], $value) : $value;
             })
             ->all();
     }

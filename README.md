@@ -329,8 +329,8 @@ To make it work, you need to enable that feature first.
 2. Select `statamic-livewire` in the list
 3. Enable synthesizers
 
-#### Transformation
-By default, the Synthesizers transform (augment) the data before it gets passed into the view. You can disable this by setting `synthesizers.transform` to `false` in your published `config/statamic-livewire.php` config.
+#### Augmentation
+By default, the Synthesizers augment the data before it gets passed into the antlers view. You can disable this by setting `synthesizers.augmentation` to `false` in your published `config/statamic-livewire.php` config.
 
 ### Entangle: Sharing State Between Livewire And Alpine
 In case you want to share state between Livewire and Alpine, there is a Blade directive called `@entangle`. To be usable with Antlers, we do provide a dedicated tag:

@@ -3,10 +3,10 @@
 namespace MarcoRieser\Livewire\Synthesizers;
 
 use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
-use MarcoRieser\Livewire\Contracts\TransformableSynthesizer;
+use MarcoRieser\Livewire\Contracts\Synthesizers\AugmentableSynthesizer;
 use Statamic\Entries\EntryCollection;
 
-class EntryCollectionSynthesizer extends Synth implements TransformableSynthesizer
+class EntryCollectionSynthesizer extends Synth implements AugmentableSynthesizer
 {
     public static string $key = 'slw_entryco';
 
@@ -15,7 +15,7 @@ class EntryCollectionSynthesizer extends Synth implements TransformableSynthesiz
         return $target instanceof EntryCollection;
     }
 
-    public static function transform($target): array
+    public static function augment($target): array
     {
         return $target->toAugmentedArray();
     }

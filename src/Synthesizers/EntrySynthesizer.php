@@ -6,11 +6,11 @@ use Carbon\CarbonInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
-use MarcoRieser\Livewire\Contracts\TransformableSynthesizer;
+use MarcoRieser\Livewire\Contracts\Synthesizers\AugmentableSynthesizer;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Entry;
 
-class EntrySynthesizer extends Synth implements TransformableSynthesizer
+class EntrySynthesizer extends Synth implements AugmentableSynthesizer
 {
     public static string $key = 'slw_entry';
 
@@ -19,7 +19,7 @@ class EntrySynthesizer extends Synth implements TransformableSynthesizer
         return $target instanceof EntryContract;
     }
 
-    public static function transform($target): array
+    public static function augment($target): array
     {
         return $target->toAugmentedArray();
     }

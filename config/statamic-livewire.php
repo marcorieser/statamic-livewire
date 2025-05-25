@@ -53,7 +53,7 @@ return [
             \MarcoRieser\Livewire\Synthesizers\ValueSynthesizer::class,
         ],
 
-        'transform' => true,
+        'augmentation' => true,
     ],
 
     /*

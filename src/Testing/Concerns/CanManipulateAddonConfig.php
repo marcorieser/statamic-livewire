@@ -16,14 +16,14 @@ trait CanManipulateAddonConfig
         $this->setConfigValue('synthesizers.enabled', false);
     }
 
-    protected function disableSynthesizerTransform(): void
+    protected function disableSynthesizerAugmentation(): void
     {
-        $this->setConfigValue('synthesizers.transform', false);
+        $this->setConfigValue('synthesizers.augmentation', false);
     }
 
-    protected function enableSynthesizerTransform(): void
+    protected function enableSynthesizerAugmentation(): void
     {
-        $this->setConfigValue('synthesizers.transform', true);
+        $this->setConfigValue('synthesizers.augmentation', true);
     }
 
     protected function setConfigValue(string $key, $value): void
