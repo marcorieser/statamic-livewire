@@ -1,10 +1,10 @@
 <?php
 
-namespace MarcoRieser\Livewire\Tests\Traits;
+namespace MarcoRieser\Livewire\Testing\Concerns;
 
 use Illuminate\Support\Arr;
 
-trait ManipulateAddonConfig
+trait CanManipulateAddonConfig
 {
     protected function enableSynthesizers(): void
     {
@@ -16,19 +16,22 @@ trait ManipulateAddonConfig
         $this->setConfigValue('synthesizers.enabled', false);
     }
 
-    protected function disableSynthesizerTransform(): void
+    protected function disableSynthesizerAugmentation(): void
     {
-        $this->setConfigValue('synthesizers.transform', false);
+        $this->setConfigValue('synthesizers.augmentation', false);
     }
 
-    protected function enableSynthesizerTransform(): void
+    protected function enableSynthesizerAugmentation(): void
     {
-        $this->setConfigValue('synthesizers.transform', true);
+        $this->setConfigValue('synthesizers.augmentation', true);
     }
 
     protected function setConfigValue(string $key, $value): void
     {
-        $config = config()->array('statamic-livewire', require __DIR__.'/../../config/statamic-livewire.php');
+        $config = config()->array(
+            'statamic-livewire',
+            require __DIR__.'/../../../config/statamic-livewire.php'
+        );
 
         Arr::set($config, $key, $value);
 

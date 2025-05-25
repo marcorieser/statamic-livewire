@@ -4,8 +4,8 @@ namespace MarcoRieser\Livewire\Tests\Hooks;
 
 use Livewire\Component;
 use Livewire\Livewire;
+use MarcoRieser\Livewire\Testing\Concerns\CanManipulateAddonConfig;
 use MarcoRieser\Livewire\Tests\TestCase;
-use MarcoRieser\Livewire\Tests\Traits\ManipulateAddonConfig;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
@@ -14,7 +14,7 @@ use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 class LivewireTest extends TestCase
 {
-    use ManipulateAddonConfig;
+    use CanManipulateAddonConfig;
     use PreventsSavingStacheItemsToDisk;
 
     #[Test]

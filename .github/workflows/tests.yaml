@@ -30,5 +30,6 @@ jobs:
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
           composer install --no-interaction
+
       - name: Run PHPUnit
         run: vendor/bin/phpunit
