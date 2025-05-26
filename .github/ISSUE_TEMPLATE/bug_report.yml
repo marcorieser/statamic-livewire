@@ -1,5 +1,7 @@
 name: Bug report
 description: Fill out a bug report to help us improve Livewire for Statamic.
+title: "[Bug]: "
+labels: ["bug"]
 body:
   - type: textarea
     attributes:
