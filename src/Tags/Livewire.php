@@ -43,7 +43,10 @@ class Livewire extends Tags
             return null;
         }
 
-        return \Livewire\Livewire::mount($component, $this->params->except('key')->all(), $this->params->only('key')->first());
+        $params = $this->params->except(['key', 'component']);
+        $params = config()->boolean('statamic-livewire.synthesizers.enabled', false) ? $params->all() : $params->toArray();
+
+        return \Livewire\Livewire::mount($component, $params, $this->params->only('key')->first());
     }
 
     /**
