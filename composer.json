@@ -1,6 +1,6 @@
 {
     "name": "marcorieser/statamic-livewire",
-    "description": "A Laravel Livewire integration for Statamics Antlers engine.",
+    "description": "A Laravel Livewire integration for Statamic.",
     "keywords": [
         "Statamic",
         "Addon",
@@ -42,7 +42,7 @@
     "extra": {
         "statamic": {
             "name": "Livewire",
-            "description": "A Laravel Livewire integration for Statamics Antlers engine"
+            "description": "A Laravel Livewire integration for Statamic."
         },
         "laravel": {
             "providers": [
