@@ -275,7 +275,7 @@ class ShowArticles extends Component
 }
 ```
 
-### Synthesizers (experimental)
+### Synthesizers
 You can use the built-in Synthesizers to make your Livewire components aware of Statamic specific data types.
 
 ```php
@@ -286,7 +286,6 @@ class Foo extends Component
     public Entry $entries;
 }
 ```
-
 
 Currently, the following types are supported:
 - `Statamic\Entries\EntryCollection`;
