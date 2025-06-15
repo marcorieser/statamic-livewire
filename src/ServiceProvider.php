@@ -35,7 +35,7 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootLocalization(): void
     {
-        if (! config()->boolean('statamic-livewire.localization.enabled', false)) {
+        if (! config()->boolean('statamic-livewire.localization', true)) {
             return;
         }
 

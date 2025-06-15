@@ -231,31 +231,8 @@ Livewire components are automatically keyed by default. If you want to manually 
 The [Official Livewire documentation](https://livewire.laravel.com/docs/components#adding-wirekey-to-foreach-loops) provides more information.
 
 ### Multi-Site / Localization
-> There is an experimental approach to the trait (see below).
-
-When using Livewire in a Multi-Site context, the current site gets lost between requests. There is a trait (`\MarcoRieser\Livewire\RestoreCurrentSite`) to solve that. Just include it in your component and use `Site::current()` as you normally do.
-```php
-class ShowArticles extends Component
-{
-    use \MarcoRieser\Livewire\RestoreCurrentSite;
-
-    protected function entries()
-    {
-        return Entry::query()
-            ->where('collection', 'articles')
-            ->where('site', Site::current())
-            ->get();
-    }
-
-    public function render()
-    {
-        return view('livewire.blog-entries', $this->entries());
-    }
-}
-```
-
-#### Automatic localization handling (experimental)
-You can set `localization.enabled` to `true` in your published `config/statamic-livewire.php` config. This enables automatic localization handling, and you can omit the above-mentioned trait entirely.
+By default, your current site is persisted between Livewire requests automatically.  
+In case you want to implement your own logic, you can disable `localization` in your published `config/statamic-livewire.php` config.
 
 ### Paginating Data
 You can paginate results by using the WithPagination trait.
