@@ -4,7 +4,6 @@ namespace MarcoRieser\Livewire\Tags;
 
 use Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets;
 use Livewire\Mechanisms\FrontendAssets\FrontendAssets;
-use MarcoRieser\Livewire\Helpers\DataFetcher;
 use Statamic\Support\Str;
 use Statamic\Tags\Tags;
 
@@ -59,36 +58,6 @@ class Livewire extends Tags
         $this->params->put('component', $this->params->pull('name'));
 
         return $this->index();
-    }
-
-    /**
-     * This will return the value of a computed property.
-     *
-     * {{ livewire:computed:my_computed_property }}
-     *
-     * @deprecated
-     */
-    public function computed()
-    {
-        if (! ($property = $this->params->get(['property', 'prop']))) {
-            return null;
-        }
-
-        $property = Str::replace([':', '.'], ':', $property);
-        $path = collect(explode(':', $property));
-        $property = $path->shift();
-
-        $property = collect([$property, Str::camel($property), Str::snake($property)])
-            ->filter(fn (string $property) => method_exists(\Livewire\Livewire::current(), $property))
-            ->first();
-
-        if (! $property) {
-            return null;
-        }
-
-        $path->prepend($property);
-
-        return DataFetcher::getValue($path->join(':'), [$property => \Livewire\Livewire::current()->$property]);
     }
 
     /**
