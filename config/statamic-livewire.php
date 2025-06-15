@@ -17,16 +17,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | EXPERIMENTAL: Livewire Synthesizers
+    | Synthesizers
     |--------------------------------------------------------------------------
     |
-    | So called synthesizers allow adding custom types to Livewire, which can
+    | Synthesizers allow adding custom types to Livewire, which can
     | can be used to make Livewire aware of Statamic classes that you want
     | to work with, as it might make things easier.
-    |
-    | This feature is experimental. It's meant to be tested and to be played
-    | with. As long as it is experimental, it can be changed and removed
-    | at any point without a warning.
     |
     */
 
