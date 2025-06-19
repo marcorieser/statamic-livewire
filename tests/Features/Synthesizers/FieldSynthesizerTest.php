@@ -5,35 +5,34 @@ namespace MarcoRieser\Livewire\Tests\Synthesizers;
 use Illuminate\View\ViewException;
 use Livewire\Component;
 use Livewire\Livewire;
-use MarcoRieser\Livewire\Testing\Concerns\CanManipulateAddonConfig;
+use MarcoRieser\Livewire\Tests\Concerns\CanManipulateAddonConfig;
 use MarcoRieser\Livewire\Tests\TestCase;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-use function Livewire\invade;
-
-class ValueSynthesizerTest extends TestCase
+class FieldSynthesizerTest extends TestCase
 {
     use CanManipulateAddonConfig;
     use PreventsSavingStacheItemsToDisk;
 
     #[Test]
     #[DefineEnvironment('enableSynthesizers')]
-    public function value_is_supported_as_property_type()
+    public function field_is_supported_as_property_type()
     {
         $component = $this->getLivewireComponent();
 
         Livewire::test($component)
-            ->assertSet('value', Entry::find(1)->augmentedValue('title'));
+            ->assertSet('field', Entry::find('1')->blueprint()->field('title'));
     }
 
     #[Test]
     #[DefineEnvironment('disableSynthesizers')]
-    public function value_is_not_supported_as_property_type()
+    public function field_is_not_supported_as_property_type()
     {
         $component = $this->getLivewireComponent();
 
@@ -45,25 +44,39 @@ class ValueSynthesizerTest extends TestCase
 
     #[Test]
     #[DefineEnvironment('enableSynthesizers')]
-    public function value_gets_dehydrated_and_rehydrated_correctly()
+    #[DefineEnvironment('enableSynthesizerAugmentation')]
+    public function field_gets_augmented_in_view()
+    {
+        $component = $this->getLivewireComponent();
+
+        $testable = Livewire::test($component);
+        $testable->assertViewHas('field', Entry::find('1')->blueprint()->field('title')->augment());
+        $this->assertInstanceOf(Value::class, $testable->viewData('field')->value());
+    }
+
+    #[Test]
+    #[DefineEnvironment('enableSynthesizers')]
+    #[DefineEnvironment('disableSynthesizerAugmentation')]
+    public function field_gets_not_augmented_in_view()
+    {
+        $component = $this->getLivewireComponent();
+
+        Livewire::test($component)
+            ->assertViewHas('field', Entry::find('1')->blueprint()->field('title'));
+    }
+
+    #[Test]
+    #[DefineEnvironment('enableSynthesizers')]
+    public function field_gets_dehydrated_and_rehydrated_correctly()
     {
         $component = $this->getLivewireComponent();
 
         $testable = Livewire::test($component)->refresh();
 
-        $expected = Entry::find(1)->augmentedValue('title');
+        $expected = Entry::find('1')->blueprint()->field('title');
 
-        $this->assertInstanceOf(Value::class, $testable->value);
-
-        $expected = invade($expected);
-        $value = invade($testable->value);
-
-        $this->assertEquals($expected->resolver, $value->resolver);
-        $this->assertEquals($expected->raw, $value->raw);
-        $this->assertEquals($expected->handle, $value->handle);
-        $this->assertEquals(get_class($expected->fieldtype), get_class($value->fieldtype));
-        $this->assertEquals(get_class($expected->augmentable), get_class($value->augmentable));
-        $this->assertEquals($expected->shallow, $value->shallow);
+        $this->assertInstanceOf(Field::class, $testable->field);
+        $this->assertEquals($expected, $testable->field);
     }
 
     protected function setUp(): void
@@ -73,10 +86,8 @@ class ValueSynthesizerTest extends TestCase
         Collection::make('entries')->save();
 
         Entry::make()
-            ->id('1')
             ->collection('entries')
-            ->blueprint('entry')
-            ->locale('default')
+            ->id('1')
             ->data(['title' => 'Entry 1'])
             ->save();
     }
@@ -85,11 +96,11 @@ class ValueSynthesizerTest extends TestCase
     {
         return new class extends Component
         {
-            public Value $value;
+            public Field $field;
 
             public function mount()
             {
-                $this->value = Entry::find(1)->augmentedValue('title');
+                $this->field = Entry::find(1)->blueprint()->field('title');
             }
 
             public function render()

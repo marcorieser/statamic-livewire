@@ -4,7 +4,6 @@ namespace MarcoRieser\Livewire\Tags;
 
 use Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets;
 use Livewire\Mechanisms\FrontendAssets\FrontendAssets;
-use MarcoRieser\Livewire\Helpers\DataFetcher;
 use Statamic\Support\Str;
 use Statamic\Tags\Tags;
 
@@ -12,7 +11,7 @@ use function Livewire\store;
 
 class Livewire extends Tags
 {
-    protected static $aliases = ['lw'];
+    protected static $aliases = ['lw', 'wire'];
 
     /**
      * This will load your Livewire component in the Antlers view
@@ -62,78 +61,7 @@ class Livewire extends Tags
     }
 
     /**
-     * This will return the value of a computed property.
-     *
-     * {{ livewire:computed:my_computed_property }}
-     *
-     * @deprecated
-     */
-    public function computed()
-    {
-        if (! ($property = $this->params->get(['property', 'prop']))) {
-            return null;
-        }
-
-        $property = Str::replace([':', '.'], ':', $property);
-        $path = collect(explode(':', $property));
-        $property = $path->shift();
-
-        $property = collect([$property, Str::camel($property), Str::snake($property)])
-            ->filter(fn (string $property) => method_exists(\Livewire\Livewire::current(), $property))
-            ->first();
-
-        if (! $property) {
-            return null;
-        }
-
-        $path->prepend($property);
-
-        return DataFetcher::getValue($path->join(':'), [$property => \Livewire\Livewire::current()->$property]);
-    }
-
-    /**
-     * Sharing State Between Livewire And Alpine via entangle.
-     *
-     * {{ livewire:entangle property="showDropdown" modifier="live" }}
-     */
-    public function entangle(): string
-    {
-        $property = $this->params->get('property');
-        $modifier = $this->params->get('modifier');
-        $instanceId = $this->context['__livewire']->getId();
-
-        $expression = ".entangle('$property')";
-
-        if ($modifier) {
-            $expression .= ".$modifier";
-        }
-
-        return "window.Livewire.find('$instanceId')$expression";
-    }
-
-    /**
-     * Accessing the Livewire component.
-     *
-     * {{ livewire:this }}
-     * {{ livewire:this set="('name', 'Jack')" }}
-     */
-    public function this(): string
-    {
-        $instanceId = $this->context['__livewire']->getId();
-
-        if (! count($this->params)) {
-            return "window.Livewire.find('$instanceId')";
-        }
-
-        $action = $this->params->take(1)->toArray();
-        $method = key($action);
-        $parameters = reset($action);
-
-        return "window.Livewire.find('$instanceId').$method$parameters";
-    }
-
-    /**
-     * Loading the livewire styles in antlers style
+     * Antlers implementation of @livewireStyles
      *
      * {{ livewire:styles }}
      */
@@ -143,7 +71,7 @@ class Livewire extends Tags
     }
 
     /**
-     * Loading the livewire scripts in antlers style
+     * Antlers implementation of @livewireScripts
      *
      * {{ livewire:scripts }}
      */
@@ -153,7 +81,7 @@ class Livewire extends Tags
     }
 
     /**
-     * Prevent livewire from auto-injecting styles and scripts
+     * Antlers implementation of @livewireScriptConfig
      *
      * {{ livewire:scriptConfig }}
      */
@@ -165,7 +93,7 @@ class Livewire extends Tags
     /**
      * Antlers implementation of @assets - https://livewire.laravel.com/docs/javascript#loading-assets
      *
-     * {{ livewire:assets }}....{{ /livewire:assets }}
+     * {{ livewire:assets }}...{{ /livewire:assets }}
      */
     public function assets(): void
     {
@@ -193,5 +121,50 @@ class Livewire extends Tags
         $key = md5($html);
 
         store($this->context['__livewire'])->push('scripts', $html, $key);
+    }
+
+    /**
+     * Antlers implementation of @this
+     *
+     * {{ livewire:this }}
+     * {{ livewire:this set="('name', 'Jack')" }}
+     *
+     * @deprecated
+     */
+    public function this(): string
+    {
+        $instanceId = $this->context['__livewire']->getId();
+
+        if (! count($this->params)) {
+            return "window.Livewire.find('$instanceId')";
+        }
+
+        $action = $this->params->take(1)->toArray();
+        $method = key($action);
+        $parameters = reset($action);
+
+        return "window.Livewire.find('$instanceId').$method$parameters";
+    }
+
+    /**
+     * Antlers implementation of @entangle
+     *
+     * {{ livewire:entangle property="showDropdown" modifier="live" }}
+     *
+     * @deprecated
+     */
+    public function entangle(): string
+    {
+        $property = $this->params->get('property');
+        $modifier = $this->params->get('modifier');
+        $instanceId = $this->context['__livewire']->getId();
+
+        $expression = ".entangle('$property')";
+
+        if ($modifier) {
+            $expression .= ".$modifier";
+        }
+
+        return "window.Livewire.find('$instanceId')$expression";
     }
 }

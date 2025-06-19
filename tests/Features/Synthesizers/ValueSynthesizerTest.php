@@ -5,33 +5,35 @@ namespace MarcoRieser\Livewire\Tests\Synthesizers;
 use Illuminate\View\ViewException;
 use Livewire\Component;
 use Livewire\Livewire;
-use MarcoRieser\Livewire\Testing\Concerns\CanManipulateAddonConfig;
+use MarcoRieser\Livewire\Tests\Concerns\CanManipulateAddonConfig;
 use MarcoRieser\Livewire\Tests\TestCase;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Fields\Value;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-class EntryCollectionSynthesizerTest extends TestCase
+use function Livewire\invade;
+
+class ValueSynthesizerTest extends TestCase
 {
     use CanManipulateAddonConfig;
     use PreventsSavingStacheItemsToDisk;
 
     #[Test]
     #[DefineEnvironment('enableSynthesizers')]
-    public function entry_collection_is_supported_as_property_type()
+    public function value_is_supported_as_property_type()
     {
         $component = $this->getLivewireComponent();
 
         Livewire::test($component)
-            ->assertSet('entries', Entry::all());
+            ->assertSet('value', Entry::find(1)->augmentedValue('title'));
     }
 
     #[Test]
     #[DefineEnvironment('disableSynthesizers')]
-    public function entry_collection_is_not_supported_as_property_type()
+    public function value_is_not_supported_as_property_type()
     {
         $component = $this->getLivewireComponent();
 
@@ -43,37 +45,25 @@ class EntryCollectionSynthesizerTest extends TestCase
 
     #[Test]
     #[DefineEnvironment('enableSynthesizers')]
-    #[DefineEnvironment('enableSynthesizerAugmentation')]
-    public function entry_collection_gets_augmented_in_view()
-    {
-        $component = $this->getLivewireComponent();
-
-        Livewire::test($component)
-            ->assertViewHas('entries', Entry::all()->toAugmentedArray());
-    }
-
-    #[Test]
-    #[DefineEnvironment('enableSynthesizers')]
-    #[DefineEnvironment('disableSynthesizerAugmentation')]
-    public function entry_collection_gets_not_augmented_in_view()
-    {
-        $component = $this->getLivewireComponent();
-
-        Livewire::test($component)
-            ->assertViewHas('entries', Entry::all());
-    }
-
-    #[Test]
-    #[DefineEnvironment('enableSynthesizers')]
-    public function entry_collection_gets_dehydrated_and_rehydrated_correctly()
+    public function value_gets_dehydrated_and_rehydrated_correctly()
     {
         $component = $this->getLivewireComponent();
 
         $testable = Livewire::test($component)->refresh();
 
-        $this->assertInstanceOf(EntryCollection::class, $testable->entries);
-        $this->assertInstanceOf(\Statamic\Contracts\Entries\Entry::class, $testable->entries->first());
-        $this->assertEquals(Entry::all(), $testable->entries);
+        $expected = Entry::find(1)->augmentedValue('title');
+
+        $this->assertInstanceOf(Value::class, $testable->value);
+
+        $expected = invade($expected);
+        $value = invade($testable->value);
+
+        $this->assertEquals($expected->resolver, $value->resolver);
+        $this->assertEquals($expected->raw, $value->raw);
+        $this->assertEquals($expected->handle, $value->handle);
+        $this->assertEquals(get_class($expected->fieldtype), get_class($value->fieldtype));
+        $this->assertEquals(get_class($expected->augmentable), get_class($value->augmentable));
+        $this->assertEquals($expected->shallow, $value->shallow);
     }
 
     protected function setUp(): void
@@ -95,11 +85,11 @@ class EntryCollectionSynthesizerTest extends TestCase
     {
         return new class extends Component
         {
-            public EntryCollection $entries;
+            public Value $value;
 
             public function mount()
             {
-                $this->entries = Entry::all();
+                $this->value = Entry::find(1)->augmentedValue('title');
             }
 
             public function render()
