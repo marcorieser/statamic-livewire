@@ -4,7 +4,7 @@ namespace MarcoRieser\Livewire\Tests\Tags;
 
 use Livewire\Component;
 use Livewire\Livewire;
-use MarcoRieser\Livewire\Testing\Concerns\CanManipulateAddonConfig;
+use MarcoRieser\Livewire\Tests\Concerns\CanManipulateAddonConfig;
 use MarcoRieser\Livewire\Tests\TestCase;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;

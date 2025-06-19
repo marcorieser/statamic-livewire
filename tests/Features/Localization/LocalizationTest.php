@@ -2,7 +2,7 @@
 
 namespace MarcoRieser\Livewire\Tests\Features\Localization;
 
-use MarcoRieser\Livewire\Testing\Concerns\CanManipulateAddonConfig;
+use MarcoRieser\Livewire\Tests\Concerns\CanManipulateAddonConfig;
 use MarcoRieser\Livewire\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
