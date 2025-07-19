@@ -1,6 +1,6 @@
 <?php
 
-namespace MarcoRieser\Livewire\Testing\Concerns;
+namespace MarcoRieser\Livewire\Tests\Concerns;
 
 use Illuminate\Support\Arr;
 
@@ -30,7 +30,7 @@ trait CanManipulateAddonConfig
     {
         $config = config()->array(
             'statamic-livewire',
-            require __DIR__.'/../../../config/statamic-livewire.php'
+            require __DIR__.'/../../config/statamic-livewire.php'
         );
 
         Arr::set($config, $key, $value);
