@@ -1,23 +1,9 @@
 # Statamic Livewire
-<!-- statamic:hide -->
-![Statamic 5.17+](https://img.shields.io/badge/Statamic-5.17+-FF269E?style=for-the-badge&link=https://statamic.com)
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/marcorieser/statamic-livewire.svg?style=for-the-badge)](https://packagist.org/packages/marcorieser/statamic-livewire)
-<!-- /statamic:hide -->
 
 ## Description
 A third-party [Laravel Livewire](https://laravel-livewire.com/) integration for Statamic.
 
 It's as easy as it gets to get started with Livewire if using Statamic.
-
-## Migrate from `jonassiewertsen/statamic-livewire`
-### Without breaking changes (v3)
-1. Replace `jonassiewertsen/statamic-livewire` with `marcorieser/statamic-livewire` in your `composer.json`
-2. Run `composer update marcorieser/statamic-livewire`
-
-### With breaking changes (v4)
-1. Replace `"jonassiewertsen/statamic-livewire": "^3.0"` with `"marcorieser/statamic-livewire": "^4.0"` in your `composer.json`
-2. Replace the namespace `Jonassiewertsen\Livewire` with `MarcoRieser\Livewire` in your code
-3. Run `composer update marcorieser/statamic-livewire`
 
 ## Installation
 Pull in the Livewire package with composer
@@ -27,54 +13,71 @@ composer require marcorieser/statamic-livewire
 ```
 
 ### Manually including Livewire's frontend assets
-By default, Livewire injects the JavaScript and CSS assets it needs into each page that includes a Livewire component. If you want more control over this behavior, you can [manually include the assets](https://livewire.laravel.com/docs/installation#manually-including-livewires-frontend-assets) on a page using the following Antlers tags or Blade directives:
+By default, Livewire injects the JavaScript and CSS assets it needs into each page that includes a Livewire component. 
+If you want more control over this behavior, you can [manually include the assets](https://livewire.laravel.com/docs/installation#manually-including-livewires-frontend-assets) on a page using the following Antlers tags or Blade directives:
 
-```html
+```antlers
 <html>
     <head>
-        <!-- If using Antlers -->
         {{ livewire:styles }}
-
-        <!-- If using Blade -->
-        @livewireStyles
     </head>
     <body>
 
-        ...
-        <!-- If using Antlers -->
         {{ livewire:scripts }}
-
-        <!-- Blade -->
+    </body>
+</html>
+```
+```bladehtml
+<html>
+    <head>
+        @livewireStyles
+    </head>
+    <body>
+        
         @livewireScripts
     </body>
 </html>
 ```
 
 ### Manually bundling Livewire and Alpine
-If you need to include some custom Alpine plugins, you need to [manually bundle the Livewire and Alpine assets](https://livewire.laravel.com/docs/installation#manually-bundling-livewire-and-alpine) and disable the automatic injection by using the following Antlers tag or Blade directive. Do not forget to include the Livewire styles as well.
+If you need to include some custom Alpine plugins, you need to [manually bundle the Livewire and Alpine assets](https://livewire.laravel.com/docs/installation#manually-bundling-livewire-and-alpine) and disable the automatic injection by using the following Antlers tag or Blade directive. 
+Remember to include the Livewire styles as well.
 
-```html
+```antlers
 <html>
     <head>
-        <!-- If using Antlers -->
         {{ livewire:styles }}
+    </head>
+    <body>
 
-        <!-- If using Blade -->
+        {{ livewire:scriptConfig }}
+    </body>
+</html>
+```
+
+```antlers
+<html>
+    <head>
         @livewireStyles
     </head>
     <body>
 
-        ...
-        <!-- If using Antlers -->
-        {{ livewire:scriptConfig }}
-
-        <!-- Blade -->
         @livewireScriptConfig
     </body>
 </html>
 ```
 
-### Static caching
+## Upgrade
+Below is a list for specific upgrade instructions.
+
+- [Addon ownership transfer](docs/addon-ownership-transfer.md)
+- [Upgrade from 3 to 4](docs/upgrade-3-to-4.md)
+
+### Livewire 2 to 3
+Make sure to read the Livewire upgrade guide, in case you're updating to `Statamic Livewire` 3, as there are breaking changes:
+https://livewire.laravel.com/docs/upgrading
+
+## Static caching
 This addon adds an `AssetsReplacer` class to make Livewire compatible with half and full static caching. You may customize the replacers in the config of this addon:
 
 ```php
@@ -92,11 +95,6 @@ if (window.livewireScriptConfig?.csrf === 'STATAMIC_CSRF_TOKEN') {
     Livewire.start();
 }
 ```
-
-## Upgrade
-
-Make sure to read the Livewire upgrade guide, in case you're updating to `Statamic Livewire` 3, as there are breaking changes:
-https://livewire.laravel.com/docs/upgrading
 
 ## General documentation
 [Livewire Docs](https://livewire.laravel.com/docs/quickstart)
