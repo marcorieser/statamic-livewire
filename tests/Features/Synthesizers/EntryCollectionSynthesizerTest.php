@@ -5,34 +5,33 @@ namespace MarcoRieser\Livewire\Tests\Synthesizers;
 use Illuminate\View\ViewException;
 use Livewire\Component;
 use Livewire\Livewire;
-use MarcoRieser\Livewire\Testing\Concerns\CanManipulateAddonConfig;
+use MarcoRieser\Livewire\Tests\Concerns\CanManipulateAddonConfig;
 use MarcoRieser\Livewire\Tests\TestCase;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
-use Statamic\Fields\Field;
-use Statamic\Fields\Value;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-class FieldSynthesizerTest extends TestCase
+class EntryCollectionSynthesizerTest extends TestCase
 {
     use CanManipulateAddonConfig;
     use PreventsSavingStacheItemsToDisk;
 
     #[Test]
     #[DefineEnvironment('enableSynthesizers')]
-    public function field_is_supported_as_property_type()
+    public function entry_collection_is_supported_as_property_type()
     {
         $component = $this->getLivewireComponent();
 
         Livewire::test($component)
-            ->assertSet('field', Entry::find('1')->blueprint()->field('title'));
+            ->assertSet('entries', Entry::all());
     }
 
     #[Test]
     #[DefineEnvironment('disableSynthesizers')]
-    public function field_is_not_supported_as_property_type()
+    public function entry_collection_is_not_supported_as_property_type()
     {
         $component = $this->getLivewireComponent();
 
@@ -45,38 +44,36 @@ class FieldSynthesizerTest extends TestCase
     #[Test]
     #[DefineEnvironment('enableSynthesizers')]
     #[DefineEnvironment('enableSynthesizerAugmentation')]
-    public function field_gets_augmented_in_view()
+    public function entry_collection_gets_augmented_in_view()
     {
         $component = $this->getLivewireComponent();
 
-        $testable = Livewire::test($component);
-        $testable->assertViewHas('field', Entry::find('1')->blueprint()->field('title')->augment());
-        $this->assertInstanceOf(Value::class, $testable->viewData('field')->value());
+        Livewire::test($component)
+            ->assertViewHas('entries', Entry::all()->toAugmentedArray());
     }
 
     #[Test]
     #[DefineEnvironment('enableSynthesizers')]
     #[DefineEnvironment('disableSynthesizerAugmentation')]
-    public function field_gets_not_augmented_in_view()
+    public function entry_collection_gets_not_augmented_in_view()
     {
         $component = $this->getLivewireComponent();
 
         Livewire::test($component)
-            ->assertViewHas('field', Entry::find('1')->blueprint()->field('title'));
+            ->assertViewHas('entries', Entry::all());
     }
 
     #[Test]
     #[DefineEnvironment('enableSynthesizers')]
-    public function field_gets_dehydrated_and_rehydrated_correctly()
+    public function entry_collection_gets_dehydrated_and_rehydrated_correctly()
     {
         $component = $this->getLivewireComponent();
 
         $testable = Livewire::test($component)->refresh();
 
-        $expected = Entry::find('1')->blueprint()->field('title');
-
-        $this->assertInstanceOf(Field::class, $testable->field);
-        $this->assertEquals($expected, $testable->field);
+        $this->assertInstanceOf(EntryCollection::class, $testable->entries);
+        $this->assertInstanceOf(\Statamic\Contracts\Entries\Entry::class, $testable->entries->first());
+        $this->assertEquals(Entry::all(), $testable->entries);
     }
 
     protected function setUp(): void
@@ -86,8 +83,10 @@ class FieldSynthesizerTest extends TestCase
         Collection::make('entries')->save();
 
         Entry::make()
-            ->collection('entries')
             ->id('1')
+            ->collection('entries')
+            ->blueprint('entry')
+            ->locale('default')
             ->data(['title' => 'Entry 1'])
             ->save();
     }
@@ -96,11 +95,11 @@ class FieldSynthesizerTest extends TestCase
     {
         return new class extends Component
         {
-            public Field $field;
+            public EntryCollection $entries;
 
             public function mount()
             {
-                $this->field = Entry::find(1)->blueprint()->field('title');
+                $this->entries = Entry::all();
             }
 
             public function render()
