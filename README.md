@@ -25,8 +25,8 @@ A third-party [Laravel Livewire](https://laravel-livewire.com/) integration for 
 * [Other Statamic Livewire Packages](#other-statamic-livewire-packages)
 * [Credits](#credits)
 * [Requirements](#requirements)
-- [Support](#support)
-- [License](#license)
+* [Support](#support)
+* [License](#license)
 
 ## Installation
 Install the addon via composer:
