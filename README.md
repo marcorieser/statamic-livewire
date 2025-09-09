@@ -3,6 +3,7 @@
 A third-party [Laravel Livewire](https://laravel-livewire.com/) integration for Statamic. It aims to make it as easy as possible to use Livewire in Statamic.
 
 ## Table of Contents
+* [Requirements](#requirements)
 * [Installation](#installation)
 * [Upgrade](#upgrade)
 * [Livewire documentation](#livewire-documentation)
@@ -24,9 +25,13 @@ A third-party [Laravel Livewire](https://laravel-livewire.com/) integration for 
     + [This: Accessing the Livewire component](#this--accessing-the-livewire-component)
 * [Other Statamic Livewire Packages](#other-statamic-livewire-packages)
 * [Credits](#credits)
-* [Requirements](#requirements)
 * [Support](#support)
 * [License](#license)
+
+## Requirements
+- PHP 8.2
+- Laravel 11, 12
+- Statamic 5
 
 ## Installation
 Install the addon via composer:
@@ -318,11 +323,6 @@ Thanks to:
 - [Jonas Siewertsen](https://jonassiewertsen.com/) for building the addon and give me the permission to take it over
 - [Caleb](https://github.com/calebporzio) and the community for building [Livewire](https://laravel-livewire.com/)
 - [Austenc](https://github.com/austenc) for the Statamic marketplace preview image
-
-## Requirements
-- PHP 8.2
-- Laravel 11, 12
-- Statamic 5
 
 # Support
 I love to share with the community. Nevertheless, it does take a lot of work, time and effort.
