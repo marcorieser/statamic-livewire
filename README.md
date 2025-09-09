@@ -2,6 +2,32 @@
 
 A third-party [Laravel Livewire](https://laravel-livewire.com/) integration for Statamic. It aims to make it as easy as possible to use Livewire in Statamic.
 
+## Table of Contents
+* [Installation](#installation)
+* [Upgrade](#upgrade)
+* [Livewire documentation](#livewire-documentation)
+* [Features](#features)
+    + [Blade or Antlers? Yes, please!](#blade-or-antlers--yes--please-)
+    + [Include components](#include-components)
+    + [Passing Initial Parameters](#passing-initial-parameters)
+    + [Keying Components](#keying-components)
+    + [Manually including Livewire's frontend assets](#manually-including-livewire-s-frontend-assets)
+    + [Manually bundling Livewire and Alpine](#manually-bundling-livewire-and-alpine)
+    + [Static caching](#static-caching)
+    + [`@script` and `@assets`](#--script--and---assets-)
+    + [Computed Properties](#computed-properties)
+    + [Multi-Site / Localization](#multi-site---localization)
+    + [Lazy Components](#lazy-components)
+    + [Paginating Data](#paginating-data)
+    + [Synthesizers](#synthesizers)
+    + [Entangle: Sharing State Between Livewire And Alpine](#entangle--sharing-state-between-livewire-and-alpine)
+    + [This: Accessing the Livewire component](#this--accessing-the-livewire-component)
+* [Other Statamic Livewire Packages](#other-statamic-livewire-packages)
+* [Credits](#credits)
+* [Requirements](#requirements)
+- [Support](#support)
+- [License](#license)
+
 ## Installation
 Install the addon via composer:
 
