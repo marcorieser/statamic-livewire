@@ -3,7 +3,7 @@
 ## Upgrade steps
 1. Replace `"marcorieser/statamic-livewire": "^4.0"` with `"marcorieser/statamic-livewire": "^5.0"` in your `composer.json`
 2. Remove the `RestoreCurrentSite` trait from your components
-3. Remove the `{{ computed:... }}` tags in your views 
+3. Remove the `{{ livewire:computed:... }}` tags in your views 
 4. Remove the `DataFetcher` helper if you're using it (quite unlikely)
 
 ## In details
@@ -16,7 +16,7 @@ Therefore, the deprecated `RestoreCurrentSite` trait is removed, and you need to
 ### Computed Properties
 Computed properties are available in your Antlers views automatically. You can use the property name like any other variable.
 
-For example `{{ computed:entries }}` is now `{{ entries }}`.
+For example `{{ livewire:computed:entries }}` is now `{{ entries }}`.
 
 Additionally, the `DataFetcher` helper is removed since it was only used for accessing computed properties behind the scenes. 
 
