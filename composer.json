@@ -36,8 +36,8 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^11.0 || ^12.0",
-        "statamic/cms": "^5.17.0",
-        "livewire/livewire": "^3.6.4"
+        "statamic/cms": "^5.17.0 || ^6.0",
+        "livewire/livewire": "^3.6.4 || ^4.0"
     },
     "extra": {
         "statamic": {
@@ -60,5 +60,7 @@
         "orchestra/testbench": "^9.0 || ^10.0",
         "phpunit/phpunit": "^10.5|^11.0",
         "spatie/laravel-ray": "^1.0"
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
