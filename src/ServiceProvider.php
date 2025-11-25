@@ -6,6 +6,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Livewire\Livewire;
 use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
+use MarcoRieser\Livewire\Hooks\CascadeVariablesAutoloader;
 use MarcoRieser\Livewire\Hooks\ComputedPropertiesAutoloader;
 use MarcoRieser\Livewire\Hooks\SynthesizerAugmentor;
 use MarcoRieser\Livewire\Http\Middleware\ResolveCurrentSiteByLivewireUrl;
@@ -24,6 +25,7 @@ class ServiceProvider extends AddonServiceProvider
 
         $this->registerSynthesizerAugmentation();
         $this->registerComputedPropertiesAutoloader();
+        $this->registerCascadeVariablesAutoloader();
     }
 
     public function bootAddon(): void
@@ -74,5 +76,10 @@ class ServiceProvider extends AddonServiceProvider
     protected function registerComputedPropertiesAutoloader(): void
     {
         Livewire::componentHook(ComputedPropertiesAutoloader::class);
+    }
+
+    protected function registerCascadeVariablesAutoloader(): void
+    {
+        Livewire::componentHook(CascadeVariablesAutoloader::class);
     }
 }
