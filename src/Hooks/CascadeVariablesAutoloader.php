@@ -26,6 +26,7 @@ class CascadeVariablesAutoloader extends ComponentHook
             ->getAttributes()
             ->whereInstanceOf(CascadeAttribute::class)
             ->first();
+
         if (! $attribute) {
             return;
         }

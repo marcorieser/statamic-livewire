@@ -32,8 +32,8 @@ class CascadeVariablesAutoloaderTest extends TestCase
 
         $testable = Livewire::test($component);
 
-        $testable = $testable->assertViewMissing('homepage');
-        $testable = $testable->assertViewMissing('environment');
+        $testable->assertViewMissing('homepage');
+        $testable->assertViewMissing('environment');
     }
 
     #[Test]
@@ -43,9 +43,9 @@ class CascadeVariablesAutoloaderTest extends TestCase
 
         $testable = Livewire::test($component);
 
-        $testable = $testable->assertViewHas('homepage', '/');
-        $testable = $testable->assertViewHas('my_global', true);
-        $testable = $testable->assertViewMissing('environment');
+        $testable->assertViewHas('homepage', '/');
+        $testable->assertViewHas('my_global', true);
+        $testable->assertViewMissing('environment');
     }
 
     #[Test]
@@ -56,7 +56,7 @@ class CascadeVariablesAutoloaderTest extends TestCase
 
         $component = $this->getInvalidLivewireComponent();
 
-        $testable = Livewire::test($component);
+        Livewire::test($component);
     }
 
     #[Test]
@@ -66,8 +66,8 @@ class CascadeVariablesAutoloaderTest extends TestCase
 
         $testable = Livewire::test($component);
 
-        $testable = $testable->assertViewMissing('homepage');
-        $testable = $testable->assertViewMissing('environment');
+        $testable->assertViewMissing('homepage');
+        $testable->assertViewMissing('environment');
     }
 
     protected function getAntlersLivewireComponent(): Component
