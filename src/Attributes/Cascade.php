@@ -70,7 +70,7 @@ class Cascade extends LivewireAttribute
             ->after(Site::current()->absoluteUrl())
             ->start('/');
 
-        if (! ($entry = Entry::findByUri($url))) {
+        if (! ($entry = Entry::findByUri($url, Site::current()))) {
             return;
         }
 
