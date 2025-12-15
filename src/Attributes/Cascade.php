@@ -5,6 +5,7 @@ namespace MarcoRieser\Livewire\Attributes;
 use Livewire\Features\SupportAttributes\Attribute as LivewireAttribute;
 use Statamic\Exceptions\CascadeDataNotFoundException;
 use Statamic\Facades\Cascade as CascadeFacade;
+use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 
 #[\Attribute]
@@ -17,6 +18,8 @@ class Cascade extends LivewireAttribute
     public function getCascadeData(): array
     {
         if (! $data = CascadeFacade::toArray()) {
+            CascadeFacade::withSite(Site::current());
+
             $data = CascadeFacade::hydrate()->toArray();
         }
 
