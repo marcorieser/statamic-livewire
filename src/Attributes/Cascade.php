@@ -2,7 +2,9 @@
 
 namespace MarcoRieser\Livewire\Attributes;
 
+use Illuminate\Support\Facades\Request;
 use Livewire\Features\SupportAttributes\Attribute as LivewireAttribute;
+use Livewire\Livewire;
 use Statamic\Exceptions\CascadeDataNotFoundException;
 use Statamic\Facades\Cascade as CascadeFacade;
 use Statamic\Facades\Site;
@@ -19,6 +21,7 @@ class Cascade extends LivewireAttribute
     {
         if (! $data = CascadeFacade::toArray()) {
             CascadeFacade::withSite(Site::current());
+            CascadeFacade::withRequest(Request::create(uri: Livewire::originalUrl(), method: Livewire::originalMethod()));
 
             $data = CascadeFacade::hydrate()->toArray();
         }
