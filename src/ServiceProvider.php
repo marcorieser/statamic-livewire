@@ -9,6 +9,7 @@ use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
 use MarcoRieser\Livewire\Hooks\CascadeVariablesAutoloader;
 use MarcoRieser\Livewire\Hooks\ComputedPropertiesAutoloader;
 use MarcoRieser\Livewire\Hooks\SynthesizerAugmentor;
+use MarcoRieser\Livewire\Http\Middleware\HydrateCascadeByLivewireUrl;
 use MarcoRieser\Livewire\Http\Middleware\ResolveCurrentSiteByLivewireUrl;
 use Statamic\Http\Middleware\Localize;
 use Statamic\Providers\AddonServiceProvider;
@@ -46,6 +47,7 @@ class ServiceProvider extends AddonServiceProvider
             ->each(fn (Route $route) => $route->middleware([
                 ResolveCurrentSiteByLivewireUrl::class,
                 Localize::class,
+                HydrateCascadeByLivewireUrl::class,
             ]));
     }
 
