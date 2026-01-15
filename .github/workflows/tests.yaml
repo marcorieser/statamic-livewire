@@ -10,9 +10,10 @@ jobs:
       matrix:
         php: [8.2, 8.3, 8.4]
         laravel: [11.*, 12.*]
+        livewire: [3.*, 4.*]
         os: [ubuntu-latest]
 
-    name: ${{ matrix.php }} - ${{ matrix.laravel }}
+    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} - Livewire ${{ matrix.livewire }}
 
     runs-on: ${{ matrix.os }}
 
@@ -29,6 +30,7 @@ jobs:
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
+          composer require "livewire/livewire:${{ matrix.livewire }}" --no-interaction --no-update
           composer install --no-interaction
 
       - name: Run PHPUnit
