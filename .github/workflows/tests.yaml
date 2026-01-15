@@ -13,7 +13,7 @@ jobs:
         livewire: [3.*, 4.*]
         os: [ubuntu-latest]
 
-    name: ${{ matrix.php }} - ${{ matrix.laravel }} - ${{ matrix.livewire }}
+    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} - Livewire ${{ matrix.livewire }}
 
     runs-on: ${{ matrix.os }}
 
