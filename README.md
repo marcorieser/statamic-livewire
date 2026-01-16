@@ -17,6 +17,7 @@ A third-party [Laravel Livewire](https://laravel-livewire.com/) integration for 
     + [Static caching](#static-caching)
     + [`@script` and `@assets`](#--script--and---assets-)
     + [Computed Properties](#computed-properties)
+    + [Cascade](#cascade)
     + [Multi-Site / Localization](#multi-site---localization)
     + [Lazy Components](#lazy-components)
     + [Paginating Data](#paginating-data)
@@ -191,6 +192,40 @@ public function entries() {
     {{ title }}
 {{ /entries }}
 ```
+
+### Cascade
+Normally all the variables in the Cascade are only available on initial render and get lost between Livewire requests. This means you'd need pass in the required ones into the component yourself.
+To make our lives a bit easier, you can add the `#[Cascade]` attribute to your component. <br> This is only needed for Antlers views and mirrors the logic of Blade's [`@cascade`](https://statamic.dev/blade#cascade-directive) directive.
+
+```php
+use Livewire\Component;
+use MarcoRieser\Livewire\Attributes\Cascade;
+
+#[Cascade]
+class ShowArticle extends Component
+{
+    ...
+}
+```
+
+Now you can access the variables from the Cascade directly in your Antlers view, even on subsequent renders:
+
+```antlers
+<h1>{{ title }}</h1>
+{{ seo_title }}
+```
+
+You can also limit which cascade keys are exposed (and provide defaults):
+
+```php
+#[Cascade([
+    'title',
+    'seo_title' => 'Fallback title',
+])]
+class ShowArticle extends Component {}
+```
+
+For subsequent requests, the addon restores the Cascade using the original Livewire URL, so site, request, and content data resolve as expected.
 
 ### Multi-Site / Localization
 By default, your current site is persisted between Livewire requests automatically.  

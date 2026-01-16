@@ -6,14 +6,18 @@ use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Livewire\Livewire;
 use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
+use MarcoRieser\Livewire\Hooks\CascadeVariablesAutoloader;
 use MarcoRieser\Livewire\Hooks\ComputedPropertiesAutoloader;
 use MarcoRieser\Livewire\Hooks\SynthesizerAugmentor;
+use MarcoRieser\Livewire\Http\Middleware\HydrateCascadeByLivewireUrl;
 use MarcoRieser\Livewire\Http\Middleware\ResolveCurrentSiteByLivewireUrl;
 use Statamic\Http\Middleware\Localize;
 use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
 {
+    protected array $middlewares = [];
+
     protected $tags = [
         'MarcoRieser\Livewire\Tags\Livewire',
     ];
@@ -24,13 +28,16 @@ class ServiceProvider extends AddonServiceProvider
 
         $this->registerSynthesizerAugmentation();
         $this->registerComputedPropertiesAutoloader();
+        $this->registerCascadeVariablesAutoloader();
     }
 
     public function bootAddon(): void
     {
         $this->bootLocalization();
+        $this->bootCascadeRestoration();
         $this->bootReplacers();
         $this->bootSynthesizers();
+        $this->bootMiddlewares();
     }
 
     protected function bootLocalization(): void
@@ -39,12 +46,13 @@ class ServiceProvider extends AddonServiceProvider
             return;
         }
 
-        collect($this->app->make(Router::class)->getRoutes()->getRoutes())
-            ->filter(fn (Route $route) => $route->named('*livewire.update'))
-            ->each(fn (Route $route) => $route->middleware([
-                ResolveCurrentSiteByLivewireUrl::class,
-                Localize::class,
-            ]));
+        $this->middlewares[] = ResolveCurrentSiteByLivewireUrl::class;
+        $this->middlewares[] = Localize::class;
+    }
+
+    protected function bootCascadeRestoration(): void
+    {
+        $this->middlewares[] = HydrateCascadeByLivewireUrl::class;
     }
 
     protected function bootReplacers(): void
@@ -74,5 +82,17 @@ class ServiceProvider extends AddonServiceProvider
     protected function registerComputedPropertiesAutoloader(): void
     {
         Livewire::componentHook(ComputedPropertiesAutoloader::class);
+    }
+
+    protected function registerCascadeVariablesAutoloader(): void
+    {
+        Livewire::componentHook(CascadeVariablesAutoloader::class);
+    }
+
+    protected function bootMiddlewares(): void
+    {
+        collect($this->app->make(Router::class)->getRoutes()->getRoutes())
+            ->filter(fn (Route $route) => $route->named('*livewire.update'))
+            ->each(fn (Route $route) => $route->middleware($this->middlewares));
     }
 }
