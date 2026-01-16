@@ -70,15 +70,6 @@ class CascadeVariablesAutoloaderTest extends TestCase
         $testable->assertViewMissing('environment');
     }
 
-    #[Test]
-    public function marco()
-    {
-        $component = $this->getAntlersLivewireComponent();
-
-        $testable = Livewire::test($component);
-
-    }
-
     protected function getAntlersLivewireComponent(): Component
     {
         return new
