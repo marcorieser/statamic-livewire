@@ -194,8 +194,8 @@ public function entries() {
 ```
 
 ### Cascade
-Normally all the variables in the Cascade are only available on initial render and get lost between Livewire requests. This means you'd need pass in the required ones into the component yourself. <br>
-To make our lives a bit easier, you can add the `#[Cascade]` attribute to your component. This is only needed for Antlers views and mirrors the logic of Blade's [`@cascade`](https://statamic.dev/blade#cascade-directive) directive.
+Normally all the variables in the Cascade are only available on initial render and get lost between Livewire requests. This means you'd need pass in the required ones into the component yourself.
+To make our lives a bit easier, you can add the `#[Cascade]` attribute to your component. <br> This is only needed for Antlers views and mirrors the logic of Blade's [`@cascade`](https://statamic.dev/blade#cascade-directive) directive.
 
 ```php
 use Livewire\Component;
