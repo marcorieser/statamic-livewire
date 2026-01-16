@@ -16,6 +16,8 @@ use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
 {
+    protected array $middlewares = [];
+
     protected $tags = [
         'MarcoRieser\Livewire\Tags\Livewire',
     ];
@@ -32,8 +34,10 @@ class ServiceProvider extends AddonServiceProvider
     public function bootAddon(): void
     {
         $this->bootLocalization();
+        $this->bootCascadeRestoration();
         $this->bootReplacers();
         $this->bootSynthesizers();
+        $this->bootMiddlewares();
     }
 
     protected function bootLocalization(): void
@@ -42,13 +46,13 @@ class ServiceProvider extends AddonServiceProvider
             return;
         }
 
-        collect($this->app->make(Router::class)->getRoutes()->getRoutes())
-            ->filter(fn (Route $route) => $route->named('*livewire.update'))
-            ->each(fn (Route $route) => $route->middleware([
-                ResolveCurrentSiteByLivewireUrl::class,
-                Localize::class,
-                HydrateCascadeByLivewireUrl::class,
-            ]));
+        $this->middlewares[] = ResolveCurrentSiteByLivewireUrl::class;
+        $this->middlewares[] = Localize::class;
+    }
+
+    protected function bootCascadeRestoration(): void
+    {
+        $this->middlewares[] = HydrateCascadeByLivewireUrl::class;
     }
 
     protected function bootReplacers(): void
@@ -83,5 +87,12 @@ class ServiceProvider extends AddonServiceProvider
     protected function registerCascadeVariablesAutoloader(): void
     {
         Livewire::componentHook(CascadeVariablesAutoloader::class);
+    }
+
+    protected function bootMiddlewares(): void
+    {
+        collect($this->app->make(Router::class)->getRoutes()->getRoutes())
+            ->filter(fn (Route $route) => $route->named('*livewire.update'))
+            ->each(fn (Route $route) => $route->middleware($this->middlewares));
     }
 }
