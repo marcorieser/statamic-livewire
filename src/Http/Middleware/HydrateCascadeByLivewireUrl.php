@@ -39,6 +39,6 @@ class HydrateCascadeByLivewireUrl
 
     protected function hydrateContent(): void
     {
-        Cascade::withContent(Data::findByRequestUrl(Livewire::originalUrl()));
+        Cascade::withContent(fn () => Data::findByRequestUrl(Livewire::originalUrl()));
     }
 }
