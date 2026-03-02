@@ -30,9 +30,9 @@ A third-party [Laravel Livewire](https://laravel-livewire.com/) integration for 
 * [License](#license)
 
 ## Requirements
-- PHP 8.2
-- Laravel 11, 12
-- Statamic 5
+- PHP 8.2+
+- Laravel 11+
+- Statamic 5+
 
 ## Installation
 Install the addon via composer:
