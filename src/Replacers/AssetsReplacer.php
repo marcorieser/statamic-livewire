@@ -41,7 +41,7 @@ class AssetsReplacer implements Replacer
             /**
              * Ensure Livewire injects its assets on the initial request.
              *
-             * @see \Livewire\Features\SupportAutoInjectedAssets\SupportAutoInjectedAssets
+             * @see SupportAutoInjectedAssets
              */
             app(FrontendAssets::class)->hasRenderedStyles = false;
             app(FrontendAssets::class)->hasRenderedScripts = false;
