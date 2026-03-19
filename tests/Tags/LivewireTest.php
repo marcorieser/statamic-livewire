@@ -38,7 +38,7 @@ class LivewireTest extends TestCase
 
         Livewire::expects('mount')->with('test', ['entry' => $entry->toArray()], null);
 
-        Parse::template('{{ livewire:test :entry="entry" /}}', ['entry' => $entry]);
+        Parse::template('{{ livewire:test :entry="entry" /}}', ['entry' => $entry], [], true);
     }
 
     #[Test]
@@ -61,7 +61,7 @@ class LivewireTest extends TestCase
 
         Livewire::expects('mount')->with('test', ['entry' => $entry], null);
 
-        Parse::template('{{ livewire:test :entry="entry" /}}', ['entry' => $entry]);
+        Parse::template('{{ livewire:test :entry="entry" /}}', ['entry' => $entry], [], true);
     }
 
     protected function setUp(): void
