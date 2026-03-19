@@ -19,6 +19,13 @@ jobs:
           ref: ${{ github.head_ref }}
           persist-credentials: true
 
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            **.php
+
       - name: "laravel-pint"
         uses: aglipanci/laravel-pint-action@v2
         with:
