@@ -26,6 +26,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v1
 
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            **.php
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
