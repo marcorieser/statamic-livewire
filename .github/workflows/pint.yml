@@ -21,6 +21,13 @@ jobs:
 
       - name: "laravel-pint"
         uses: aglipanci/laravel-pint-action@v2
+        with:
+          preset: laravel
+          verboseMode: true
+          onlyDirty: true
+          onlyDiff: "main"
 
       - name: Commit linted files
         uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: Fix styling
