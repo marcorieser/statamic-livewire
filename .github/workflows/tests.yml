@@ -8,13 +8,15 @@ jobs:
   php_tests:
     strategy:
       matrix:
-        php: [8.2, 8.3, 8.4, 8.5]
+        php: [8.3, 8.4, 8.5]
         laravel: [11.*, 12.*, 13.*]
         livewire: [3.*, 4.*]
         os: [ubuntu-latest]
         exclude:
-          - php: 8.2
-            laravel: 13.*
+          - laravel: 11.*
+            php: 8.5
+          - laravel: 13.*
+            php: 8.2
 
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} - Livewire ${{ matrix.livewire }}
 
