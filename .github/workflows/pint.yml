@@ -1,0 +1,18 @@
+name: Fix Code Style
+
+on:
+  push:
+
+jobs:
+  phplint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: "laravel-pint"
+        uses: aglipanci/laravel-pint-action@v2
+
+      - name: Commit linted files
+        uses: stefanzweifel/git-auto-commit-action@v6
