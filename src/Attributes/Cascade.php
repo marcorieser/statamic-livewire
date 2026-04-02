@@ -73,8 +73,7 @@ class Cascade extends LivewireAttribute
 
     protected function resolveContextIdentifier()
     {
-        $attributes = collect($this->getComponent()->getHtmlAttributes());
 
-        return $attributes[$this->contextAttribute] ?? null;
+        return $this->getComponent()->getHtmlAttributes()[$this->contextAttribute] ?? null;
     }
 }
