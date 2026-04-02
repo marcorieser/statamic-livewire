@@ -13,18 +13,16 @@ class Cascade extends LivewireAttribute
 {
     public function __construct(
         public array $keys = [],
-        public bool $context = false,
-        public ?string $contextBy = null,
+        public string $contextAttribute = '_context',
     ) {}
 
-    public function getCascadeData(): array
+    public function data(): array
     {
         if (! $data = CascadeFacade::toArray()) {
             $data = CascadeFacade::hydrate()->toArray();
         }
 
-        // TODO[mr]: ensure works in blade (02.04.2026 mr)
-        if ($this->context && $contextIdentifier = $this->resolveContextIdentifier()) {
+        if ($contextIdentifier = $this->resolveContextIdentifier()) {
             $path = $this->cascadePath(CascadeFacade::get('page'), $contextIdentifier);
             $data = array_merge($data, CascadeFacade::get($path)?->toArray() ?? []);
         }
@@ -75,21 +73,8 @@ class Cascade extends LivewireAttribute
 
     protected function resolveContextIdentifier()
     {
-        $possibleIdentifiers = collect([
-            $this->contextBy,
-            'id',
-            'context',
-            'context_id',
-            'cascade_id',
-            'contextId',
-            'cascadeId',
-        ])
-            ->filter()
-            ->values();
-
         $attributes = collect($this->getComponent()->getHtmlAttributes());
-        $match = $possibleIdentifiers->intersect($attributes->keys())->first();
 
-        return $attributes[$match] ?? null;
+        return $attributes[$this->contextAttribute] ?? null;
     }
 }
