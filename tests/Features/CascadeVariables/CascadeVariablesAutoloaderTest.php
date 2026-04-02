@@ -26,14 +26,14 @@ class CascadeVariablesAutoloaderTest extends TestCase
     }
 
     #[Test]
-    public function cascade_variables_are_not_autoloaded_in_blade()
+    public function cascade_variables_are_autoloaded_in_blade()
     {
         $component = $this->getBladeLivewireComponent();
 
         $testable = Livewire::test($component);
 
-        $testable->assertViewMissing('homepage');
-        $testable->assertViewMissing('environment');
+        $testable->assertViewHas('homepage');
+        $testable->assertViewHas('environment');
     }
 
     #[Test]
