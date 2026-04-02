@@ -14,6 +14,8 @@ class CascadeVariablesAutoloaderTest extends TestCase
 {
     use PreventsSavingStacheItemsToDisk;
 
+    // TODO[mr]: add tests for context and for refreshing (02.04.2026 mr)
+
     #[Test]
     public function cascade_variables_are_autoloaded_in_antlers()
     {
