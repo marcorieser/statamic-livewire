@@ -2,12 +2,10 @@
 
 namespace MarcoRieser\Livewire\Hooks;
 
-use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\ComponentHook;
 use Livewire\Livewire;
 use MarcoRieser\Livewire\Attributes\Cascade as CascadeAttribute;
-use Statamic\View\Antlers\Engine as AntlersEngine;
 
 class CascadeVariablesAutoloader extends ComponentHook
 {
@@ -15,10 +13,6 @@ class CascadeVariablesAutoloader extends ComponentHook
     {
         /** @var Component $component */
         if (! ($component = Livewire::current())) {
-            return;
-        }
-
-        if (! $this->isUsingAntlers($view)) {
             return;
         }
 
@@ -32,13 +26,6 @@ class CascadeVariablesAutoloader extends ComponentHook
             return;
         }
 
-        $cascade = $attribute->getCascadeData();
-
-        $view->with(array_merge($cascade, $data));
-    }
-
-    protected function isUsingAntlers(View $view): bool
-    {
-        return $view->getEngine() instanceof AntlersEngine;
+        $view->with(array_merge($attribute->data(), $data));
     }
 }

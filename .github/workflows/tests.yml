@@ -8,17 +8,19 @@ jobs:
   php_tests:
     strategy:
       matrix:
-        php: [8.2, 8.3, 8.4, 8.5]
-        laravel: [11.*, 12.*, 13.*]
-        livewire: [3.*, 4.*]
         os: [ubuntu-latest]
+        php: [8.2, 8.3, 8.4, 8.5]
+        laravel: [12.*, 13.*]
+        statamic: [5.*, 6.*]
+        livewire: [4.*]
+        stability: [prefer-lowest, prefer-stable]
         exclude:
-          - laravel: 11.*
-            php: 8.5
+          - statamic: 5.*
+            laravel: 13.*
           - laravel: 13.*
             php: 8.2
 
-    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} - Livewire ${{ matrix.livewire }}
+    name: PHP ${{ matrix.php }} - Statamic ${{ matrix.statamic }} - Laravel ${{ matrix.laravel }} - Livewire ${{ matrix.livewire }} - ${{ matrix.stability }}
 
     runs-on: ${{ matrix.os }}
 
@@ -34,9 +36,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
-          composer require "livewire/livewire:${{ matrix.livewire }}" --no-interaction --no-update
-          composer install --no-interaction
+          composer require "laravel/framework:${{ matrix.laravel }}" "statamic/cms:${{ matrix.statamic }}" "livewire/livewire:${{ matrix.livewire }}" --no-interaction --no-update
+          composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: Run PHPUnit
         run: vendor/bin/phpunit
