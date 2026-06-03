@@ -151,7 +151,7 @@ If you are using full measure static caching, and you're manually bundling Livew
 
 ```js
 if (window.livewireScriptConfig?.csrf === 'STATAMIC_CSRF_TOKEN') {
-    document.addEventListener('statamic:nocache.replaced', () => Livewire.start());
+    document.addEventListener('statamic:csrf.replaced', () => Livewire.start());
 } else {
     Livewire.start();
 }
