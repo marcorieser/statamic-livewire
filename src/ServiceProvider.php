@@ -4,8 +4,10 @@ namespace MarcoRieser\Livewire;
 
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
+use Livewire\Features\SupportIslands\SupportIslands;
 use Livewire\Livewire;
 use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
+use MarcoRieser\Livewire\Hooks\AntlersIslandsRegenerator;
 use MarcoRieser\Livewire\Hooks\CascadeVariablesAutoloader;
 use MarcoRieser\Livewire\Hooks\ComputedPropertiesAutoloader;
 use MarcoRieser\Livewire\Hooks\SynthesizerAugmentor;
@@ -29,6 +31,7 @@ class ServiceProvider extends AddonServiceProvider
         $this->registerSynthesizerAugmentation();
         $this->registerComputedPropertiesAutoloader();
         $this->registerCascadeVariablesAutoloader();
+        $this->registerAntlersIslandsRegenerator();
     }
 
     public function bootAddon(): void
@@ -87,6 +90,15 @@ class ServiceProvider extends AddonServiceProvider
     protected function registerCascadeVariablesAutoloader(): void
     {
         Livewire::componentHook(CascadeVariablesAutoloader::class);
+    }
+
+    protected function registerAntlersIslandsRegenerator(): void
+    {
+        if (! class_exists(SupportIslands::class)) {
+            return;
+        }
+
+        Livewire::componentHook(AntlersIslandsRegenerator::class);
     }
 
     protected function bootMiddlewares(): void

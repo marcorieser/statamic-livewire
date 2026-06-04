@@ -24,12 +24,18 @@ class ComputedPropertiesAutoloader extends ComponentHook
             return;
         }
 
-        $computed = $component->getAttributes()
+        $view->with(array_merge($data, static::computedProperties($component)));
+    }
+
+    /**
+     * @return array<string, Value>
+     */
+    public static function computedProperties(Component $component): array
+    {
+        return $component->getAttributes()
             ->filter(fn (Attribute $attribute) => $attribute instanceof Computed)
             ->flatMap(fn (Computed $attribute) => [$attribute->getName() => new Value(fn () => $component->{$attribute->getName()})])
             ->all();
-
-        $view->with(array_merge($data, $computed));
     }
 
     protected function isUsingAntlers(View $view): bool

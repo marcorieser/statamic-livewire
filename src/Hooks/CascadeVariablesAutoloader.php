@@ -22,19 +22,25 @@ class CascadeVariablesAutoloader extends ComponentHook
             return;
         }
 
+        if (! $cascade = static::cascadeVariables($component)) {
+            return;
+        }
+
+        $view->with(array_merge($cascade, $data));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function cascadeVariables(Component $component): array
+    {
         /** @var ?CascadeAttribute $attribute */
         $attribute = $component
             ->getAttributes()
             ->whereInstanceOf(CascadeAttribute::class)
             ->first();
 
-        if (! $attribute) {
-            return;
-        }
-
-        $cascade = $attribute->getCascadeData();
-
-        $view->with(array_merge($cascade, $data));
+        return $attribute?->getCascadeData() ?? [];
     }
 
     protected function isUsingAntlers(View $view): bool
