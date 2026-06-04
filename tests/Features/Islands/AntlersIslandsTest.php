@@ -164,6 +164,47 @@ class AntlersIslandsTest extends TestCase
     }
 
     #[Test]
+    public function island_token_stays_stable_when_dynamic_with_data_changes()
+    {
+        $testable = $this->mountIslandComponent('antlers-island-with-dynamic');
+
+        $testable->assertSee('Hi World!');
+
+        preg_match('/token=(antlers-[a-f0-9\-]+)/', $testable->html(), $matches);
+        $token = $matches[1];
+
+        $testable->set('greeting', 'Yo');
+
+        $testable->assertSeeHtml('token='.$token);
+
+        $testable->call('refreshStats');
+
+        $fragments = $testable->effects['islandFragments'] ?? [];
+
+        $this->assertCount(1, $fragments);
+        $this->assertStringContainsString('token='.$token, $fragments[0]);
+        $this->assertStringContainsString('Hi World!', $fragments[0]);
+    }
+
+    #[Test]
+    public function island_cache_files_are_regenerated_when_missing_after_dynamic_with_data_changed()
+    {
+        $testable = $this->mountIslandComponent('antlers-island-with-dynamic');
+
+        $testable->set('greeting', 'Yo');
+
+        File::deleteDirectory(app('livewire.compiler')->cacheManager->cacheDirectory.'/islands');
+        File::cleanDirectory(config('view.compiled'));
+
+        $testable->call('refreshStats');
+
+        $fragments = $testable->effects['islandFragments'] ?? [];
+
+        $this->assertCount(1, $fragments);
+        $this->assertStringContainsString('Yo World!', $fragments[0]);
+    }
+
+    #[Test]
     public function same_name_islands_render_independently()
     {
         $testable = $this->mountIslandComponent('antlers-island-same-name');
@@ -215,6 +256,8 @@ class AntlersIslandsTest extends TestCase
             public string $viewName = 'antlers-island';
 
             public string $name = 'World';
+
+            public string $greeting = 'Hi';
 
             public array $withData = ['greeting' => 'Hi'];
 

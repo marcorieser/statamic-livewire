@@ -3,6 +3,7 @@
 namespace MarcoRieser\Livewire\Islands;
 
 use Illuminate\Support\Facades\File;
+use Livewire\Component;
 use Livewire\Features\SupportIslands\Compiler\IslandCompiler;
 
 class IslandManager
@@ -10,11 +11,11 @@ class IslandManager
     /**
      * @param  array<string, mixed>  $with
      */
-    public function ensureIslandCacheFile(string $name, string $content, array $with = []): string
+    public function ensureIslandCacheFile(Component $component, string $name, string $content, array $with = []): string
     {
         [$template, $placeholder] = $this->extractPlaceholder($content);
 
-        $token = $this->token($name, $template, $placeholder, $with);
+        $token = $this->token($component, $name, $template, $placeholder, $with);
 
         $path = IslandCompiler::getCachedPathFromToken($token);
 
@@ -124,14 +125,29 @@ class IslandManager
     }
 
     /**
-     * Tokens are content-addressed so they stay stable across requests and
-     * resolve to the same cache file as long as the island is unchanged.
+     * Tokens are content-addressed so they stay stable across requests. As the
+     * "with" values may change between renders while Livewire memoizes islands
+     * on mount, a token memoized for the island wins over a freshly computed one.
      *
      * @param  array<string, mixed>  $with
      */
-    protected function token(string $name, string $template, string $placeholder, array $with): string
+    protected function token(Component $component, string $name, string $template, string $placeholder, array $with): string
     {
-        return 'antlers-'.md5($name.'|'.$template.'|'.$placeholder.'|'.json_encode($with));
+        $identity = 'antlers-'.md5($name.'|'.$template.'|'.$placeholder);
+
+        return $this->mountedToken($component, $identity) ?? $identity.'-'.md5(json_encode($with));
+    }
+
+    protected function mountedToken(Component $component, string $identity): ?string
+    {
+        if ($component->islandIsMounting()) {
+            return null;
+        }
+
+        return collect($component->getIslands())
+            ->pluck('token')
+            ->filter()
+            ->first(fn (string $token) => str_starts_with($token, $identity.'-'));
     }
 
     /**

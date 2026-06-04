@@ -147,7 +147,7 @@ class Livewire extends Tags
 
         throw_unless(is_array($with), new IslandException('The with parameter of the {{ livewire:island }} tag has to be an array.'));
 
-        $token = app(IslandManager::class)->ensureIslandCacheFile($name, $this->content, $with);
+        $token = app(IslandManager::class)->ensureIslandCacheFile($component, $name, $this->content, $with);
 
         return $component->renderIslandDirective(
             name: $name,

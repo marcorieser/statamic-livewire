@@ -263,7 +263,7 @@ Inside an island, the component's public properties, computed properties and (wi
 {{ /livewire:island }}
 ```
 
-The `with` data is captured when the island is first rendered and reused for subsequent island renders. Data passed to `$this->renderIsland('stats', with: [...])` takes precedence over it.
+The `with` data is captured when the island is first rendered and reused for subsequent island renders (after the compiled view cache has been cleared, it is re-captured from the current component state). Data passed to `$this->renderIsland('stats', with: [...])` takes precedence over it.
 
 A few things to keep in mind:
 

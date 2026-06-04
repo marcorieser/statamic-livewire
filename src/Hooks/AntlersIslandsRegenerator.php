@@ -16,17 +16,28 @@ class AntlersIslandsRegenerator extends ComponentHook
 {
     public function hydrate($memo): void
     {
-        $missing = collect($memo['islands'] ?? [])
+        $islands = $memo['islands'] ?? [];
+
+        $missing = collect($islands)
             ->filter(fn (array $island) => str_starts_with($island['token'] ?? '', 'antlers-'))
             ->contains(fn (array $island) => ! file_exists(IslandCompiler::getCachedPathFromToken($island['token'])));
 
         if ($missing) {
-            $this->regenerateAntlersIslandCacheFiles();
+            $this->regenerateAntlersIslandCacheFiles($islands);
         }
     }
 
-    protected function regenerateAntlersIslandCacheFiles(): void
+    /**
+     * The island state is restored up front (core's SupportIslands hydrate may
+     * not have run yet) so the re-rendered tags reuse the memoized tokens.
+     *
+     * @param  array<int, array{name: string, token: string}>  $islands
+     */
+    protected function regenerateAntlersIslandCacheFiles(array $islands): void
     {
+        $this->component->markIslandsAsMounted();
+        $this->component->setIslands($islands);
+
         $view = $this->component->render();
 
         if (! $view instanceof View) {
