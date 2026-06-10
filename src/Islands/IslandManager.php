@@ -135,19 +135,29 @@ class IslandManager
     {
         $identity = 'antlers-'.md5($name.'|'.$template.'|'.$placeholder);
 
-        return $this->mountedToken($component, $identity) ?? $identity.'-'.md5(json_encode($with));
+        $candidate = $identity.'-'.md5(json_encode($with));
+
+        return $this->mountedToken($component, $identity, $candidate) ?? $candidate;
     }
 
-    protected function mountedToken(Component $component, string $identity): ?string
+    /**
+     * An exact match wins so same-identity islands with different static
+     * "with" data keep their own tokens. The prefix fallback covers islands
+     * whose dynamic "with" values changed since the token was memoized.
+     */
+    protected function mountedToken(Component $component, string $identity, string $candidate): ?string
     {
         if ($component->islandIsMounting()) {
             return null;
         }
 
-        return collect($component->getIslands())
+        $tokens = collect($component->getIslands())
             ->pluck('token')
             ->filter()
-            ->first(fn (string $token) => str_starts_with($token, $identity.'-'));
+            ->filter(fn (string $token) => str_starts_with($token, $identity.'-'));
+
+        return $tokens->first(fn (string $token) => $token === $candidate)
+            ?? $tokens->first();
     }
 
     /**

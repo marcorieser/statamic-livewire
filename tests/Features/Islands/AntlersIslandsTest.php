@@ -13,6 +13,18 @@ use PHPUnit\Framework\Attributes\Test;
 
 class AntlersIslandsTest extends TestCase
 {
+    /**
+     * The island cache in the testbench skeleton survives across PHPUnit
+     * processes, so stale files from previous (filtered) runs would leak
+     * into content-addressed tokens.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        File::deleteDirectory(app('livewire.compiler')->cacheManager->cacheDirectory.'/islands');
+    }
+
     #[Test]
     public function island_content_is_rendered_with_antlers_on_mount()
     {
@@ -215,6 +227,26 @@ class AntlersIslandsTest extends TestCase
         $testable->call('refreshStats');
 
         $this->assertCount(2, $testable->effects['islandFragments'] ?? []);
+    }
+
+    #[Test]
+    public function same_identity_islands_keep_their_own_tokens()
+    {
+        $testable = $this->mountIslandComponent('antlers-island-same-identity');
+
+        $testable->assertSee('Hi World from a twin island!');
+        $testable->assertSee('Yo World from a twin island!');
+
+        preg_match_all('/token=(antlers-[a-f0-9\-]+)/', $testable->html(), $matches);
+        $tokens = array_unique($matches[1]);
+
+        $this->assertCount(2, $tokens);
+
+        $testable->call('$refresh');
+
+        foreach ($tokens as $token) {
+            $testable->assertSeeHtml('token='.$token);
+        }
     }
 
     #[Test]

@@ -1,0 +1,9 @@
+<div>
+    <p>Outside the islands</p>
+    {{ livewire:island name="stats" :with="['greeting' => 'Hi']" }}
+        <p>{{ greeting }} {{ name }} from a twin island!</p>
+    {{ /livewire:island }}
+    {{ livewire:island name="stats" :with="['greeting' => 'Yo']" }}
+        <p>{{ greeting }} {{ name }} from a twin island!</p>
+    {{ /livewire:island }}
+</div>
