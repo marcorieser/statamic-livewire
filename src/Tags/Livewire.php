@@ -149,7 +149,9 @@ class Livewire extends Tags
 
         $token = app(IslandManager::class)->ensureIslandCacheFile($component, $name, $this->content, $with);
 
-        return $component->renderIslandDirective(
+        $mounting = $component->islandIsMounting();
+
+        $html = $component->renderIslandDirective(
             name: $name,
             token: $token,
             lazy: $this->params->bool('lazy'),
@@ -157,6 +159,12 @@ class Livewire extends Tags
             always: $this->params->bool('always'),
             skip: $this->params->bool('skip'),
         );
+
+        if ($mounting) {
+            app(IslandManager::class)->persistWithSnapshots($component);
+        }
+
+        return $html;
     }
 
     /**

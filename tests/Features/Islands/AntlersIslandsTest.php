@@ -153,10 +153,40 @@ class AntlersIslandsTest extends TestCase
         app(WithSnapshot::class)->snapshot(['callback' => fn () => null]);
     }
 
+    /**
+     * Snapshots persisted in cache files would put captured values on disk
+     * and break fresh mounts once their release token or checksum expires.
+     */
     #[Test]
-    public function legacy_cache_files_with_raw_with_data_are_passed_through()
+    public function with_snapshots_are_stored_in_the_islands_memo_instead_of_the_cache_files()
     {
-        $this->assertSame(['greeting' => 'Hi'], app(WithSnapshot::class)->resurrect(['greeting' => 'Hi']));
+        $testable = $this->mountIslandComponent('antlers-island-with');
+
+        $islands = $testable->snapshot['memo']['islands'] ?? [];
+
+        $this->assertNotEmpty($islands);
+        $this->assertArrayHasKey('with', $islands[0]);
+        $this->assertArrayHasKey('memo', $islands[0]['with']);
+
+        $files = File::allFiles(app('livewire.compiler')->cacheManager->cacheDirectory.'/islands');
+
+        $this->assertNotEmpty($files);
+
+        foreach ($files as $file) {
+            $this->assertStringNotContainsString('json_decode', $file->getContents());
+        }
+    }
+
+    #[Test]
+    public function fresh_mounts_render_islands_after_a_release_token_change()
+    {
+        $this->mountIslandComponent('antlers-island-with');
+
+        config()->set('livewire.release_token', 'release-2');
+
+        $testable = $this->mountIslandComponent('antlers-island-with');
+
+        $testable->assertSee('Hi World!');
     }
 
     #[Test]
@@ -251,6 +281,9 @@ class AntlersIslandsTest extends TestCase
         $this->assertStringContainsString('Hi World!', $fragments[0]);
     }
 
+    /**
+     * A cache clear regenerates the template but keeps the mount-time "with" values.
+     */
     #[Test]
     public function island_cache_files_are_regenerated_when_missing_after_dynamic_with_data_changed()
     {
@@ -266,7 +299,7 @@ class AntlersIslandsTest extends TestCase
         $fragments = $testable->effects['islandFragments'] ?? [];
 
         $this->assertCount(1, $fragments);
-        $this->assertStringContainsString('Yo World!', $fragments[0]);
+        $this->assertStringContainsString('Hi World!', $fragments[0]);
     }
 
     #[Test]

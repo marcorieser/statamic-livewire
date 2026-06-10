@@ -43,18 +43,11 @@ class WithSnapshot
     }
 
     /**
-     * Cache files written by earlier addon versions contain the raw "with"
-     * array instead of a snapshot and are passed through unchanged.
-     *
      * @param  array<string, mixed>  $snapshot
      * @return array<string, mixed>
      */
     public function resurrect(array $snapshot): array
     {
-        if (! isset($snapshot['memo'])) {
-            return $snapshot;
-        }
-
         $this->registerContainerComponent();
 
         [$container] = app('livewire')->fromSnapshot($snapshot);

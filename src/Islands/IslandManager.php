@@ -6,8 +6,12 @@ use Illuminate\Support\Facades\File;
 use Livewire\Component;
 use Livewire\Features\SupportIslands\Compiler\IslandCompiler;
 
+use function Livewire\store;
+
 class IslandManager
 {
+    public const WITH_SNAPSHOTS_STORE_KEY = 'antlersIslandsWithSnapshots';
+
     /**
      * @param  array<string, mixed>  $with
      */
@@ -22,10 +26,35 @@ class IslandManager
         $path = IslandCompiler::getCachedPathFromToken($token);
 
         if (! file_exists($path)) {
-            $this->writeIslandCacheFile($path, $name, $template, $placeholder, $withSnapshot);
+            $this->writeIslandCacheFile($path, $name, $template, $placeholder, $token);
+        }
+
+        if ($component->islandIsMounting() && $withSnapshot !== []) {
+            store($component)->push(static::WITH_SNAPSHOTS_STORE_KEY, $withSnapshot, $token);
         }
 
         return $token;
+    }
+
+    /**
+     * Move the "with" snapshots captured while mounting onto the memoized
+     * island entries; entries that already carry one keep it (frozen at mount).
+     */
+    public function persistWithSnapshots(Component $component): void
+    {
+        if (! ($pending = store($component)->get(static::WITH_SNAPSHOTS_STORE_KEY, []))) {
+            return;
+        }
+
+        $component->setIslands(collect($component->getIslands())
+            ->map(function (array $island) use ($pending) {
+                if (! isset($island['with']) && isset($pending[$island['token'] ?? null])) {
+                    $island['with'] = $pending[$island['token']];
+                }
+
+                return $island;
+            })
+            ->all());
     }
 
     /**
@@ -164,16 +193,13 @@ class IslandManager
             ?? $tokens->first();
     }
 
-    /**
-     * @param  array<string, mixed>  $withSnapshot
-     */
-    protected function writeIslandCacheFile(string $path, string $name, string $template, string $placeholder, array $withSnapshot): void
+    protected function writeIslandCacheFile(string $path, string $name, string $template, string $placeholder, string $token): void
     {
         File::ensureDirectoryExists(dirname($path));
 
         $temporaryPath = $path.'.'.bin2hex(random_bytes(8)).'.tmp';
 
-        file_put_contents($temporaryPath, $this->buildIslandCacheFileContents($name, $template, $placeholder, $withSnapshot));
+        file_put_contents($temporaryPath, $this->buildIslandCacheFileContents($name, $template, $placeholder, $token));
 
         rename($temporaryPath, $path);
 
@@ -184,14 +210,11 @@ class IslandManager
      * The cache file is a Blade-compilable PHP shim that delegates rendering
      * back to Antlers. The island sources are base64-encoded so Blade's
      * compiler never sees (and mangles) the Antlers syntax.
-     *
-     * @param  array<string, mixed>  $withSnapshot
      */
-    protected function buildIslandCacheFileContents(string $name, string $template, string $placeholder, array $withSnapshot): string
+    protected function buildIslandCacheFileContents(string $name, string $template, string $placeholder, string $token): string
     {
         $template = base64_encode($template);
         $placeholder = base64_encode($placeholder);
-        $withSnapshot = base64_encode(json_encode($withSnapshot));
 
         return <<<PHP
 <?php /** Antlers island "{$name}" extracted by marcorieser/statamic-livewire. */
@@ -199,7 +222,7 @@ echo app(\MarcoRieser\Livewire\Islands\IslandRenderer::class)->render(
     get_defined_vars(),
     base64_decode('{$template}'),
     base64_decode('{$placeholder}'),
-    json_decode(base64_decode('{$withSnapshot}'), true),
+    '{$token}',
 );
 PHP;
     }

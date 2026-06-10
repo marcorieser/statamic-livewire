@@ -7,15 +7,16 @@ use MarcoRieser\Livewire\Hooks\CascadeVariablesAutoloader;
 use MarcoRieser\Livewire\Hooks\ComputedPropertiesAutoloader;
 use Statamic\Facades\Antlers;
 
+use function Livewire\store;
+
 class IslandRenderer
 {
     protected const EXCLUDED_SCOPE_VARIABLES = ['__env', 'app', '__path', '__data', 'obLevel', '__placeholder', '__runtimeWith'];
 
     /**
      * @param  array<string, mixed>  $scope
-     * @param  array<string, mixed>  $withSnapshot
      */
-    public function render(array $scope, string $template, string $placeholder = '', array $withSnapshot = []): string
+    public function render(array $scope, string $template, string $placeholder = '', string $token = ''): string
     {
         if (array_key_exists('__placeholder', $scope)) {
             if (trim($placeholder) === '') {
@@ -25,17 +26,16 @@ class IslandRenderer
             $template = $placeholder;
         }
 
-        return (string) Antlers::parse($template, $this->buildContext($scope, $withSnapshot), true)->withoutExtractions();
+        return (string) Antlers::parse($template, $this->buildContext($scope, $token), true)->withoutExtractions();
     }
 
     /**
      * Mirror the context the addon provides to full Antlers component views.
      *
      * @param  array<string, mixed>  $scope
-     * @param  array<string, mixed>  $withSnapshot
      * @return array<string, mixed>
      */
-    protected function buildContext(array $scope, array $withSnapshot = []): array
+    protected function buildContext(array $scope, string $token = ''): array
     {
         $component = $scope['__livewire'] ?? null;
 
@@ -47,8 +47,30 @@ class IslandRenderer
             $component instanceof Component ? CascadeVariablesAutoloader::cascadeVariables($component) : [],
             $scope,
             $component instanceof Component ? ComputedPropertiesAutoloader::computedProperties($component) : [],
-            $withSnapshot === [] ? [] : app(WithSnapshot::class)->resurrect($withSnapshot),
+            $component instanceof Component ? $this->withVariables($component, $token) : [],
             is_array($runtimeWith) ? $runtimeWith : [],
         );
+    }
+
+    /**
+     * The memo entry is not filled yet while the island is first mounting,
+     * so fall back to the component's request-scoped store.
+     *
+     * @return array<string, mixed>
+     */
+    protected function withVariables(Component $component, string $token): array
+    {
+        if ($token === '') {
+            return [];
+        }
+
+        $island = collect($component->getIslands())
+            ->first(fn (array $island) => ($island['token'] ?? null) === $token);
+
+        $snapshot = $island['with']
+            ?? store($component)->get(IslandManager::WITH_SNAPSHOTS_STORE_KEY, [])[$token]
+            ?? [];
+
+        return $snapshot === [] ? [] : app(WithSnapshot::class)->resurrect($snapshot);
     }
 }
