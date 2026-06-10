@@ -19,8 +19,7 @@ class AntlersIslandsTest extends TestCase
 {
     /**
      * The island cache in the testbench skeleton survives across PHPUnit
-     * processes, so stale files from previous (filtered) runs would leak
-     * into content-addressed tokens.
+     * processes, so stale files from previous runs would otherwise leak in.
      */
     protected function setUp(): void
     {
@@ -335,6 +334,56 @@ class AntlersIslandsTest extends TestCase
         }
     }
 
+    /**
+     * Changing every dynamic "with" value used to collapse both twins onto
+     * the first memoized token, cross-wiring their fragments.
+     */
+    #[Test]
+    public function twin_islands_keep_their_own_tokens_when_all_dynamic_with_data_changes()
+    {
+        $testable = $this->mountIslandComponent('antlers-island-same-identity-dynamic');
+
+        preg_match_all('/token=(antlers-[a-f0-9\-]+)/', $testable->html(), $matches);
+        $tokens = array_values(array_unique($matches[1]));
+
+        $this->assertCount(2, $tokens);
+
+        $testable->set('greetingA', 'Hey');
+        $testable->set('greetingB', 'Yaw');
+
+        $testable->call('$refresh');
+
+        foreach ($tokens as $token) {
+            $testable->assertSeeHtml('token='.$token);
+        }
+    }
+
+    /**
+     * Tokens are independent of the island template, so clients that mounted
+     * before a template edit keep addressing the same island and receive the
+     * updated content, mirroring core's path-based tokens.
+     */
+    #[Test]
+    public function island_tokens_stay_stable_when_the_island_template_changes()
+    {
+        $testable = $this->mountIslandComponent();
+
+        preg_match('/token=(antlers-[a-f0-9\-]+)/', $testable->html(), $matches);
+        $token = $matches[1];
+
+        $edited = $this->mountIslandComponent('antlers-island-edited');
+
+        $edited->assertSee('Howdy World!');
+        $edited->assertSeeHtml('token='.$token);
+
+        $testable->call('refreshStats');
+
+        $fragments = $testable->effects['islandFragments'] ?? [];
+
+        $this->assertCount(1, $fragments);
+        $this->assertStringContainsString('Howdy World!', $fragments[0]);
+    }
+
     #[Test]
     public function placeholder_inside_an_antlers_comment_is_not_extracted()
     {
@@ -365,7 +414,8 @@ class AntlersIslandsTest extends TestCase
 
     /**
      * The view name is passed as a mount parameter so it survives Livewire
-     * re-instantiating the component on every request.
+     * re-instantiating the component on every request. The component is
+     * registered under a fixed name as tokens derive from it.
      */
     protected function mountIslandComponent(string $view = 'antlers-island'): Testable
     {
@@ -376,6 +426,10 @@ class AntlersIslandsTest extends TestCase
             public string $name = 'World';
 
             public string $greeting = 'Hi';
+
+            public string $greetingA = 'Hi';
+
+            public string $greetingB = 'Yo';
 
             public array $withData = ['greeting' => 'Hi'];
 
@@ -401,6 +455,8 @@ class AntlersIslandsTest extends TestCase
             }
         };
 
-        return Livewire::test($component, ['viewName' => $view]);
+        Livewire::component('antlers-island-component', $component::class);
+
+        return Livewire::test('antlers-island-component', ['viewName' => $view]);
     }
 }

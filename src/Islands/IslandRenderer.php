@@ -26,7 +26,17 @@ class IslandRenderer
             $template = $placeholder;
         }
 
-        return (string) Antlers::parse($template, $this->buildContext($scope, $token), true)->withoutExtractions();
+        $component = $scope['__livewire'] ?? null;
+
+        $manager = $component instanceof Component && $token !== '' ? app(IslandManager::class) : null;
+
+        $manager?->pushContext($component, $token);
+
+        try {
+            return (string) Antlers::parse($template, $this->buildContext($scope, $token), true)->withoutExtractions();
+        } finally {
+            $manager?->popContext($component);
+        }
     }
 
     /**

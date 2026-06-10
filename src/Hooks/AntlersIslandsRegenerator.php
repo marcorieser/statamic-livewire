@@ -6,6 +6,7 @@ use Illuminate\Contracts\View\View;
 use Livewire\ComponentHook;
 use Livewire\Drawer\Utils;
 use Livewire\Features\SupportIslands\Compiler\IslandCompiler;
+use MarcoRieser\Livewire\Islands\IslandManager;
 
 use function Livewire\trigger;
 
@@ -16,6 +17,15 @@ use function Livewire\trigger;
  */
 class AntlersIslandsRegenerator extends ComponentHook
 {
+    /**
+     * Island occurrences are counted per render pass, so each pass (including
+     * the regeneration pass below) starts from zero.
+     */
+    public function render($view, $data): void
+    {
+        app(IslandManager::class)->resetRootOccurrences($this->component);
+    }
+
     public function hydrate($memo): void
     {
         $islands = $memo['islands'] ?? [];

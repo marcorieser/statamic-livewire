@@ -12,6 +12,12 @@ class IslandManager
 {
     public const WITH_SNAPSHOTS_STORE_KEY = 'antlersIslandsWithSnapshots';
 
+    protected const CONTEXT_STACK_STORE_KEY = 'antlersIslandsContextStack';
+
+    protected const OCCURRENCES_STORE_KEY = 'antlersIslandsOccurrences';
+
+    protected const ROOT_CONTEXT = 'root';
+
     /**
      * @param  array<string, mixed>  $with
      */
@@ -19,21 +25,54 @@ class IslandManager
     {
         [$template, $placeholder] = $this->extractPlaceholder($content);
 
-        $withSnapshot = $with === [] ? [] : app(WithSnapshot::class)->snapshot($with);
-
-        $token = $this->token($component, $name, $template, $placeholder, $withSnapshot);
+        $token = $this->token($component, $name);
 
         $path = IslandCompiler::getCachedPathFromToken($token);
 
-        if (! file_exists($path)) {
-            $this->writeIslandCacheFile($path, $name, $template, $placeholder, $token);
+        $contents = $this->buildIslandCacheFileContents($name, $template, $placeholder, $token);
+
+        if (! file_exists($path) || file_get_contents($path) !== $contents) {
+            $this->writeIslandCacheFile($path, $contents);
         }
 
-        if ($component->islandIsMounting() && $withSnapshot !== []) {
-            store($component)->push(static::WITH_SNAPSHOTS_STORE_KEY, $withSnapshot, $token);
+        if ($component->islandIsMounting() && $with !== []) {
+            store($component)->push(static::WITH_SNAPSHOTS_STORE_KEY, app(WithSnapshot::class)->snapshot($with), $token);
         }
 
         return $token;
+    }
+
+    /**
+     * Islands rendered inside another island count their occurrences within
+     * that island, mirroring how core scopes them to the containing file.
+     */
+    public function pushContext(Component $component, string $token): void
+    {
+        $stack = store($component)->get(static::CONTEXT_STACK_STORE_KEY, []);
+
+        $stack[] = $token;
+
+        store($component)->set(static::CONTEXT_STACK_STORE_KEY, $stack);
+
+        $this->resetOccurrences($component, $token);
+    }
+
+    public function popContext(Component $component): void
+    {
+        $stack = store($component)->get(static::CONTEXT_STACK_STORE_KEY, []);
+
+        array_pop($stack);
+
+        store($component)->set(static::CONTEXT_STACK_STORE_KEY, $stack);
+    }
+
+    /**
+     * Called at the start of every render pass so re-renders count
+     * occurrences from the top again.
+     */
+    public function resetRootOccurrences(Component $component): void
+    {
+        $this->resetOccurrences($component, static::ROOT_CONTEXT);
     }
 
     /**
@@ -156,50 +195,47 @@ class IslandManager
     }
 
     /**
-     * Tokens are content-addressed so they stay stable across requests. As the
-     * "with" values may change between renders while Livewire memoizes islands
-     * on mount, a token memoized for the island wins over a freshly computed one.
-     * Only the deterministic data portion of the snapshot is hashed; its memo
-     * contains a random component id.
-     *
-     * @param  array<string, mixed>  $withSnapshot
+     * Tokens mirror core's path+occurrence scheme: component name, containing
+     * island and island name plus a render-order occurrence. Independent of
+     * template contents and "with" data, they stay stable across template
+     * edits (the cache file is refreshed in place) and data changes.
      */
-    protected function token(Component $component, string $name, string $template, string $placeholder, array $withSnapshot): string
+    protected function token(Component $component, string $name): string
     {
-        $identity = 'antlers-'.md5($name.'|'.$template.'|'.$placeholder);
+        $context = $this->currentContext($component);
 
-        $candidate = $identity.'-'.md5(json_encode($withSnapshot['data'] ?? []));
+        $occurrences = store($component)->get(static::OCCURRENCES_STORE_KEY, []);
 
-        return $this->mountedToken($component, $identity, $candidate) ?? $candidate;
+        $occurrence = $occurrences[$context][$name] = ($occurrences[$context][$name] ?? 0) + 1;
+
+        store($component)->set(static::OCCURRENCES_STORE_KEY, $occurrences);
+
+        return 'antlers-'.md5($component->getName().'|'.$context.'|'.$name).'-'.$occurrence;
     }
 
-    /**
-     * An exact match wins so same-identity islands with different static
-     * "with" data keep their own tokens. The prefix fallback covers islands
-     * whose dynamic "with" values changed since the token was memoized.
-     */
-    protected function mountedToken(Component $component, string $identity, string $candidate): ?string
+    protected function currentContext(Component $component): string
     {
-        if ($component->islandIsMounting()) {
-            return null;
-        }
+        $stack = store($component)->get(static::CONTEXT_STACK_STORE_KEY, []);
 
-        $tokens = collect($component->getIslands())
-            ->pluck('token')
-            ->filter()
-            ->filter(fn (string $token) => str_starts_with($token, $identity.'-'));
-
-        return $tokens->first(fn (string $token) => $token === $candidate)
-            ?? $tokens->first();
+        return $stack === [] ? static::ROOT_CONTEXT : end($stack);
     }
 
-    protected function writeIslandCacheFile(string $path, string $name, string $template, string $placeholder, string $token): void
+    protected function resetOccurrences(Component $component, string $context): void
+    {
+        $occurrences = store($component)->get(static::OCCURRENCES_STORE_KEY, []);
+
+        unset($occurrences[$context]);
+
+        store($component)->set(static::OCCURRENCES_STORE_KEY, $occurrences);
+    }
+
+    protected function writeIslandCacheFile(string $path, string $contents): void
     {
         File::ensureDirectoryExists(dirname($path));
 
         $temporaryPath = $path.'.'.bin2hex(random_bytes(8)).'.tmp';
 
-        file_put_contents($temporaryPath, $this->buildIslandCacheFileContents($name, $template, $placeholder, $token));
+        file_put_contents($temporaryPath, $contents);
 
         rename($temporaryPath, $path);
 
