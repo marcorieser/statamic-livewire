@@ -221,6 +221,26 @@ class AntlersIslandsTest extends TestCase
         $testable->assertSeeHtml('name=inner');
     }
 
+    /**
+     * Nested island tags only run while their containing island renders, so
+     * the regeneration pass has to descend into the outer island's view.
+     */
+    #[Test]
+    public function nested_island_cache_files_are_regenerated_when_missing()
+    {
+        $testable = $this->mountIslandComponent('antlers-island-nested');
+
+        File::deleteDirectory(app('livewire.compiler')->cacheManager->cacheDirectory.'/islands');
+        File::cleanDirectory(config('view.compiled'));
+
+        $testable->call('refreshInner');
+
+        $fragments = $testable->effects['islandFragments'] ?? [];
+
+        $this->assertCount(1, $fragments);
+        $this->assertStringContainsString('Inner island content', $fragments[0]);
+    }
+
     #[Test]
     public function directive_with_data_is_available_in_the_island()
     {
@@ -441,6 +461,11 @@ class AntlersIslandsTest extends TestCase
             public function refreshStatsWithRuntimeData(): void
             {
                 $this->renderIsland('stats', with: ['greeting' => 'Runtime']);
+            }
+
+            public function refreshInner(): void
+            {
+                $this->renderIsland('inner');
             }
 
             #[Computed]

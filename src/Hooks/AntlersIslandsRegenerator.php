@@ -55,22 +55,53 @@ class AntlersIslandsRegenerator extends ComponentHook
 
         $view = $this->component->render();
 
-        if (! $view instanceof View) {
-            return;
+        if ($view instanceof View) {
+            $properties = Utils::getPublicPropertiesDefinedOnSubclass($this->component);
+
+            $view->with(array_merge($properties, ['__livewire' => $this->component]));
+
+            $finish = trigger('render', $this->component, $view, $properties);
+
+            $html = $view->render();
+
+            $replaceHtml = function ($newHtml) use (&$html) {
+                $html = $newHtml;
+            };
+
+            $finish($html, $replaceHtml);
         }
 
-        $properties = Utils::getPublicPropertiesDefinedOnSubclass($this->component);
+        $this->regenerateNestedIslandCacheFiles($islands);
+    }
 
-        $view->with(array_merge($properties, ['__livewire' => $this->component]));
+    /**
+     * Nested {{ livewire:island }} tags only execute while their containing
+     * island renders, so the islands whose cache files exist are rendered
+     * (output discarded) until every cache file is back, one nesting level
+     * per round.
+     *
+     * @param  array<int, array{name: string, token: string}>  $islands
+     */
+    protected function regenerateNestedIslandCacheFiles(array $islands): void
+    {
+        $islands = collect($islands)
+            ->filter(fn (array $island) => str_starts_with($island['token'] ?? '', 'antlers-'));
 
-        $finish = trigger('render', $this->component, $view, $properties);
+        $rendered = [];
 
-        $html = $view->render();
+        while ($islands->contains(fn (array $island) => ! file_exists(IslandCompiler::getCachedPathFromToken($island['token'])))) {
+            $renderable = $islands->filter(fn (array $island) => ! in_array($island['token'], $rendered)
+                && file_exists(IslandCompiler::getCachedPathFromToken($island['token'])));
 
-        $replaceHtml = function ($newHtml) use (&$html) {
-            $html = $newHtml;
-        };
+            if ($renderable->isEmpty()) {
+                return;
+            }
 
-        $finish($html, $replaceHtml);
+            $renderable->each(function (array $island) use (&$rendered) {
+                $rendered[] = $island['token'];
+
+                $this->component->renderIslandView($island['name'], $island['token']);
+            });
+        }
     }
 }
