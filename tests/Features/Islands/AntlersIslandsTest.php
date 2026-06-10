@@ -2,12 +2,15 @@
 
 namespace MarcoRieser\Livewire\Tests\Features\Islands;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\View\ViewException;
 use Livewire\Component;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
+use MarcoRieser\Livewire\Exceptions\IslandException;
 use MarcoRieser\Livewire\Islands\IslandRenderer;
+use MarcoRieser\Livewire\Islands\WithSnapshot;
 use MarcoRieser\Livewire\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -104,6 +107,32 @@ class AntlersIslandsTest extends TestCase
         $this->assertSame('<p>Loading...</p>', trim($renderer->render(['__placeholder' => ''], '<p>Hello {{ name }}!</p>', '<p>Loading...</p>')));
         $this->assertSame('', $renderer->render(['__placeholder' => ''], '<p>Hello {{ name }}!</p>'));
         $this->assertSame('<p>Hello World!</p>', trim($renderer->render(['name' => 'World'], '<p>Hello {{ name }}!</p>', '<p>Loading...</p>')));
+    }
+
+    #[Test]
+    public function with_data_round_trips_rich_values_through_the_snapshot_pipeline()
+    {
+        $snapshot = app(WithSnapshot::class)->snapshot(['released' => Carbon::parse('2026-06-10 12:00:00')]);
+
+        $with = app(WithSnapshot::class)->resurrect($snapshot);
+
+        $this->assertInstanceOf(Carbon::class, $with['released']);
+        $this->assertSame('2026-06-10 12:00:00', $with['released']->format('Y-m-d H:i:s'));
+    }
+
+    #[Test]
+    public function non_dehydratable_with_data_throws_an_island_exception()
+    {
+        $this->expectException(IslandException::class);
+        $this->expectExceptionMessage('The with data of the {{ livewire:island }} tag could not be dehydrated');
+
+        app(WithSnapshot::class)->snapshot(['callback' => fn () => null]);
+    }
+
+    #[Test]
+    public function legacy_cache_files_with_raw_with_data_are_passed_through()
+    {
+        $this->assertSame(['greeting' => 'Hi'], app(WithSnapshot::class)->resurrect(['greeting' => 'Hi']));
     }
 
     #[Test]

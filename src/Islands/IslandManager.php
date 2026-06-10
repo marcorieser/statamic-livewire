@@ -15,12 +15,14 @@ class IslandManager
     {
         [$template, $placeholder] = $this->extractPlaceholder($content);
 
-        $token = $this->token($component, $name, $template, $placeholder, $with);
+        $withSnapshot = $with === [] ? [] : app(WithSnapshot::class)->snapshot($with);
+
+        $token = $this->token($component, $name, $template, $placeholder, $withSnapshot);
 
         $path = IslandCompiler::getCachedPathFromToken($token);
 
         if (! file_exists($path)) {
-            $this->writeIslandCacheFile($path, $name, $template, $placeholder, $with);
+            $this->writeIslandCacheFile($path, $name, $template, $placeholder, $withSnapshot);
         }
 
         return $token;
@@ -128,14 +130,16 @@ class IslandManager
      * Tokens are content-addressed so they stay stable across requests. As the
      * "with" values may change between renders while Livewire memoizes islands
      * on mount, a token memoized for the island wins over a freshly computed one.
+     * Only the deterministic data portion of the snapshot is hashed; its memo
+     * contains a random component id.
      *
-     * @param  array<string, mixed>  $with
+     * @param  array<string, mixed>  $withSnapshot
      */
-    protected function token(Component $component, string $name, string $template, string $placeholder, array $with): string
+    protected function token(Component $component, string $name, string $template, string $placeholder, array $withSnapshot): string
     {
         $identity = 'antlers-'.md5($name.'|'.$template.'|'.$placeholder);
 
-        $candidate = $identity.'-'.md5(json_encode($with));
+        $candidate = $identity.'-'.md5(json_encode($withSnapshot['data'] ?? []));
 
         return $this->mountedToken($component, $identity, $candidate) ?? $candidate;
     }
@@ -161,15 +165,15 @@ class IslandManager
     }
 
     /**
-     * @param  array<string, mixed>  $with
+     * @param  array<string, mixed>  $withSnapshot
      */
-    protected function writeIslandCacheFile(string $path, string $name, string $template, string $placeholder, array $with): void
+    protected function writeIslandCacheFile(string $path, string $name, string $template, string $placeholder, array $withSnapshot): void
     {
         File::ensureDirectoryExists(dirname($path));
 
         $temporaryPath = $path.'.'.bin2hex(random_bytes(8)).'.tmp';
 
-        file_put_contents($temporaryPath, $this->buildIslandCacheFileContents($name, $template, $placeholder, $with));
+        file_put_contents($temporaryPath, $this->buildIslandCacheFileContents($name, $template, $placeholder, $withSnapshot));
 
         rename($temporaryPath, $path);
 
@@ -181,13 +185,13 @@ class IslandManager
      * back to Antlers. The island sources are base64-encoded so Blade's
      * compiler never sees (and mangles) the Antlers syntax.
      *
-     * @param  array<string, mixed>  $with
+     * @param  array<string, mixed>  $withSnapshot
      */
-    protected function buildIslandCacheFileContents(string $name, string $template, string $placeholder, array $with): string
+    protected function buildIslandCacheFileContents(string $name, string $template, string $placeholder, array $withSnapshot): string
     {
         $template = base64_encode($template);
         $placeholder = base64_encode($placeholder);
-        $with = base64_encode(json_encode($with));
+        $withSnapshot = base64_encode(json_encode($withSnapshot));
 
         return <<<PHP
 <?php /** Antlers island "{$name}" extracted by marcorieser/statamic-livewire. */
@@ -195,7 +199,7 @@ echo app(\MarcoRieser\Livewire\Islands\IslandRenderer::class)->render(
     get_defined_vars(),
     base64_decode('{$template}'),
     base64_decode('{$placeholder}'),
-    json_decode(base64_decode('{$with}'), true),
+    json_decode(base64_decode('{$withSnapshot}'), true),
 );
 PHP;
     }

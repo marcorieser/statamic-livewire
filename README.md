@@ -263,7 +263,7 @@ Inside an island, the component's public properties, computed properties and (wi
 {{ /livewire:island }}
 ```
 
-The `with` data is captured when the island is first rendered and reused for subsequent island renders (after the compiled view cache has been cleared, it is re-captured from the current component state). Data passed to `$this->renderIsland('stats', with: [...])` takes precedence over it.
+The `with` data is captured when the island is first rendered and reused for subsequent island renders (after the compiled view cache has been cleared, it is re-captured from the current component state). The captured values are dehydrated and rehydrated through Livewire's synthesizer pipeline, so the same serialization rules apply as for public component properties — dates, collections and (with the addon's [Synthesizers](#synthesizers) enabled) Statamic values survive the round trip, while unsupported types throw an exception. Data passed to `$this->renderIsland('stats', with: [...])` takes precedence over the captured values and is handed to the island live, without being serialized.
 
 A few things to keep in mind:
 

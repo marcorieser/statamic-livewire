@@ -13,9 +13,9 @@ class IslandRenderer
 
     /**
      * @param  array<string, mixed>  $scope
-     * @param  array<string, mixed>  $with
+     * @param  array<string, mixed>  $withSnapshot
      */
-    public function render(array $scope, string $template, string $placeholder = '', array $with = []): string
+    public function render(array $scope, string $template, string $placeholder = '', array $withSnapshot = []): string
     {
         if (array_key_exists('__placeholder', $scope)) {
             if (trim($placeholder) === '') {
@@ -25,17 +25,17 @@ class IslandRenderer
             $template = $placeholder;
         }
 
-        return (string) Antlers::parse($template, $this->buildContext($scope, $with), true)->withoutExtractions();
+        return (string) Antlers::parse($template, $this->buildContext($scope, $withSnapshot), true)->withoutExtractions();
     }
 
     /**
      * Mirror the context the addon provides to full Antlers component views.
      *
      * @param  array<string, mixed>  $scope
-     * @param  array<string, mixed>  $with
+     * @param  array<string, mixed>  $withSnapshot
      * @return array<string, mixed>
      */
-    protected function buildContext(array $scope, array $with = []): array
+    protected function buildContext(array $scope, array $withSnapshot = []): array
     {
         $component = $scope['__livewire'] ?? null;
 
@@ -47,7 +47,7 @@ class IslandRenderer
             $component instanceof Component ? CascadeVariablesAutoloader::cascadeVariables($component) : [],
             $scope,
             $component instanceof Component ? ComputedPropertiesAutoloader::computedProperties($component) : [],
-            $with,
+            $withSnapshot === [] ? [] : app(WithSnapshot::class)->resurrect($withSnapshot),
             is_array($runtimeWith) ? $runtimeWith : [],
         );
     }
