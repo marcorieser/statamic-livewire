@@ -5,6 +5,7 @@ namespace MarcoRieser\Livewire\Tests\Features\Islands;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\View\ViewException;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
@@ -90,6 +91,29 @@ class AntlersIslandsTest extends TestCase
         $testable = $this->mountIslandComponent();
 
         File::deleteDirectory(app('livewire.compiler')->cacheManager->cacheDirectory.'/islands');
+
+        $testable->call('refreshStats');
+
+        $fragments = $testable->effects['islandFragments'] ?? [];
+
+        $this->assertCount(1, $fragments);
+        $this->assertStringContainsString('Hello World!', $fragments[0]);
+    }
+
+    /**
+     * The regeneration render must go through Livewire's render hooks so
+     * autoloaded data (computed properties, Cascade) is available — otherwise
+     * islands inside conditions depending on it are silently dropped.
+     */
+    #[Test]
+    public function islands_inside_computed_property_conditions_are_regenerated_when_missing()
+    {
+        $testable = $this->mountIslandComponent('antlers-island-computed-condition');
+
+        $testable->assertSee('Hello World!');
+
+        File::deleteDirectory(app('livewire.compiler')->cacheManager->cacheDirectory.'/islands');
+        File::cleanDirectory(config('view.compiled'));
 
         $testable->call('refreshStats');
 
@@ -330,6 +354,12 @@ class AntlersIslandsTest extends TestCase
             public function refreshStatsWithRuntimeData(): void
             {
                 $this->renderIsland('stats', with: ['greeting' => 'Runtime']);
+            }
+
+            #[Computed]
+            public function showStats(): bool
+            {
+                return true;
             }
 
             public function render()

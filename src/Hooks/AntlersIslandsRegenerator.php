@@ -7,6 +7,8 @@ use Livewire\ComponentHook;
 use Livewire\Drawer\Utils;
 use Livewire\Features\SupportIslands\Compiler\IslandCompiler;
 
+use function Livewire\trigger;
+
 /**
  * Re-renders the component's Antlers view when island cache files have been
  * cleared, so the {{ livewire:island }} tags rewrite them before Livewire
@@ -29,7 +31,10 @@ class AntlersIslandsRegenerator extends ComponentHook
 
     /**
      * The island state is restored up front (core's SupportIslands hydrate may
-     * not have run yet) so the re-rendered tags reuse the memoized tokens.
+     * not have run yet) so the re-rendered tags reuse the memoized tokens. The
+     * render is driven through Livewire's render trigger so component hooks
+     * (like the addon's computed property and Cascade autoloaders) provide the
+     * same view data as on a regular render.
      *
      * @param  array<int, array{name: string, token: string}>  $islands
      */
@@ -44,9 +49,18 @@ class AntlersIslandsRegenerator extends ComponentHook
             return;
         }
 
-        $view->with(array_merge(
-            Utils::getPublicPropertiesDefinedOnSubclass($this->component),
-            ['__livewire' => $this->component],
-        ))->render();
+        $properties = Utils::getPublicPropertiesDefinedOnSubclass($this->component);
+
+        $view->with(array_merge($properties, ['__livewire' => $this->component]));
+
+        $finish = trigger('render', $this->component, $view, $properties);
+
+        $html = $view->render();
+
+        $replaceHtml = function ($newHtml) use (&$html) {
+            $html = $newHtml;
+        };
+
+        $finish($html, $replaceHtml);
     }
 }
