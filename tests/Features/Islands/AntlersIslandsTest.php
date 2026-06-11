@@ -307,6 +307,23 @@ class AntlersIslandsTest extends TestCase
     }
 
     /**
+     * Core supports islands inside placeholder regions, so the placeholder
+     * extraction must pair the outer tags across a nested island that carries
+     * its own placeholder block instead of truncating at its closing tag.
+     */
+    #[Test]
+    public function placeholder_containing_a_nested_island_with_its_own_placeholder_stays_intact()
+    {
+        $testable = $this->mountIslandComponent('antlers-island-placeholder-nested-island');
+
+        $testable->assertSee('Loading outer...');
+        $testable->assertSee('Loading inner...');
+        $testable->assertDontSee('Outer island content');
+        $testable->assertDontSee('Inner island content');
+        $testable->assertSeeHtml('name=inner');
+    }
+
+    /**
      * Nested island tags only run while their containing island renders, so
      * the regeneration pass has to descend into the outer island's view.
      */

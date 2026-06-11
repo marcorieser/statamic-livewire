@@ -104,13 +104,15 @@ class IslandManager
     /**
      * Split the placeholder region off the island template, mirroring the
      * behavior of Blade's placeholder directives. Placeholder tags inside
-     * Antlers comments or nested {{ livewire:island }} pairs are left untouched.
+     * Antlers comments or nested {{ livewire:island }} pairs are left
+     * untouched, so an outer placeholder pair may span a nested island that
+     * carries its own placeholder block.
      *
      * @return array{0: string, 1: string}
      */
     protected function extractPlaceholder(string $content): array
     {
-        if (! preg_match_all('/\{\{\s*placeholder\s*\}\}(.*?)\{\{\s*\/placeholder\s*\}\}/s', $content, $matches, PREG_OFFSET_CAPTURE)) {
+        if (! preg_match_all('/\{\{\s*\/?placeholder\s*\}\}/', $content, $matches, PREG_OFFSET_CAPTURE)) {
             return [$content, ''];
         }
 
@@ -120,13 +122,30 @@ class IslandManager
         $placeholder = '';
         $removals = [];
 
-        foreach ($matches[0] as $index => [$block, $offset]) {
+        $depth = 0;
+        $regionStart = null;
+        $innerStart = null;
+
+        foreach ($matches[0] as [$tag, $offset]) {
             if ($this->insideRegions($offset, $protectedRegions)) {
                 continue;
             }
 
-            $placeholder .= $matches[1][$index][0];
-            $removals[] = [$offset, strlen($block)];
+            if (! preg_match('/^\{\{\s*\//', $tag)) {
+                if ($depth === 0) {
+                    $regionStart = $offset;
+                    $innerStart = $offset + strlen($tag);
+                }
+
+                $depth++;
+
+                continue;
+            }
+
+            if ($depth > 0 && --$depth === 0) {
+                $placeholder .= substr($content, $innerStart, $offset - $innerStart);
+                $removals[] = [$regionStart, $offset + strlen($tag) - $regionStart];
+            }
         }
 
         foreach (array_reverse($removals) as [$offset, $length]) {

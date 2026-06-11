@@ -1,0 +1,13 @@
+<div>
+    <p>Outside the islands</p>
+    {{ livewire:island name="outer" defer="true" }}
+        {{ placeholder }}
+            <p>Loading outer...</p>
+            {{ livewire:island name="inner" defer="true" }}
+                {{ placeholder }}<p>Loading inner...</p>{{ /placeholder }}
+                <p>Inner island content</p>
+            {{ /livewire:island }}
+        {{ /placeholder }}
+        <p>Outer island content</p>
+    {{ /livewire:island }}
+</div>
