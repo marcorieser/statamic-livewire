@@ -100,6 +100,45 @@ class AntlersIslandsTest extends TestCase
     }
 
     /**
+     * Components may provide their view through view() instead of defining
+     * render(), so cache regeneration has to resolve the view the same way
+     * Livewire's normal render path does.
+     */
+    #[Test]
+    public function island_cache_files_are_regenerated_for_components_with_a_provided_view()
+    {
+        $component = new class extends Component
+        {
+            public string $name = 'World';
+
+            public function refreshStats(): void
+            {
+                $this->renderIsland('stats');
+            }
+
+            public function view()
+            {
+                return view('antlers-island');
+            }
+        };
+
+        Livewire::component('antlers-island-provided-view-component', $component::class);
+
+        $testable = Livewire::test('antlers-island-provided-view-component');
+
+        $testable->assertSee('Hello World!');
+
+        File::deleteDirectory(app('livewire.compiler')->cacheManager->cacheDirectory.'/islands');
+
+        $testable->call('refreshStats');
+
+        $fragments = $testable->effects['islandFragments'] ?? [];
+
+        $this->assertCount(1, $fragments);
+        $this->assertStringContainsString('Hello World!', $fragments[0]);
+    }
+
+    /**
      * The regeneration render must go through Livewire's render hooks so
      * autoloaded data (computed properties, Cascade) is available — otherwise
      * islands inside conditions depending on it are silently dropped.
@@ -461,6 +500,19 @@ class AntlersIslandsTest extends TestCase
         $this->expectExceptionMessage('The {{ livewire:island }} tag requires a name parameter.');
 
         $this->mountIslandComponent('antlers-island-nameless');
+    }
+
+    /**
+     * "0" is a falsy string, so the name presence check must not mistake it
+     * for a missing parameter.
+     */
+    #[Test]
+    public function island_name_may_be_zero()
+    {
+        $testable = $this->mountIslandComponent('antlers-island-zero-name');
+
+        $testable->assertSee('Hello World!');
+        $testable->assertSeeHtml('type=island|name=0|token=antlers-');
     }
 
     #[Test]

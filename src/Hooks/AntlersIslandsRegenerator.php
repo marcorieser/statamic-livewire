@@ -9,6 +9,7 @@ use Livewire\Features\SupportIslands\Compiler\IslandCompiler;
 use MarcoRieser\Livewire\Islands\IslandManager;
 
 use function Livewire\trigger;
+use function Livewire\wrap;
 
 /**
  * Re-renders the component's Antlers view when island cache files have been
@@ -57,7 +58,7 @@ class AntlersIslandsRegenerator extends ComponentHook
         $this->component->markIslandsAsMounted();
         $this->component->setIslands($islands);
 
-        $view = $this->component->render();
+        $view = $this->resolveComponentView();
 
         if ($view instanceof View) {
             $properties = Utils::getPublicPropertiesDefinedOnSubclass($this->component);
@@ -76,6 +77,23 @@ class AntlersIslandsRegenerator extends ComponentHook
         }
 
         $this->regenerateNestedIslandCacheFiles($islands);
+    }
+
+    /**
+     * Components may define render() or provide their view through view(),
+     * mirroring the view resolution of Livewire's normal render path.
+     */
+    protected function resolveComponentView(): ?View
+    {
+        if (method_exists($this->component, 'render')) {
+            $view = wrap($this->component)->render();
+        } elseif ($this->component->hasProvidedView()) {
+            $view = $this->component->getProvidedView();
+        } else {
+            $view = null;
+        }
+
+        return $view instanceof View ? $view : null;
     }
 
     /**

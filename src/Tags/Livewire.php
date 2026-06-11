@@ -135,9 +135,11 @@ class Livewire extends Tags
     {
         throw_unless($this->isPair, new IslandException('The {{ livewire:island }} tag has to be used as a tag pair.'));
 
-        throw_unless($name = $this->params->get('name'), new IslandException('The {{ livewire:island }} tag requires a name parameter.'));
+        $name = $this->params->get('name');
 
-        throw_unless(preg_match('/^[\w.\-]+$/', $name), new IslandException('The {{ livewire:island }} name may only contain letters, numbers, underscores, dashes and dots.'));
+        throw_if($name === null || $name === '', new IslandException('The {{ livewire:island }} tag requires a name parameter.'));
+
+        throw_unless(is_scalar($name) && preg_match('/^[\w.\-]+$/', $name = (string) $name), new IslandException('The {{ livewire:island }} name may only contain letters, numbers, underscores, dashes and dots.'));
 
         throw_unless($component = $this->context->value('__livewire'), new IslandException('The {{ livewire:island }} tag can only be used inside the Antlers view of a Livewire component.'));
 
