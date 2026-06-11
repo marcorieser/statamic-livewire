@@ -161,6 +161,52 @@ class AntlersIslandsTest extends TestCase
         $this->assertStringContainsString('Hello World!', $fragments[0]);
     }
 
+    /**
+     * boot() runs on every request and is the documented place to initialize
+     * non-persisted component state, so the regeneration render must not run
+     * before Livewire's lifecycle hooks have initialized the component.
+     */
+    #[Test]
+    public function island_cache_files_are_regenerated_after_lifecycle_hooks_initialize_the_component()
+    {
+        $component = new class extends Component
+        {
+            public string $name = 'World';
+
+            protected string $resolvedViewName;
+
+            public function boot(): void
+            {
+                $this->resolvedViewName = 'antlers-island';
+            }
+
+            public function refreshStats(): void
+            {
+                $this->renderIsland('stats');
+            }
+
+            public function render()
+            {
+                return view($this->resolvedViewName);
+            }
+        };
+
+        Livewire::component('antlers-island-boot-component', $component::class);
+
+        $testable = Livewire::test('antlers-island-boot-component');
+
+        $testable->assertSee('Hello World!');
+
+        File::deleteDirectory(app('livewire.compiler')->cacheManager->cacheDirectory.'/islands');
+
+        $testable->call('refreshStats');
+
+        $fragments = $testable->effects['islandFragments'] ?? [];
+
+        $this->assertCount(1, $fragments);
+        $this->assertStringContainsString('Hello World!', $fragments[0]);
+    }
+
     #[Test]
     public function island_renderer_renders_the_placeholder_branch()
     {

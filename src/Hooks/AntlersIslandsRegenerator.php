@@ -31,9 +31,16 @@ class AntlersIslandsRegenerator extends ComponentHook
         );
     }
 
-    public function hydrate($memo): void
+    /**
+     * Regeneration happens at call time instead of hydrate time: every island
+     * render on subsequent requests (action islands, lazy-load mounts and
+     * mid-method streamIsland calls) is reached through a method call, and by
+     * then the component's own boot()/hydrate() lifecycle hooks have
+     * initialized any state the re-render depends on.
+     */
+    public function call($method, $params, $returnEarly, $metadata): void
     {
-        $islands = $memo['islands'] ?? [];
+        $islands = $this->component->getIslands();
 
         $missing = collect($islands)
             ->filter(fn (array $island) => str_starts_with($island['token'] ?? '', 'antlers-'))
@@ -45,19 +52,14 @@ class AntlersIslandsRegenerator extends ComponentHook
     }
 
     /**
-     * The island state is restored up front (core's SupportIslands hydrate may
-     * not have run yet) so the re-rendered tags reuse the memoized tokens. The
-     * render is driven through Livewire's render trigger so component hooks
-     * (like the addon's computed property and Cascade autoloaders) provide the
-     * same view data as on a regular render.
+     * The render is driven through Livewire's render trigger so component
+     * hooks (like the addon's computed property and Cascade autoloaders)
+     * provide the same view data as on a regular render.
      *
      * @param  array<int, array{name: string, token: string}>  $islands
      */
     protected function regenerateAntlersIslandCacheFiles(array $islands): void
     {
-        $this->component->markIslandsAsMounted();
-        $this->component->setIslands($islands);
-
         $view = $this->resolveComponentView();
 
         if ($view instanceof View) {
