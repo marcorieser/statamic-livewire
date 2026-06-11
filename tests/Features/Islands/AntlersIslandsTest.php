@@ -386,12 +386,23 @@ class AntlersIslandsTest extends TestCase
     #[Test]
     public function island_tokens_stay_stable_when_the_island_template_changes()
     {
-        $testable = $this->mountIslandComponent();
+        $path = $this->createEditableView('antlers-island-editable', <<<'ANTLERS'
+        <div>
+            <p>Outside the island</p>
+            {{ livewire:island name="stats" }}
+                <p>Hello {{ name }}!</p>
+            {{ /livewire:island }}
+        </div>
+        ANTLERS);
+
+        $testable = $this->mountIslandComponent('antlers-island-editable');
 
         preg_match('/token=(antlers-[a-f0-9\-]+)/', $testable->html(), $matches);
         $token = $matches[1];
 
-        $edited = $this->mountIslandComponent('antlers-island-edited');
+        File::put($path, str_replace('Hello', 'Howdy', File::get($path)));
+
+        $edited = $this->mountIslandComponent('antlers-island-editable');
 
         $edited->assertSee('Howdy World!');
         $edited->assertSeeHtml('token='.$token);
@@ -402,6 +413,35 @@ class AntlersIslandsTest extends TestCase
 
         $this->assertCount(1, $fragments);
         $this->assertStringContainsString('Howdy World!', $fragments[0]);
+    }
+
+    /**
+     * Same-name islands in different views of the same component must not
+     * share a cache file: tokens are scoped to the rendered view, so one
+     * view can't overwrite the other's island template.
+     */
+    #[Test]
+    public function same_name_islands_in_different_views_keep_their_own_cache_files()
+    {
+        $testable = $this->mountIslandComponent();
+
+        preg_match('/token=(antlers-[a-f0-9\-]+)/', $testable->html(), $matches);
+        $token = $matches[1];
+
+        $other = $this->mountIslandComponent('antlers-island-other-view');
+
+        $other->assertSee('Howdy World!');
+
+        preg_match('/token=(antlers-[a-f0-9\-]+)/', $other->html(), $otherMatches);
+
+        $this->assertNotSame($token, $otherMatches[1]);
+
+        $testable->call('refreshStats');
+
+        $fragments = $testable->effects['islandFragments'] ?? [];
+
+        $this->assertCount(1, $fragments);
+        $this->assertStringContainsString('Hello World!', $fragments[0]);
     }
 
     #[Test]
@@ -483,5 +523,23 @@ class AntlersIslandsTest extends TestCase
         Livewire::component('antlers-island-component', $component::class);
 
         return Livewire::test('antlers-island-component', ['viewName' => $view]);
+    }
+
+    /**
+     * Writes a view the test can edit in place (Antlers reads the source
+     * from disk on every render) without touching the shared fixtures.
+     */
+    protected function createEditableView(string $name, string $contents): string
+    {
+        $directory = storage_path('antlers-islands-test-views');
+
+        File::deleteDirectory($directory);
+        File::ensureDirectoryExists($directory);
+
+        view()->addLocation($directory);
+
+        File::put($path = $directory.'/'.$name.'.antlers.html', $contents);
+
+        return $path;
     }
 }

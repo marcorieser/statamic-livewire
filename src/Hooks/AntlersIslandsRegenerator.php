@@ -18,12 +18,16 @@ use function Livewire\trigger;
 class AntlersIslandsRegenerator extends ComponentHook
 {
     /**
-     * Island occurrences are counted per render pass, so each pass (including
-     * the regeneration pass below) starts from zero.
+     * Island occurrences are counted per render pass and root tokens are
+     * scoped to the rendered view, so each pass (including the regeneration
+     * pass below) registers its view and counts from zero.
      */
     public function render($view, $data): void
     {
-        app(IslandManager::class)->resetRootOccurrences($this->component);
+        app(IslandManager::class)->startRenderPass(
+            $this->component,
+            $view instanceof View ? (string) $view->name() : '',
+        );
     }
 
     public function hydrate($memo): void

@@ -268,7 +268,7 @@ The `with` data is captured when the island is first rendered and reused for sub
 A few things to keep in mind:
 
 - Don't place islands inside Antlers loops: every iteration produces the same island, so updates collapse into one fragment (the same applies to `@island` inside `@foreach` in Blade).
-- Same-name islands in one view are told apart by render order; rendering them conditionally — or reusing an island name across different views of the same component — can cross-wire their caches.
+- Same-name islands in one view are told apart by render order; rendering them conditionally can cross-wire their caches. Islands in different views of the same component are kept separate.
 - The component's `render()` method should stay free of side effects (as Livewire recommends): after the compiled view cache has been cleared, the addon re-renders the component view once to regenerate the island files.
 
 ### Lazy Components

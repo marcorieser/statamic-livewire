@@ -16,6 +16,8 @@ class IslandManager
 
     protected const OCCURRENCES_STORE_KEY = 'antlersIslandsOccurrences';
 
+    protected const VIEW_NAME_STORE_KEY = 'antlersIslandsViewName';
+
     protected const ROOT_CONTEXT = 'root';
 
     /**
@@ -67,12 +69,15 @@ class IslandManager
     }
 
     /**
-     * Called at the start of every render pass so re-renders count
-     * occurrences from the top again.
+     * Called at the start of every render pass: registers the rendered view
+     * (root tokens are scoped to it) and counts occurrences from the top
+     * again.
      */
-    public function resetRootOccurrences(Component $component): void
+    public function startRenderPass(Component $component, string $viewName): void
     {
-        $this->resetOccurrences($component, static::ROOT_CONTEXT);
+        store($component)->set(static::VIEW_NAME_STORE_KEY, $viewName);
+
+        $this->resetOccurrences($component, $this->rootContext($component));
     }
 
     /**
@@ -195,10 +200,11 @@ class IslandManager
     }
 
     /**
-     * Tokens mirror core's path+occurrence scheme: component name, containing
-     * island and island name plus a render-order occurrence. Independent of
-     * template contents and "with" data, they stay stable across template
-     * edits (the cache file is refreshed in place) and data changes.
+     * Tokens mirror core's path+occurrence scheme: component name, rendered
+     * view (or containing island) and island name plus a render-order
+     * occurrence. Independent of template contents and "with" data, they stay
+     * stable across template edits (the cache file is refreshed in place) and
+     * data changes.
      */
     protected function token(Component $component, string $name): string
     {
@@ -217,7 +223,19 @@ class IslandManager
     {
         $stack = store($component)->get(static::CONTEXT_STACK_STORE_KEY, []);
 
-        return $stack === [] ? static::ROOT_CONTEXT : end($stack);
+        return $stack === [] ? $this->rootContext($component) : end($stack);
+    }
+
+    /**
+     * Root tokens are scoped to the rendered view so same-name islands in
+     * different views of the same component keep their own cache files,
+     * mirroring core's path-based tokens.
+     */
+    protected function rootContext(Component $component): string
+    {
+        $viewName = store($component)->get(static::VIEW_NAME_STORE_KEY, '');
+
+        return $viewName === '' ? static::ROOT_CONTEXT : static::ROOT_CONTEXT.'|'.$viewName;
     }
 
     protected function resetOccurrences(Component $component, string $context): void
