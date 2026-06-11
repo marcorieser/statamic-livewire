@@ -263,12 +263,13 @@ Inside an island, the component's public properties, computed properties and (wi
 {{ /livewire:island }}
 ```
 
-The `with` data is captured when the island is first rendered and reused for subsequent island renders — it travels inside the component's snapshot, so it survives view cache clears unchanged. The captured values are dehydrated and rehydrated through Livewire's synthesizer pipeline, so the same serialization rules apply as for public component properties — dates, collections and (with the addon's [Synthesizers](#synthesizers) enabled) Statamic values survive the round trip, while unsupported types throw an exception. Data passed to `$this->renderIsland('stats', with: [...])` takes precedence over the captured values and is handed to the island live, without being serialized.
+The `with` data is captured when the island is first rendered and reused for subsequent island renders — it travels inside the component's snapshot, so it survives view cache clears unchanged. As the snapshot is part of the rendered HTML, the captured values are readable in the browser: like public component properties (and the mount parameters of [lazy components](https://livewire.laravel.com/docs/lazy)), they are signed against tampering but not encrypted, so treat them as public and don't pass sensitive values. The captured values are dehydrated and rehydrated through Livewire's synthesizer pipeline, so the same serialization rules apply as for public component properties — dates, collections and (with the addon's [Synthesizers](#synthesizers) enabled) Statamic values survive the round trip, while unsupported types throw an exception. Data passed to `$this->renderIsland('stats', with: [...])` takes precedence over the captured values and is handed to the island live, without being serialized.
 
 A few things to keep in mind:
 
-- Don't place islands inside Antlers loops: every iteration produces the same island, so updates collapse into one fragment (the same applies to `@island` inside `@foreach` in Blade).
+- Don't place islands inside Antlers loops: every iteration produces its own island entry and cache file, and a changing iteration count shifts the render-order tokens, cross-wiring the islands' caches (`@island` inside `@foreach` is discouraged in Blade as well, where all iterations share one island).
 - Same-name islands in one view are told apart by render order; rendering them conditionally can cross-wire their caches. Islands in different views of the same component are kept separate.
+- Keep island names static (as they are in Blade, where `@island` names are literals): the name is part of the island's cache file identity, so a dynamic name creates one cache file per distinct value.
 - The component's `render()` method should stay free of side effects (as Livewire recommends): after the compiled view cache has been cleared, the addon re-renders the component view once to regenerate the island files.
 
 ### Lazy Components
