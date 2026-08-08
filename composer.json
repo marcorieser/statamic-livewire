@@ -2,8 +2,12 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "marcorieser/statamic-livewire",
     "description": "A Laravel Livewire integration for Statamic.",
+    "type": "statamic-addon",
     "keywords": [
         "laravel",
+        "livewire",
+        "statamic",
+        "statamic-addon",
         "marcorieser",
         "statamic-livewire"
     ],
@@ -17,18 +21,22 @@
         }
     ],
     "require": {
-        "php": "^8.3",
-        "illuminate/support": "^12.0||^13.0"
+        "php": "^8.4",
+        "laravel/framework": "^13.0",
+        "livewire/livewire": "^4.2",
+        "statamic/cms": "^6.24"
     },
     "require-dev": {
+        "driftingly/rector-laravel": "^2.0",
         "larastan/larastan": "^3.9",
         "laravel/pint": "^1.29",
         "laravel/pao": "^1.0",
-        "orchestra/testbench": "^10.0||^11.0",
+        "orchestra/testbench": "^11.0",
         "pestphp/pest": "^4.6||^5.0",
         "pestphp/pest-plugin-laravel": "^4.1||^5.0",
         "pestphp/pest-plugin-type-coverage": "^4.0||^5.0",
-        "phpstan/extension-installer": "^1.4"
+        "phpstan/extension-installer": "^1.4",
+        "rector/rector": "^2.0"
     },
     "autoload": {
         "psr-4": {
@@ -68,6 +76,12 @@
         "analyse": [
             "vendor/bin/phpstan analyse"
         ],
+        "refactor": [
+            "vendor/bin/rector process"
+        ],
+        "refactor:check": [
+            "vendor/bin/rector process --dry-run"
+        ],
         "test:types": [
             "vendor/bin/pest --type-coverage --min=100"
         ],
@@ -77,6 +91,7 @@
         "test": [
             "@analyse",
             "@lint:check",
+            "@refactor:check",
             "@test:types",
             "@test:unit"
         ],
@@ -87,11 +102,12 @@
     "extra": {
         "laravel": {
             "providers": [
-                "MarcoRieser\\Livewire\\LivewireServiceProvider"
-            ],
-            "aliases": {
-                "Livewire": "MarcoRieser\\Livewire\\Facades\\Livewire"
-            }
+                "MarcoRieser\\Livewire\\ServiceProvider"
+            ]
+        },
+        "statamic": {
+            "name": "Livewire",
+            "description": "A Laravel Livewire integration for Statamic."
         }
     },
     "config": {

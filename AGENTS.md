@@ -1,6 +1,6 @@
 # Statamic Livewire
 
-This repository is a Laravel package. Keep the package focused, idiomatic, and easy for Laravel developers to install, test, and maintain.
+This repository is a Statamic addon (a Laravel package) integrating Livewire 4 with Statamic 6 and Antlers. Keep the package focused, idiomatic, and easy for Laravel developers to install, test, and maintain.
 
 ## Package Conventions
 
@@ -15,6 +15,7 @@ This repository is a Laravel package. Keep the package focused, idiomatic, and e
 - Full validation: `composer test`
 - Formatting check: `composer lint:check`
 - Static analysis: `composer analyse`
+- Rector check: `composer refactor:check` (apply: `composer refactor`)
 - Pest tests: `composer test:unit`
 - Workbench build: `composer build`
 - Workbench server: `composer serve`

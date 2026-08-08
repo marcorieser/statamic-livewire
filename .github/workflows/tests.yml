@@ -22,12 +22,10 @@ jobs:
       fail-fast: true
       matrix:
         os: [ubuntu-latest, windows-latest]
-        php: [8.3, 8.4, 8.5]
-        laravel: [12.*, 13.*]
+        php: [8.4, 8.5]
+        laravel: [13.*]
         stability: [prefer-lowest, prefer-stable]
         include:
-          - laravel: 12.*
-            testbench: 10.*
           - laravel: 13.*
             testbench: 11.*
 
@@ -57,6 +55,9 @@ jobs:
 
       - name: Linter
         run: composer lint:check
+
+      - name: Rector
+        run: composer refactor:check
 
       - name: Type Coverage
         if: runner.os != 'Windows'
