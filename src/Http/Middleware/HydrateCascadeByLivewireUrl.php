@@ -43,8 +43,6 @@ class HydrateCascadeByLivewireUrl
 
     protected function hydrateContent(): void
     {
-        // Null content is safe (statamic/cms#14502) and mirrors the initial
-        // render of URLs without Statamic content: no `page` key is set.
         Cascade::withContent(fn () => Data::findByRequestUrl(Livewire::originalUrl()));
     }
 }

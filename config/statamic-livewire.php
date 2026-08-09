@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 use MarcoRieser\Livewire\Replacers\AssetsReplacer;
 use MarcoRieser\Livewire\Replacers\DisableBackButtonCacheReplacer;
 
