@@ -208,7 +208,40 @@ The replacers can be adjusted in the config:
 ],
 ```
 
-<!-- Sections are added as features land: synthesizers, pagination, slots, islands. -->
+### Passing Statamic data to components
+
+Don't store Statamic objects like entries in component properties — they would be serialized into the Livewire payload on every request, and the component would work with stale, client-round-tripped data. Pass an id instead, and resolve the object in a [computed property](#computed-properties):
+
+```antlers
+{{ livewire:show-article :article="id" }}
+```
+
+```php
+class ShowArticle extends Component
+{
+    public string $article;
+
+    #[Computed]
+    public function entry(): ?Entry
+    {
+        return Entry::find($this->article);
+    }
+}
+```
+
+```antlers
+<div>
+    <h1>{{ entry:title }}</h1>
+    {{ entry:content }}
+</div>
+```
+
+This keeps the payload small and guarantees fresh content on every update — the computed property is only fetched when the view uses it, and only once per request.
+
+> [!NOTE]
+> Version 5's opt-in property synthesizers were removed in favor of this pattern.
+
+<!-- Sections are added as features land: pagination, slots, islands. -->
 
 ## Changelog
 

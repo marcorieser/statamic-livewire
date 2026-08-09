@@ -44,8 +44,7 @@ class Livewire extends Tags
         }
 
         // Parameters are deep-converted through toArray() so augmentable Statamic
-        // objects reach the component as plain values. The opt-in synthesizer
-        // feature will switch this to all() to hand over the raw objects.
+        // objects reach the component as plain values.
         $params = $this->params->except(['key', 'component'])->toArray();
 
         return \Livewire\Livewire::mount($component, $params, $this->params->get('key'));
