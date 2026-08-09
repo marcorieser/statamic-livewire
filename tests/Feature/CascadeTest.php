@@ -56,6 +56,12 @@ it('rehydrates the cascade from the original url on update requests', function (
     preg_match('/wire:snapshot="([^"]+)"/', $html, $matches);
     $snapshot = html_entity_decode($matches[1] ?? '', ENT_QUOTES);
 
+    // In production every request hydrates a fresh cascade; in tests the app
+    // persists between the render and the update request, so reset both the
+    // container instance and the facade's resolved-instance cache.
+    app()->forgetInstance(Statamic\View\Cascade::class);
+    Statamic\Facades\Cascade::clearResolvedInstances();
+
     $response = $this
         ->withoutMiddleware(PreventRequestForgery::class)
         ->postJson(Livewire::getUpdateUri(), [
