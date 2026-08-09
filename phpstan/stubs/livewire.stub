@@ -63,6 +63,28 @@ interface LivewireStore
     public function unset($key, $iKey = null);
 }
 
+namespace Livewire;
+
+abstract class Component
+{
+    /** @return iterable<int, \Livewire\Features\SupportAttributes\Attribute> */
+    public function getAttributes() {}
+}
+
+abstract class ComponentHook
+{
+    /** @var Component */
+    protected $component;
+}
+
+namespace Livewire\Features\SupportAttributes;
+
+abstract class Attribute
+{
+    /** @return string */
+    public function getName() {}
+}
+
 namespace Livewire\Mechanisms\FrontendAssets;
 
 class FrontendAssets

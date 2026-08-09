@@ -133,7 +133,30 @@ The Antlers equivalents of Livewire's [`@assets` and `@script` directives](https
 
 `{{ livewire:assets }}` loads an asset once per page, no matter how many components use it, and also works outside of component views. `{{ livewire:script }}` runs a script when its component initializes and must be used inside a component view.
 
-<!-- Sections are added as features land: computed properties, cascade, multi-site, static caching, synthesizers, pagination, slots, islands. -->
+### Computed properties
+
+[Computed properties](https://livewire.laravel.com/docs/computed-properties) are available as variables in Antlers component views — no need to call them like methods:
+
+```php
+class ShowPost extends Component
+{
+    #[Computed]
+    public function post(): array
+    {
+        return Entry::find($this->postId)->toAugmentedArray();
+    }
+}
+```
+
+```antlers
+<div>
+    {{ post:title }}
+</div>
+```
+
+Each computed property is resolved lazily: it only executes when the view actually uses it.
+
+<!-- Sections are added as features land: cascade, multi-site, static caching, synthesizers, pagination, slots, islands. -->
 
 ## Changelog
 
