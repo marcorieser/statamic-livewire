@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use Livewire\Component;
 use Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets;
 use Livewire\Mechanisms\FrontendAssets\FrontendAssets;
+use MarcoRieser\Livewire\Islands\IslandManager;
 use RuntimeException;
 use Statamic\Tags\Tags;
 
@@ -75,6 +76,76 @@ class Livewire extends Tags
         }
 
         self::$slotStack[array_key_last(self::$slotStack)][$name] = trim((string) $this->parse());
+    }
+
+    /**
+     * Antlers implementation of @island.
+     *
+     * {{ livewire:island name="stats" }} ... {{ /livewire:island }}
+     */
+    public function island(): string
+    {
+        $component = $this->context->value('__livewire');
+
+        if (! $component instanceof Component) {
+            throw new RuntimeException('The {{ livewire:island }} tag must be used inside a Livewire component view.');
+        }
+
+        $name = $this->params->get('name');
+
+        if (! is_string($name) || $name === '') {
+            throw new InvalidArgumentException('The {{ livewire:island }} tag requires a name.');
+        }
+
+        $manager = resolve(IslandManager::class);
+
+        $token = $manager->token($component->getName(), $name);
+
+        $manager->store($token, (string) $this->content);
+
+        // Any other parameters become the island's scope. Unlike Blade's
+        // with:, the values are captured here — with the surrounding template
+        // context available — and persisted through the component memo, so
+        // island updates can re-render with them.
+        $with = $this->params->except(['name', 'lazy', 'defer', 'always', 'skip'])->toArray();
+
+        $this->registerIsland($component, $name, $token, $with);
+
+        $html = $component->renderIslandDirective(
+            name: $name,
+            token: $token,
+            lazy: $this->boolParam('lazy'),
+            defer: $this->boolParam('defer'),
+            always: $this->boolParam('always'),
+            skip: $this->boolParam('skip'),
+        );
+
+        // renderIslandDirective() registers the island again while mounting —
+        // drop that duplicate in favor of the entry carrying the scope.
+        $this->registerIsland($component, $name, $token, $with);
+
+        return $html;
+    }
+
+    /**
+     * @param  array<mixed>  $with
+     */
+    protected function registerIsland(Component $component, string $name, string $token, array $with): void
+    {
+        $component->setIslands(collect($component->getIslands())
+            ->reject(fn (array $island): bool => ($island['name'] ?? null) === $name)
+            ->values()
+            ->push(array_filter([
+                'name' => $name,
+                'token' => $token,
+                'with' => $with,
+            ], fn (mixed $value): bool => $value !== []))
+            ->all());
+    }
+
+    protected function boolParam(string $key): bool
+    {
+        return filter_var($this->params->get($key, false), FILTER_VALIDATE_BOOL);
     }
 
     /**

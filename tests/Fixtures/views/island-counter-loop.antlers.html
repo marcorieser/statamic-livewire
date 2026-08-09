@@ -1,0 +1,7 @@
+<div>
+    {{ items }}
+        {{ livewire:island name="item-{value}" :item="value" }}
+            <span>island-{{ item }}</span>
+        {{ /livewire:island }}
+    {{ /items }}
+</div>

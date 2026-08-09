@@ -10,7 +10,7 @@
     <a href="https://packagist.org/packages/marcorieser/statamic-livewire"><img src="https://img.shields.io/packagist/dt/marcorieser/statamic-livewire.svg?style=flat-square" alt="Total Downloads"></a>
 </p>
 
-A Laravel Livewire integration for Statamic. Use [Livewire](https://livewire.laravel.com) components in your [Antlers](https://statamic.dev/antlers) templates — including Blade or Antlers component views, Statamic-aware property synthesizers, multi-site support, and static caching compatibility.
+A Laravel Livewire integration for Statamic. Use [Livewire](https://livewire.laravel.com) components in your [Antlers](https://statamic.dev/antlers) templates — including Antlers component views, slots, islands, multi-site support, and static caching compatibility.
 
 > [!NOTE]
 > Version 6 is a rewrite targeting Livewire 4 and Statamic 6 exclusively. For Livewire 3 or Statamic 5, use [version 5](https://github.com/marcorieser/statamic-livewire/tree/5.x).
@@ -313,7 +313,51 @@ Slots can be rendered conditionally — a slot that wasn't provided is empty:
 
 Slot content is parsed in the context of the surrounding template, and Livewire persists it across component updates. In Blade component views, use Livewire's native `{{ $slot }}` / `{{ $slots }}` syntax instead.
 
-<!-- Sections are added as features land: islands. -->
+### Islands
+
+[Islands](https://livewire.laravel.com/docs/islands) isolate a region of a component view so it can re-render independently of the rest of the component. In Antlers component views, define them with the `{{ livewire:island }}` tag pair:
+
+```antlers
+<div>
+    {{ livewire:island name="stats" }}
+        <span>{{ count }}</span>
+    {{ /livewire:island }}
+
+    <button wire:click="increment">Increment</button>
+</div>
+```
+
+Actions triggered from inside an island only re-render that island; full component updates leave island DOM untouched. To re-render an island together with its component, mark it as `always`:
+
+```antlers
+{{ livewire:island name="stats" always="true" }}
+```
+
+Islands can be [loaded lazily](https://livewire.laravel.com/docs/islands#lazy-loading) — `lazy` loads when scrolled into view, `defer` right after the page load, and `skip` only when triggered explicitly. On the initial render, lazy islands show their placeholder branch:
+
+```antlers
+{{ livewire:island name="stats" lazy="true" }}
+    {{ if __is_placeholder }}
+        <span>Loading…</span>
+    {{ else }}
+        <span>{{ count }}</span>
+    {{ /if }}
+{{ /livewire:island }}
+```
+
+Islands can be nested, and island content sees the component's scope (its public and computed properties). To bring additional variables into an island — for example loop values — pass them as parameters. Their values are captured when the island is defined and persist across island updates:
+
+```antlers
+{{ items }}
+    {{ livewire:island name="item-{id}" :item="id" }}
+        <span>{{ item }}</span>
+    {{ /livewire:island }}
+{{ /items }}
+```
+
+Every island needs a `name` that is unique within its component — in loops, make it dynamic like above. Captured values are stored in the component's payload, so keep them small and JSON-serializable (ids, not entries).
+
+<!-- All usage sections are in place. -->
 
 ## Changelog
 

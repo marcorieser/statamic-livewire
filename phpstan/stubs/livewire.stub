@@ -74,6 +74,33 @@ abstract class Component
 
     /** @return iterable<int, \Livewire\Features\SupportSlots\Slot> */
     public function getSlots() {}
+
+    /** @return string */
+    public function getName() {}
+
+    /** @return list<array<string, mixed>> */
+    public function getIslands() {}
+
+    /**
+     * @param  array<int, array<string, mixed>>  $islands
+     * @return void
+     */
+    public function setIslands($islands) {}
+
+    /** @return bool */
+    public function islandIsMounting() {}
+
+    /**
+     * @param  string|null  $name
+     * @param  string|null  $token
+     * @param  bool  $lazy
+     * @param  bool  $defer
+     * @param  bool  $always
+     * @param  bool  $skip
+     * @param  array<string, mixed>  $with
+     * @return string
+     */
+    public function renderIslandDirective($name = null, $token = null, $lazy = false, $defer = false, $always = false, $skip = false, $with = []) {}
 }
 
 /**

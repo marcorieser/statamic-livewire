@@ -1,0 +1,9 @@
+<div>
+    {{ livewire:island name="stats" lazy="true" }}
+        {{ if __is_placeholder }}
+            <span>loading…</span>
+        {{ else }}
+            <span>inside: {{ count }}</span>
+        {{ /if }}
+    {{ /livewire:island }}
+</div>
