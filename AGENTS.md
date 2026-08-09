@@ -17,6 +17,7 @@ This repository is a Statamic addon (a Laravel package) integrating Livewire 4 w
 - Static analysis: `composer analyse`
 - Rector check: `composer refactor:check` (apply: `composer refactor`)
 - Pest tests: `composer test:unit`
+- Coverage: `composer test:coverage` (needs Xdebug or PCOV)
 - Workbench build: `composer build`
 - Workbench server: `composer serve`
 
