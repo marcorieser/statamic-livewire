@@ -68,5 +68,5 @@ No changes required, but worth adopting:
 
 - [Slots](README.md#slots): pass content into components with tag pairs, including named slots.
 - [Islands](README.md#islands): isolated regions that update independently, incl. lazy loading and placeholders.
-- [Lazy components](README.md#islands): `lazy="true"` / `defer="true"` on the mount tag.
+- [Lazy components](README.md#lazy-loading-components): `lazy="true"` / `defer="true"` on the mount tag.
 - `{{ livewire:assets }}` now also works outside of component views.
