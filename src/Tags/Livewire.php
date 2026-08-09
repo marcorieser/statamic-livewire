@@ -19,6 +19,13 @@ class Livewire extends Tags
     protected static $aliases = ['lw', 'wire'];
 
     /**
+     * Named slots collected per component tag pair currently being parsed.
+     *
+     * @var list<array<string, string>>
+     */
+    protected static array $slotStack = [];
+
+    /**
      * Mount a Livewire component.
      *
      * {{ livewire:your-component-name }}
@@ -47,7 +54,27 @@ class Livewire extends Tags
         // objects reach the component as plain values.
         $params = $this->params->except(['key', 'component'])->toArray();
 
-        return \Livewire\Livewire::mount($component, $params, $this->params->get('key'));
+        return \Livewire\Livewire::mount($component, $params, $this->params->get('key'), $this->slots());
+    }
+
+    /**
+     * Define a named slot inside a component tag pair.
+     *
+     * {{ livewire:slot name="header" }} ... {{ /livewire:slot }}
+     */
+    public function slot(): void
+    {
+        if (self::$slotStack === []) {
+            throw new RuntimeException('The {{ livewire:slot }} tag must be used inside a Livewire component tag pair.');
+        }
+
+        $name = $this->params->get('name');
+
+        if (! is_string($name) || $name === '') {
+            throw new InvalidArgumentException('The {{ livewire:slot }} tag requires a name.');
+        }
+
+        self::$slotStack[array_key_last(self::$slotStack)][$name] = trim((string) $this->parse());
     }
 
     /**
@@ -139,5 +166,33 @@ class Livewire extends Tags
         $html = trim((string) $this->parse());
 
         store($component)->push('scripts', $html, hash('xxh3', $html));
+    }
+
+    /**
+     * Parse the tag pair content into the component's slots: nested
+     * {{ livewire:slot }} pairs become named slots, the remaining
+     * content becomes the default slot.
+     *
+     * @return array<string, string>
+     */
+    protected function slots(): array
+    {
+        if (! $this->isPair) {
+            return [];
+        }
+
+        self::$slotStack[] = [];
+
+        try {
+            $default = trim((string) $this->parse());
+        } finally {
+            $slots = array_pop(self::$slotStack);
+        }
+
+        if ($default !== '') {
+            $slots['default'] = $default;
+        }
+
+        return $slots;
     }
 }

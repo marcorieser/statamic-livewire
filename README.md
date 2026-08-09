@@ -280,7 +280,40 @@ When using [multiple paginators](https://livewire.laravel.com/docs/pagination#mu
 $this->withPagination('articles', $articles, linksKey: 'articles_links')
 ```
 
-<!-- Sections are added as features land: slots, islands. -->
+### Slots
+
+Pass content into a component with a tag pair — the content becomes the [default slot](https://livewire.laravel.com/docs/slots). Named slots are defined with nested `{{ livewire:slot }}` pairs:
+
+```antlers
+{{ livewire:card }}
+    {{ livewire:slot name="header" }}
+        <h1>{{ title }}</h1>
+    {{ /livewire:slot }}
+
+    <p>This becomes the default slot.</p>
+{{ /livewire:card }}
+```
+
+In the component's Antlers view, render slots by name:
+
+```antlers
+<div>
+    <header>{{ slots:header }}</header>
+    <main>{{ slots:default }}</main>
+</div>
+```
+
+Slots can be rendered conditionally — a slot that wasn't provided is empty:
+
+```antlers
+{{ if slots:header }}
+    <header>{{ slots:header }}</header>
+{{ /if }}
+```
+
+Slot content is parsed in the context of the surrounding template, and Livewire persists it across component updates. In Blade component views, use Livewire's native `{{ $slot }}` / `{{ $slots }}` syntax instead.
+
+<!-- Sections are added as features land: islands. -->
 
 ## Changelog
 

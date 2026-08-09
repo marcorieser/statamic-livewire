@@ -8,12 +8,15 @@ use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use MarcoRieser\Livewire\Hooks\CascadeVariablesAutoloader;
 use MarcoRieser\Livewire\Hooks\ComputedPropertiesAutoloader;
+use MarcoRieser\Livewire\Hooks\SlotsAutoloader;
 use MarcoRieser\Livewire\Http\Middleware\HydrateCascadeByLivewireUrl;
 use MarcoRieser\Livewire\Http\Middleware\ResolveCurrentSiteByLivewireUrl;
 use MarcoRieser\Livewire\Tags\Livewire;
 use Override;
 use Statamic\Http\Middleware\Localize;
 use Statamic\Providers\AddonServiceProvider;
+
+use function Livewire\on;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -35,23 +38,7 @@ class ServiceProvider extends AddonServiceProvider
     {
         $this->bootUpdateRouteMiddleware();
         $this->bootStaticCachingReplacers();
-    }
-
-    protected function bootStaticCachingReplacers(): void
-    {
-        config()->set('statamic.static_caching.replacers', [
-            ...config()->array('statamic-livewire.replacers', []),
-            ...config()->array('statamic.static_caching.replacers', []),
-        ]);
-    }
-
-    protected function bootUpdateRouteMiddleware(): void
-    {
-        $middleware = $this->updateRouteMiddleware();
-
-        collect($this->app->make(Router::class)->getRoutes()->getRoutes())
-            ->filter(fn (Route $route): bool => $route->named('*livewire.update'))
-            ->each(fn (Route $route): Route => $route->middleware($middleware));
+        $this->bootSlotsAutoloader();
     }
 
     /**
@@ -69,5 +56,30 @@ class ServiceProvider extends AddonServiceProvider
         $middleware[] = HydrateCascadeByLivewireUrl::class;
 
         return $middleware;
+    }
+
+    protected function bootSlotsAutoloader(): void
+    {
+        // Registered as a plain render listener instead of a component hook,
+        // so it runs after Livewire's own slot support and can replace the
+        // Blade-only slot proxy for Antlers views.
+        on('render', new SlotsAutoloader);
+    }
+
+    protected function bootStaticCachingReplacers(): void
+    {
+        config()->set('statamic.static_caching.replacers', [
+            ...config()->array('statamic-livewire.replacers', []),
+            ...config()->array('statamic.static_caching.replacers', []),
+        ]);
+    }
+
+    protected function bootUpdateRouteMiddleware(): void
+    {
+        $middleware = $this->updateRouteMiddleware();
+
+        collect($this->app->make(Router::class)->getRoutes()->getRoutes())
+            ->filter(fn (Route $route): bool => $route->named('*livewire.update'))
+            ->each(fn (Route $route): Route => $route->middleware($middleware));
     }
 }

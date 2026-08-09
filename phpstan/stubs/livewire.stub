@@ -65,17 +65,48 @@ interface LivewireStore
 
 namespace Livewire;
 
+use Illuminate\Support\Facades\Facade;
+
 abstract class Component
 {
     /** @return iterable<int, \Livewire\Features\SupportAttributes\Attribute> */
     public function getAttributes() {}
+
+    /** @return iterable<int, \Livewire\Features\SupportSlots\Slot> */
+    public function getSlots() {}
 }
+
+/**
+ * @method static void component(string $name, ?string $class = null)
+ * @method static string mount(string $name, array<mixed> $params = [], mixed $key = null, array<string, string> $slots = [])
+ * @method static \Livewire\Features\SupportTesting\Testable test(string|object $name, array<string, mixed> $params = [])
+ * @method static string getUpdateUri()
+ * @method static string originalUrl()
+ * @method static string originalMethod()
+ * @method static void componentHook(string|object $hook)
+ * @method static void addLocation(?string $viewPath = null, ?string $classNamespace = null)
+ * @method static bool isLivewireRequest()
+ */
+class Livewire extends Facade {}
 
 abstract class ComponentHook
 {
     /** @var Component */
     protected $component;
 }
+
+namespace Livewire\Features\SupportSlots;
+
+class Slot
+{
+    public function getName(): string {}
+
+    public function toHtml(): string {}
+}
+
+namespace Livewire\Features\SupportTesting;
+
+class Testable {}
 
 namespace Livewire\Features\SupportAttributes;
 
