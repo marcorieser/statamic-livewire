@@ -23,6 +23,9 @@
             <directory>tests/Feature</directory>
         </testsuite>
     </testsuites>
+    <php>
+        <env name="APP_KEY" value="base64:HSJZZ0K4NXBOG7yQx8lVQEnpMYK0eNRoy0hQeQ8Ov6E="/>
+    </php>
     <source>
         <include>
             <directory suffix=".php">src</directory>

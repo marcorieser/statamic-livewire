@@ -38,7 +38,35 @@ php artisan vendor:publish --tag="statamic-livewire-config"
 
 ## Usage
 
-<!-- Sections are added as features land: mount tag, asset tags, Antlers component views, computed properties, cascade, multi-site, static caching, synthesizers, pagination, slots, islands. -->
+### Mounting components in Antlers
+
+Use the `livewire` tag (aliases: `lw`, `wire`) to render a Livewire component in any Antlers template:
+
+```antlers
+{{ livewire:your-component-name }}
+```
+
+Pass parameters like on any other tag — bound parameters (`:param`) resolve from the Antlers context:
+
+```antlers
+{{ livewire:counter label="Clicks" :count="entry_count" }}
+```
+
+To resolve the component name dynamically, use the `component` method with a `name` parameter:
+
+```antlers
+{{ livewire:component :name="component_name" }}
+```
+
+When rendering components in a loop, give each instance a [key](https://livewire.laravel.com/docs/components#adding-wirekey-to-foreach-loops):
+
+```antlers
+{{ items }}
+    {{ livewire:item-card :item="id" :key="id" }}
+{{ /items }}
+```
+
+<!-- Sections are added as features land: asset tags, Antlers component views, computed properties, cascade, multi-site, static caching, synthesizers, pagination, slots, islands. -->
 
 ## Changelog
 
