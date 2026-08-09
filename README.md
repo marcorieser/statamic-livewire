@@ -156,7 +156,35 @@ class ShowPost extends Component
 
 Each computed property is resolved lazily: it only executes when the view actually uses it.
 
-<!-- Sections are added as features land: cascade, multi-site, static caching, synthesizers, pagination, slots, islands. -->
+### Cascade data
+
+Statamic's [cascade](https://statamic.dev/cascade) is not available in Livewire component views by default. Add the `#[Cascade]` attribute to a component to expose it to the component's Antlers view:
+
+```php
+use MarcoRieser\Livewire\Attributes\Cascade;
+
+#[Cascade]
+class ShowArticle extends Component
+{
+    //
+}
+```
+
+```antlers
+<div>
+    {{ title }} on {{ site:name }}
+</div>
+```
+
+To keep the view scope clean and make the component's dependencies explicit, select only the keys you need. String keys define a fallback for when the key is absent from the cascade; selecting a missing key without a fallback throws an exception:
+
+```php
+#[Cascade(['title', 'author' => 'Anonymous'])]
+```
+
+The package also keeps the cascade consistent across component updates: on Livewire requests, the cascade is rebuilt as if the original page URL was requested — including the site, request, and page content.
+
+<!-- Sections are added as features land: multi-site, static caching, synthesizers, pagination, slots, islands. -->
 
 ## Changelog
 
