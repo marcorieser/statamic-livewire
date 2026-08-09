@@ -12,6 +12,11 @@ return RectorConfig::configure()
         __DIR__.'/config',
         __DIR__.'/tests',
     ])
+    // Single-file and multi-file Livewire component fixtures are compiler
+    // input, not standalone-valid PHP.
+    ->withSkip([
+        __DIR__.'/tests/Fixtures/components',
+    ])
     ->withPhpSets()
     ->withPreparedSets(
         deadCode: true,

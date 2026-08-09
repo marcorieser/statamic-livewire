@@ -1,5 +1,8 @@
 {
     "preset": "laravel",
+    "exclude": [
+        "tests/Fixtures/components"
+    ],
     "rules": {
         "no_extra_blank_lines": {
             "tokens": [

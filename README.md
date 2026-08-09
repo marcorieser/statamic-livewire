@@ -66,7 +66,34 @@ When rendering components in a loop, give each instance a [key](https://livewire
 {{ /items }}
 ```
 
-<!-- Sections are added as features land: asset tags, Antlers component views, computed properties, cascade, multi-site, static caching, synthesizers, pagination, slots, islands. -->
+### Antlers component views
+
+Class components can render an Antlers view instead of a Blade view — reference the view by name, without the `.antlers.html` extension:
+
+```php
+class Counter extends Component
+{
+    public int $count = 0;
+
+    public function render(): View
+    {
+        return view('livewire.counter'); // resources/views/livewire/counter.antlers.html
+    }
+}
+```
+
+Public properties are available as Antlers variables:
+
+```antlers
+<div>
+    <span>{{ count }}</span>
+    <button wire:click="increment">Increment</button>
+</div>
+```
+
+Livewire's own component formats — class components with Blade views, [single-file components, and multi-file components](https://livewire.laravel.com/docs/components) — all work with the mount tag as well. Only single-file and multi-file component templates themselves must be Blade, since they run through Livewire's compiler.
+
+<!-- Sections are added as features land: asset tags, computed properties, cascade, multi-site, static caching, synthesizers, pagination, slots, islands. -->
 
 ## Changelog
 

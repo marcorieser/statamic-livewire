@@ -4,4 +4,8 @@ parameters:
         - src
         - config
         - tests
+    excludePaths:
+        # Single-file and multi-file Livewire component fixtures are compiler
+        # input, not standalone-valid PHP.
+        - tests/Fixtures/components
     tmpDir: build/phpstan
