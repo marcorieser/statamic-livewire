@@ -115,9 +115,15 @@ class SupportScriptsAndAssets
     /** @var list<string> */
     public static $alreadyRunAssetKeys = [];
 
-    /** @var array<string, array<string, string>> */
+    /** @var array<string, string> */
     public static $renderedAssets = [];
 
     /** @var array<string, string> */
     public static $nonLivewireAssets = [];
+
+    /** @return array<string, string> */
+    public static function getAssets() {}
+
+    /** @return void */
+    public static function processNonLivewireAssets() {}
 }

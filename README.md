@@ -192,7 +192,23 @@ On [multi-site](https://statamic.dev/multi-site) installations, the current site
 'localization' => false,
 ```
 
-<!-- Sections are added as features land: static caching, synthesizers, pagination, slots, islands. -->
+### Static caching
+
+Livewire works on [statically cached](https://statamic.dev/static-caching) pages out of the box. Two replacers are registered automatically:
+
+- Livewire's assets (and any `{{ livewire:assets }}` content) are baked into cached responses, since asset injection normally happens after the response is prepared for caching.
+- Livewire's back/forward-cache protection headers (`Cache-Control: no-store`, …) are restored on cached pages containing components, so browsers don't restore stale component snapshots when navigating back.
+
+The replacers can be adjusted in the config:
+
+```php
+'replacers' => [
+    \MarcoRieser\Livewire\Replacers\AssetsReplacer::class,
+    \MarcoRieser\Livewire\Replacers\DisableBackButtonCacheReplacer::class,
+],
+```
+
+<!-- Sections are added as features land: synthesizers, pagination, slots, islands. -->
 
 ## Changelog
 

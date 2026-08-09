@@ -34,6 +34,15 @@ class ServiceProvider extends AddonServiceProvider
     public function bootAddon(): void
     {
         $this->bootUpdateRouteMiddleware();
+        $this->bootStaticCachingReplacers();
+    }
+
+    protected function bootStaticCachingReplacers(): void
+    {
+        config()->set('statamic.static_caching.replacers', [
+            ...config()->array('statamic-livewire.replacers', []),
+            ...config()->array('statamic.static_caching.replacers', []),
+        ]);
     }
 
     protected function bootUpdateRouteMiddleware(): void

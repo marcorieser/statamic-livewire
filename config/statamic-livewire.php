@@ -1,6 +1,8 @@
 <?php
 
 declare(strict_types=1);
+use MarcoRieser\Livewire\Replacers\AssetsReplacer;
+use MarcoRieser\Livewire\Replacers\DisableBackButtonCacheReplacer;
 
 return [
 
@@ -16,5 +18,21 @@ return [
     */
 
     'localization' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Replacers
+    |--------------------------------------------------------------------------
+    |
+    | Replacers keep Livewire working on statically cached pages: they bake
+    | the assets into cached responses and restore the back/forward-cache
+    | protection headers on cached pages containing components.
+    |
+    */
+
+    'replacers' => [
+        AssetsReplacer::class,
+        DisableBackButtonCacheReplacer::class,
+    ],
 
 ];
