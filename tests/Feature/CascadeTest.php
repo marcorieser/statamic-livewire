@@ -35,6 +35,10 @@ it('resolves only the selected cascade keys', function (): void {
         ->and($data['not_in_cascade'])->toBe('fallback-value');
 });
 
+it('throws for a non-string cascade key', function (): void {
+    new Cascade([123])->getCascadeData();
+})->throws(InvalidArgumentException::class, 'Cascade keys must be strings.');
+
 it('throws for a selected cascade key that does not exist', function (): void {
     antlers('{{ livewire:missing-cascade-key-viewer }}');
 })->throws(CascadeDataNotFoundException::class);
