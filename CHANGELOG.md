@@ -1,6 +1,6 @@
 # Release Notes
 
-## [Unreleased](https://github.com/marcorieser/statamic-livewire/compare/v6.0.0...main)
+## [Unreleased](https://github.com/marcorieser/statamic-livewire/compare/v6.0.0...6.x)
 
 ## [v6.0.0](https://github.com/marcorieser/statamic-livewire/compare/v5.3.1...v6.0.0) - 202x-xx-xx
 
