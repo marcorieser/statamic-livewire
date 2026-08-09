@@ -241,7 +241,46 @@ This keeps the payload small and guarantees fresh content on every update — th
 > [!NOTE]
 > Version 5's opt-in property synthesizers were removed in favor of this pattern.
 
-<!-- Sections are added as features land: pagination, slots, islands. -->
+### Pagination
+
+For [pagination](https://livewire.laravel.com/docs/pagination) in Antlers component views, use this package's `WithPagination` trait instead of Livewire's (Blade views keep using Livewire's own trait). The `withPagination()` helper turns a paginator into view data — the items as a loopable variable and the rendered pagination links:
+
+```php
+use MarcoRieser\Livewire\WithPagination;
+
+class ShowArticles extends Component
+{
+    use WithPagination;
+
+    public function render(): View
+    {
+        $entries = Entry::query()
+            ->where('collection', 'articles')
+            ->paginate(3);
+
+        return view('livewire.show-articles')
+            ->with($this->withPagination('entries', $entries));
+    }
+}
+```
+
+```antlers
+<div>
+    {{ entries }}
+        <h2>{{ title }}</h2>
+    {{ /entries }}
+
+    {{ links }}
+</div>
+```
+
+When using [multiple paginators](https://livewire.laravel.com/docs/pagination#multiple-paginators) in one component, give each one its own links key:
+
+```php
+$this->withPagination('articles', $articles, linksKey: 'articles_links')
+```
+
+<!-- Sections are added as features land: slots, islands. -->
 
 ## Changelog
 
