@@ -19,8 +19,10 @@ return RectorConfig::configure()
         earlyReturn: true,
     )
     ->withSets([
+        LaravelSetList::LARAVEL_130,
         LaravelSetList::LARAVEL_CODE_QUALITY,
         LaravelSetList::LARAVEL_COLLECTION,
+        LaravelSetList::LARAVEL_TESTING,
         PestSetList::CODING_STYLE,
     ])
     ->withImportNames(importDocBlockNames: false);
