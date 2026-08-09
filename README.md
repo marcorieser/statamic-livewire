@@ -93,7 +93,47 @@ Public properties are available as Antlers variables:
 
 Livewire's own component formats — class components with Blade views, [single-file components, and multi-file components](https://livewire.laravel.com/docs/components) — all work with the mount tag as well. Only single-file and multi-file component templates themselves must be Blade, since they run through Livewire's compiler.
 
-<!-- Sections are added as features land: asset tags, computed properties, cascade, multi-site, static caching, synthesizers, pagination, slots, islands. -->
+### Including the assets
+
+Livewire's assets are injected automatically. To control their placement — or when [auto-injection is disabled](https://livewire.laravel.com/docs/installation#manually-bundling-livewire-and-alpine) — use the Antlers equivalents of Livewire's Blade directives:
+
+```antlers
+<html>
+<head>
+    {{ livewire:styles }}
+</head>
+<body>
+    {{ livewire:counter }}
+    {{ livewire:scripts }}
+</body>
+</html>
+```
+
+When bundling Livewire manually, output the script configuration instead:
+
+```antlers
+{{ livewire:scriptConfig }}
+```
+
+### Custom assets and scripts
+
+The Antlers equivalents of Livewire's [`@assets` and `@script` directives](https://livewire.laravel.com/docs/javascript):
+
+```antlers
+{{ livewire:assets }}
+    <script src="https://cdn.example.com/chart.js" defer></script>
+{{ /livewire:assets }}
+
+{{ livewire:script }}
+    <script>
+        console.log('Component initialized');
+    </script>
+{{ /livewire:script }}
+```
+
+`{{ livewire:assets }}` loads an asset once per page, no matter how many components use it, and also works outside of component views. `{{ livewire:script }}` runs a script when its component initializes and must be used inside a component view.
+
+<!-- Sections are added as features land: computed properties, cascade, multi-site, static caching, synthesizers, pagination, slots, islands. -->
 
 ## Changelog
 

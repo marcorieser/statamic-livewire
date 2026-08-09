@@ -8,4 +8,7 @@ parameters:
         # Single-file and multi-file Livewire component fixtures are compiler
         # input, not standalone-valid PHP.
         - tests/Fixtures/components
+    stubFiles:
+        # Type declarations for untyped Livewire internals the package relies on.
+        - phpstan/stubs/livewire.stub
     tmpDir: build/phpstan

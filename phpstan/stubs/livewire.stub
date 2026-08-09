@@ -1,0 +1,101 @@
+<?php
+
+namespace Livewire;
+
+use MarcoRieser\Livewire\PhpStan\LivewireStore;
+
+/**
+ * @param  object|null  $instance
+ * @return LivewireStore
+ */
+function store($instance = null) {}
+
+namespace MarcoRieser\Livewire\PhpStan;
+
+/**
+ * Static type for the anonymous store object returned by \Livewire\store().
+ * Only exists for analysis; has no runtime counterpart.
+ */
+interface LivewireStore
+{
+    /**
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function get($key, $default = null);
+
+    /**
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return void
+     */
+    public function set($key, $value);
+
+    /**
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  array-key|null  $iKey
+     * @return void
+     */
+    public function push($key, $value, $iKey = null);
+
+    /**
+     * @param  string  $key
+     * @param  array-key|null  $iKey
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function find($key, $iKey = null, $default = null);
+
+    /**
+     * @param  string  $key
+     * @param  array-key|null  $iKey
+     * @return bool
+     */
+    public function has($key, $iKey = null);
+
+    /**
+     * @param  string  $key
+     * @param  array-key|null  $iKey
+     * @return void
+     */
+    public function unset($key, $iKey = null);
+}
+
+namespace Livewire\Mechanisms\FrontendAssets;
+
+class FrontendAssets
+{
+    /**
+     * @param  array<string, mixed>  $options
+     * @return string
+     */
+    public static function styles($options = []) {}
+
+    /**
+     * @param  array<string, mixed>  $options
+     * @return string
+     */
+    public static function scripts($options = []) {}
+
+    /**
+     * @param  array<string, mixed>  $options
+     * @return string
+     */
+    public static function scriptConfig($options = []) {}
+}
+
+namespace Livewire\Features\SupportScriptsAndAssets;
+
+class SupportScriptsAndAssets
+{
+    /** @var list<string> */
+    public static $alreadyRunAssetKeys = [];
+
+    /** @var array<string, array<string, string>> */
+    public static $renderedAssets = [];
+
+    /** @var array<string, string> */
+    public static $nonLivewireAssets = [];
+}
