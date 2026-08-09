@@ -13,7 +13,7 @@
 A Laravel Livewire integration for Statamic. Use [Livewire](https://livewire.laravel.com) components in your [Antlers](https://statamic.dev/antlers) templates — including Antlers component views, slots, islands, multi-site support, and static caching compatibility.
 
 > [!NOTE]
-> Version 6 is a rewrite targeting Livewire 4 and Statamic 6 exclusively. For Livewire 3 or Statamic 5, use [version 5](https://github.com/marcorieser/statamic-livewire/tree/5.x).
+> Version 6 is a rewrite targeting Livewire 4 and Statamic 6 exclusively. For Livewire 3 or Statamic 5, use [version 5](https://github.com/marcorieser/statamic-livewire/tree/5.x). Upgrading? See the [upgrade guide](UPGRADE.md).
 
 ## Requirements
 
