@@ -166,7 +166,10 @@ it('restores the back-button-cache headers on cached pages with components', fun
     (new DisableBackButtonCacheReplacer)->replaceInCachedResponse($response);
 
     expect($response->headers->get('Cache-Control'))->toContain('no-store')
-        ->and($response->headers->get('Pragma'))->toBe('no-cache');
+        ->and($response->headers->get('Pragma'))->toBe('no-cache')
+        // Each header is set exactly once, replacing existing values.
+        ->and($response->headers->all('Cache-Control'))->toHaveCount(1)
+        ->and($response->headers->all('Pragma'))->toHaveCount(1);
 });
 
 it('leaves cached pages without components cacheable by the browser', function (): void {
