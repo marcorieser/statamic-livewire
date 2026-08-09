@@ -27,7 +27,7 @@
         "statamic/cms": "^6.24"
     },
     "require-dev": {
-        "driftingly/rector-laravel": "^2.0",
+        "driftingly/rector-laravel": "^2.2",
         "larastan/larastan": "^3.9",
         "laravel/pao": "^1.0",
         "laravel/pint": "^1.29",
