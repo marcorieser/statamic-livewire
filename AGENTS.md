@@ -10,6 +10,14 @@ This repository is a Statamic addon (a Laravel package) integrating Livewire 4 w
 - Prefer explicit Laravel package code over helper abstractions unless the extension point is real.
 - Keep tests focused on observable package behavior through public APIs, service provider wiring, commands, routes, published resources, and documentation promises.
 
+## Git & Commits
+
+- Only commit when explicitly instructed for that specific commit; a standing "commit as you go" permission must be granted explicitly for the session.
+- Use Conventional Commits (`feat:`, `fix:`, `chore:`, `test:`, `ci:`, `refactor:`, `docs:`, …).
+- Commit in logical units: one self-contained change per commit; split unrelated changes instead of bundling them.
+- Keep subjects short and precise; add a body only when the subject alone is not self-explanatory.
+- No co-author trailers or AI attribution; commits are authored by the repository owner only.
+
 ## Quick Commands
 
 - Full validation: `composer test`
