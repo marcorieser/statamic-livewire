@@ -345,7 +345,7 @@ Islands can be [loaded lazily](https://livewire.laravel.com/docs/islands#lazy-lo
 {{ /livewire:island }}
 ```
 
-The `{{ livewire:placeholder }}` tag pair is only available inside islands. Whole components can be lazy loaded as well — pass `lazy="true"` to the mount tag — but their loading state is defined in PHP, with a [`placeholder()` method](https://livewire.laravel.com/docs/lazy#custom-placeholders) on the component class (just like class-based components in Blade):
+The `{{ livewire:placeholder }}` tag pair is only available inside islands. Whole components can be [lazy loaded](https://livewire.laravel.com/docs/lazy) as well — `lazy="true"` loads when scrolled into view, `defer="true"` right after the page load — but their loading state is defined in PHP, with a [`placeholder()` method](https://livewire.laravel.com/docs/lazy#custom-placeholders) on the component class (just like class-based components in Blade):
 
 ```antlers
 {{ livewire:revenue lazy="true" }}

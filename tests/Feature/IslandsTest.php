@@ -120,6 +120,19 @@ it('mounts lazy components with their placeholder', function (): void {
         ->not->toContain('component content');
 });
 
+it('mounts deferred components with their placeholder', function (string $param): void {
+    Livewire::component('lazy-placeholder-counter', LazyPlaceholderCounter::class);
+
+    $html = antlers('{{ livewire:lazy-placeholder-counter '.$param.' }}');
+
+    expect($html)
+        ->toContain('waiting…')
+        ->not->toContain('component content');
+})->with([
+    'defer' => 'defer="true"',
+    'legacy on-load' => 'lazy="on-load"',
+]);
+
 it('renders an empty placeholder for deferred islands without a placeholder branch', function (): void {
     $html = mountIslands('island-counter-defer');
 
