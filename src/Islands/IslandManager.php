@@ -70,17 +70,35 @@ class IslandManager
 
         $isPlaceholder = array_key_exists('__placeholder', $scope);
 
-        if ($isPlaceholder && ! str_contains($source, '__is_placeholder')) {
-            return '';
-        }
-
         $scope = Arr::except($scope, ['__env', 'app', '__data', '__path', 'obLevel', '__placeholder']);
 
         $scope = [...$scope, ...$this->islandScope($token, $scope['__livewire'] ?? null)];
 
-        $scope['__is_placeholder'] = $isPlaceholder;
+        [$content, $placeholder] = $this->splitPlaceholder($source);
 
-        return (string) Antlers::parse($source, $scope, true);
+        if ($isPlaceholder) {
+            return $placeholder === null ? '' : (string) Antlers::parse($placeholder, $scope, true);
+        }
+
+        return (string) Antlers::parse($content, $scope, true);
+    }
+
+    /**
+     * Split the island source into its content and the loading state defined
+     * by a {{ livewire:placeholder }} tag pair. Without one, the placeholder
+     * is empty — mirroring Blade islands.
+     *
+     * @return array{string, string|null}
+     */
+    protected function splitPlaceholder(string $source): array
+    {
+        $pattern = '/{{\s*livewire:placeholder\s*}}(.*?){{\s*\/livewire:placeholder\s*}}/s';
+
+        if (! preg_match($pattern, $source, $matches)) {
+            return [$source, null];
+        }
+
+        return [preg_replace($pattern, '', $source) ?? $source, trim($matches[1])];
     }
 
     /**

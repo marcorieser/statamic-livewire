@@ -9,6 +9,7 @@ use Livewire\Features\SupportIslands\Compiler\IslandCompiler;
 use Livewire\Livewire;
 use MarcoRieser\Livewire\Islands\IslandManager;
 use MarcoRieser\Livewire\Tests\Fixtures\IslandCounter;
+use MarcoRieser\Livewire\Tests\Fixtures\LazyPlaceholderCounter;
 use MarcoRieser\Livewire\Tests\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -94,7 +95,29 @@ it('renders a placeholder for lazy islands and loads them on trigger', function 
 
     $response->assertOk();
 
-    expect($response->content())->toContain('inside: 0');
+    expect($response->content())
+        ->toContain('inside: 0')
+        ->not->toContain('loading…');
+});
+
+it('throws when the placeholder tag is used outside an island', function (): void {
+    file_put_contents(__DIR__.'/../Fixtures/views/island-counter-stray-placeholder.antlers.html', '<div>{{ livewire:placeholder }}x{{ /livewire:placeholder }}</div>');
+
+    try {
+        mountIslands('island-counter-stray-placeholder');
+    } finally {
+        unlink(__DIR__.'/../Fixtures/views/island-counter-stray-placeholder.antlers.html');
+    }
+})->throws(RuntimeException::class, 'The {{ livewire:placeholder }} tag must be used inside a {{ livewire:island }} tag pair.');
+
+it('mounts lazy components with their placeholder', function (): void {
+    Livewire::component('lazy-placeholder-counter', LazyPlaceholderCounter::class);
+
+    $html = antlers('{{ livewire:lazy-placeholder-counter lazy="true" }}');
+
+    expect($html)
+        ->toContain('waiting…')
+        ->not->toContain('component content');
 });
 
 it('renders an empty placeholder for deferred islands without a placeholder branch', function (): void {

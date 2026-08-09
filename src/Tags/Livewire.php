@@ -143,6 +143,18 @@ class Livewire extends Tags
             ->all());
     }
 
+    /**
+     * The loading state of a lazy island. Handled by the IslandManager while
+     * rendering island sources — reaching this method means the pair was
+     * used outside of an island.
+     *
+     * {{ livewire:placeholder }} ... {{ /livewire:placeholder }}
+     */
+    public function placeholder(): never
+    {
+        throw new RuntimeException('The {{ livewire:placeholder }} tag must be used inside a {{ livewire:island }} tag pair.');
+    }
+
     protected function boolParam(string $key): bool
     {
         return filter_var($this->params->get($key, false), FILTER_VALIDATE_BOOL);

@@ -333,16 +333,32 @@ Actions triggered from inside an island only re-render that island; full compone
 {{ livewire:island name="stats" always="true" }}
 ```
 
-Islands can be [loaded lazily](https://livewire.laravel.com/docs/islands#lazy-loading) — `lazy` loads when scrolled into view, `defer` right after the page load, and `skip` only when triggered explicitly. On the initial render, lazy islands show their placeholder branch:
+Islands can be [loaded lazily](https://livewire.laravel.com/docs/islands#lazy-loading) — `lazy` loads when scrolled into view, `defer` right after the page load, and `skip` only when triggered explicitly. Until loaded, lazy islands show their [placeholder](https://livewire.laravel.com/docs/lazy#custom-placeholders):
 
 ```antlers
 {{ livewire:island name="stats" lazy="true" }}
-    {{ if __is_placeholder }}
+    {{ livewire:placeholder }}
         <span>Loading…</span>
-    {{ else }}
-        <span>{{ count }}</span>
-    {{ /if }}
+    {{ /livewire:placeholder }}
+
+    <span>{{ count }}</span>
 {{ /livewire:island }}
+```
+
+The `{{ livewire:placeholder }}` tag pair is only available inside islands. Whole components can be lazy loaded as well — pass `lazy="true"` to the mount tag — but their loading state is defined in PHP, with a [`placeholder()` method](https://livewire.laravel.com/docs/lazy#custom-placeholders) on the component class (just like class-based components in Blade):
+
+```antlers
+{{ livewire:revenue lazy="true" }}
+```
+
+```php
+class Revenue extends Component
+{
+    public function placeholder(): string
+    {
+        return '<div>Loading…</div>';
+    }
+}
 ```
 
 Islands can be nested, and island content sees the component's scope (its public and computed properties). To bring additional variables into an island — for example loop values — pass them as parameters. Their values are captured when the island is defined and persist across island updates:
