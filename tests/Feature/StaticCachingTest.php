@@ -18,6 +18,8 @@ beforeEach(function (): void {
     SupportAutoInjectedAssets::$hasRenderedAComponentThisRequest = false;
     SupportAutoInjectedAssets::$forceAssetInjection = false;
     SupportScriptsAndAssets::$renderedAssets = [];
+    SupportScriptsAndAssets::$nonLivewireAssets = [];
+    SupportScriptsAndAssets::$alreadyRunAssetKeys = [];
 });
 
 it('serves cached pages with livewire assets and back-button-cache headers', function (): void {
