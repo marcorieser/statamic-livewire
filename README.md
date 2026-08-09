@@ -12,6 +12,8 @@
 
 A Laravel Livewire integration for Statamic. Use [Livewire](https://livewire.laravel.com) components in your [Antlers](https://statamic.dev/antlers) templates — including Antlers component views, slots, islands, multi-site support, and static caching compatibility.
 
+This documentation covers what the package adds on top of Livewire — it assumes you know Livewire itself. If you are new to it, work through the [Livewire documentation](https://livewire.laravel.com/docs) first.
+
 > [!NOTE]
 > Version 6 is a rewrite targeting Livewire 4 and Statamic 6 exclusively. For Livewire 3 or Statamic 5, use [version 5](https://github.com/marcorieser/statamic-livewire/tree/5.x). Upgrading? See the [upgrade guide](UPGRADE.md).
 
@@ -121,7 +123,10 @@ Public properties are available as Antlers variables:
 </div>
 ```
 
-Livewire's own component formats — class components with Blade views, [single-file components, and multi-file components](https://livewire.laravel.com/docs/components) — all work with the mount tag as well. Only single-file and multi-file component templates themselves must be Blade, since they run through Livewire's compiler.
+Livewire's own component formats — class components with Blade views, [single-file components, and multi-file components](https://livewire.laravel.com/docs/components) — all work with the mount tag as well.
+
+> [!IMPORTANT]
+> Antlers views are only supported for class components. Single-file and multi-file component templates must be Blade, since they run through Livewire's compiler.
 
 ### Including the assets
 
