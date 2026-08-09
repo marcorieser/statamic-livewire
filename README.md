@@ -184,7 +184,15 @@ To keep the view scope clean and make the component's dependencies explicit, sel
 
 The package also keeps the cascade consistent across component updates: on Livewire requests, the cascade is rebuilt as if the original page URL was requested — including the site, request, and page content.
 
-<!-- Sections are added as features land: multi-site, static caching, synthesizers, pagination, slots, islands. -->
+### Multi-site
+
+On [multi-site](https://statamic.dev/multi-site) installations, the current site and its locale are resolved from the original page URL on Livewire update requests — components keep rendering in the site context of the page they live on. This is enabled by default and can be turned off in the config:
+
+```php
+'localization' => false,
+```
+
+<!-- Sections are added as features land: static caching, synthesizers, pagination, slots, islands. -->
 
 ## Changelog
 

@@ -9,24 +9,16 @@ use Illuminate\Routing\Router;
 use MarcoRieser\Livewire\Hooks\CascadeVariablesAutoloader;
 use MarcoRieser\Livewire\Hooks\ComputedPropertiesAutoloader;
 use MarcoRieser\Livewire\Http\Middleware\HydrateCascadeByLivewireUrl;
+use MarcoRieser\Livewire\Http\Middleware\ResolveCurrentSiteByLivewireUrl;
 use MarcoRieser\Livewire\Tags\Livewire;
 use Override;
+use Statamic\Http\Middleware\Localize;
 use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
 {
     protected $tags = [
         Livewire::class,
-    ];
-
-    /**
-     * Middleware for the Livewire update route, run in order: the current
-     * site has to be resolved before the cascade is hydrated with it.
-     *
-     * @var list<class-string>
-     */
-    protected array $updateRouteMiddleware = [
-        HydrateCascadeByLivewireUrl::class,
     ];
 
     #[Override]
@@ -46,8 +38,27 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootUpdateRouteMiddleware(): void
     {
+        $middleware = $this->updateRouteMiddleware();
+
         collect($this->app->make(Router::class)->getRoutes()->getRoutes())
             ->filter(fn (Route $route): bool => $route->named('*livewire.update'))
-            ->each(fn (Route $route): Route => $route->middleware($this->updateRouteMiddleware));
+            ->each(fn (Route $route): Route => $route->middleware($middleware));
+    }
+
+    /**
+     * @return list<class-string>
+     */
+    public function updateRouteMiddleware(): array
+    {
+        $middleware = [];
+
+        if (config()->boolean('statamic-livewire.localization', true)) {
+            $middleware[] = ResolveCurrentSiteByLivewireUrl::class;
+            $middleware[] = Localize::class;
+        }
+
+        $middleware[] = HydrateCascadeByLivewireUrl::class;
+
+        return $middleware;
     }
 }
