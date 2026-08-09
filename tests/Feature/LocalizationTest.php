@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Events\RouteMatched;
+use Illuminate\Routing\Route;
 use Livewire\Livewire;
 use MarcoRieser\Livewire\Http\Middleware\HydrateCascadeByLivewireUrl;
 use MarcoRieser\Livewire\Http\Middleware\ResolveCurrentSiteByLivewireUrl;
@@ -19,7 +20,13 @@ beforeEach(function (): void {
 it('resolves the site before hydrating the cascade on update routes', function (): void {
     $route = resolve('router')->getRoutes()->getByName('default-livewire.update');
 
-    $middleware = collect($route?->gatherMiddleware() ?? [])
+    if (! $route instanceof Route) {
+        $this->fail('The livewire update route is not registered.');
+    }
+
+    event(new RouteMatched($route, request()));
+
+    $middleware = collect($route->gatherMiddleware())
         ->filter(fn (mixed $middleware): bool => in_array($middleware, addonProvider()->updateRouteMiddleware(), true))
         ->values()
         ->all();
@@ -51,28 +58,13 @@ it('resolves the current site from the original url on update requests', functio
 
     $html = antlers('{{ livewire:cascade-viewer }}');
 
-    preg_match('/wire:snapshot="([^"]+)"/', $html, $matches);
-    $snapshot = html_entity_decode($matches[1] ?? '', ENT_QUOTES);
-
     // In production every request hydrates a fresh cascade; in tests the app
     // persists between the render and the update request, so reset both the
     // container instance and the facade's resolved-instance cache.
     app()->forgetInstance(Cascade::class);
     Statamic\Facades\Cascade::clearResolvedInstances();
 
-    $response = $this
-        ->withoutMiddleware(PreventRequestForgery::class)
-        ->postJson(Livewire::getUpdateUri(), [
-            'components' => [
-                [
-                    'snapshot' => $snapshot,
-                    'updates' => [],
-                    'calls' => [
-                        ['method' => '$refresh', 'params' => []],
-                    ],
-                ],
-            ],
-        ], ['X-Livewire' => '1']);
+    $response = postLivewireUpdate($this, $html, ['method' => '$refresh', 'params' => []]);
 
     $response->assertOk();
 

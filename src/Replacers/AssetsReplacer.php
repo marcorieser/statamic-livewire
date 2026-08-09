@@ -8,7 +8,9 @@ use Illuminate\Http\Response;
 use Livewire\Features\SupportAutoInjectedAssets\SupportAutoInjectedAssets;
 use Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets;
 use Livewire\Mechanisms\FrontendAssets\FrontendAssets;
+use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\Replacer;
+use Statamic\StaticCaching\StaticCacheManager;
 
 class AssetsReplacer implements Replacer
 {
@@ -25,7 +27,7 @@ class AssetsReplacer implements Replacer
         }
 
         // Don't disturb Livewire's assets injection when caching is off.
-        if (config('statamic.static_caching.strategy') === null) {
+        if (resolve(StaticCacheManager::class)->driver() instanceof NullCacher) {
             return;
         }
 

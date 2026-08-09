@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace MarcoRieser\Livewire\Islands;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
 use Livewire\Component;
 use Livewire\Features\SupportIslands\Compiler\IslandCompiler;
+use MarcoRieser\Livewire\Hooks\SlotsAutoloader;
+use MarcoRieser\Livewire\Tags\Livewire;
 use RuntimeException;
 use Statamic\Facades\Antlers;
 
@@ -54,8 +57,8 @@ class IslandManager
     /**
      * Render the island's Antlers source with the scope Livewire passes to
      * island views (the component's public properties and __livewire). On
-     * placeholder passes (lazy, defer and skipped islands), templates can
-     * branch on {{ __is_placeholder }}; without such a branch the
+     * placeholder passes (lazy, defer and skipped islands), only the
+     * {{ livewire:placeholder }} pair content renders; without one the
      * placeholder is empty, mirroring Blade islands.
      *
      * @param  array<string, mixed>  $scope
@@ -70,9 +73,23 @@ class IslandManager
 
         $isPlaceholder = array_key_exists('__placeholder', $scope);
 
-        $scope = Arr::except($scope, ['__env', 'app', '__data', '__path', 'obLevel', '__placeholder']);
+        // Runtime island data from renderIsland()/streamIsland() overrides
+        // the scope captured by the island tag.
+        $runtimeWith = $scope['__runtimeWith'] ?? [];
+        $runtimeWith = is_array($runtimeWith) ? $runtimeWith : [];
 
-        $scope = [...$scope, ...$this->islandScope($token, $scope['__livewire'] ?? null)];
+        $scope = Arr::except($scope, ['__env', 'app', '__data', '__path', 'obLevel', '__placeholder', '__runtimeWith']);
+
+        // Replace Livewire's Blade-only slot proxy with the antlers-friendly
+        // slot html — islands render through the shim, so the SlotsAutoloader
+        // render listener never runs for them.
+        $component = $scope['__livewire'] ?? null;
+
+        if ($component instanceof Component && ($slots = SlotsAutoloader::forComponent($component)) !== []) {
+            $scope['slots'] = $slots;
+        }
+
+        $scope = [...$scope, ...$this->islandScope($token, $component), ...$runtimeWith];
 
         [$content, $placeholder] = $this->splitPlaceholder($source);
 
@@ -84,21 +101,74 @@ class IslandManager
     }
 
     /**
+     * Restore the island cache files of a component when they are missing —
+     * after cleared view caches, or when the update request lands on a server
+     * that never rendered the page. Re-rendering the component's view runs
+     * the island tags, which write the files as a side effect.
+     */
+    public function ensureIslandFiles(Component $component): void
+    {
+        $missing = collect($component->getIslands())
+            ->pluck('token')
+            ->filter(fn (mixed $token): bool => is_string($token)
+                && str_starts_with($token, 'antlers-')
+                && (! file_exists($this->sourcePath($token)) || ! file_exists(IslandCompiler::getCachedPathFromToken($token))));
+
+        if ($missing->isEmpty() || ! method_exists($component, 'render')) {
+            return;
+        }
+
+        $view = $component->render();
+
+        if ($view instanceof View) {
+            $view->with(['__livewire' => $component])->render();
+        }
+    }
+
+    /**
      * Split the island source into its content and the loading state defined
-     * by a {{ livewire:placeholder }} tag pair. Without one, the placeholder
-     * is empty — mirroring Blade islands.
+     * by a {{ livewire:placeholder }} tag pair. Placeholders of nested
+     * islands stay with their island; without an own placeholder pair, the
+     * placeholder is empty — mirroring Blade islands.
      *
      * @return array{string, string|null}
      */
     protected function splitPlaceholder(string $source): array
     {
-        $pattern = '/{{\s*livewire:placeholder\s*}}(.*?){{\s*\/livewire:placeholder\s*}}/s';
+        $tags = '(?:'.implode('|', Livewire::handles()).')';
 
-        if (! preg_match($pattern, $source, $matches)) {
-            return [$source, null];
+        preg_match_all('/{{\s*(\/?)'.$tags.':island[^}]*}}/', $source, $islandTags, PREG_OFFSET_CAPTURE);
+        preg_match_all('/{{\s*'.$tags.':placeholder\s*}}(.*?){{\s*\/'.$tags.':placeholder\s*}}/s', $source, $pairs, PREG_OFFSET_CAPTURE);
+
+        $placeholder = null;
+        $removals = [];
+
+        foreach ($pairs[0] as $index => [$pair, $offset]) {
+            // Only placeholder pairs outside of nested island pairs belong to
+            // this island.
+            $depth = 0;
+
+            foreach ($islandTags[0] as $tagIndex => [$tag, $tagOffset]) {
+                if ($tagOffset >= $offset) {
+                    break;
+                }
+
+                $depth += $islandTags[1][$tagIndex][0] === '/' ? -1 : 1;
+            }
+
+            if ($depth !== 0) {
+                continue;
+            }
+
+            $placeholder ??= trim($pairs[1][$index][0]);
+            $removals[] = [$offset, strlen($pair)];
         }
 
-        return [preg_replace($pattern, '', $source) ?? $source, trim($matches[1])];
+        foreach (array_reverse($removals) as [$offset, $length]) {
+            $source = substr_replace($source, '', $offset, $length);
+        }
+
+        return [$source, $placeholder];
     }
 
     /**

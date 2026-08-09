@@ -11,9 +11,9 @@ The version floors moved. Upgrade your application first:
 | Dependency | v5 | v6 |
 | --- | --- | --- |
 | PHP | 8.2+ | 8.4+ |
-| Laravel | 10+ | 13+ |
-| Statamic | 5+ | 6.24+ |
-| Livewire | 3+ | 4.2+ |
+| Laravel | 11+ | 13+ |
+| Statamic | 5.73+ | 6.24+ |
+| Livewire | 3.6+ | 4.2+ |
 
 When upgrading from Livewire 3, also follow [Livewire's own upgrade guide](https://livewire.laravel.com/docs/upgrading) (e.g. `layout` → `component_layout` config, changed defaults).
 
@@ -51,6 +51,8 @@ Instead of silently rendering nothing, the tags now fail loudly:
 
 - `{{ livewire }}` or `{{ livewire:component }}` without a component name throws an `InvalidArgumentException`.
 - `{{ livewire:script }}` outside of a component view throws a `RuntimeException`.
+
+The tag methods `slot`, `island` and `placeholder` are reserved: components with those names can no longer be mounted via `{{ livewire:slot }}` etc. — use `{{ livewire component="slot" }}` instead (or rename the component).
 
 ### Changed: config file
 

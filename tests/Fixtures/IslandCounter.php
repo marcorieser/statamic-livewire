@@ -21,6 +21,11 @@ class IslandCounter extends Component
         $this->count++;
     }
 
+    public function flash(): void
+    {
+        $this->renderIsland('stats', with: ['flash' => 'boom']);
+    }
+
     public function render(): View
     {
         // larastan's view-string check only discovers .blade.php files, so the

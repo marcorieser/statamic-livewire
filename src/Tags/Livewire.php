@@ -20,6 +20,16 @@ class Livewire extends Tags
     protected static $aliases = ['lw', 'wire'];
 
     /**
+     * All tag names this tag responds to.
+     *
+     * @return list<string>
+     */
+    public static function handles(): array
+    {
+        return ['livewire', ...static::$aliases];
+    }
+
+    /**
      * Named slots collected per component tag pair currently being parsed.
      *
      * @var list<array<string, string>>

@@ -2,16 +2,13 @@
 
 declare(strict_types=1);
 
-use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\File;
-use Illuminate\Testing\TestResponse;
 use Livewire\Features\SupportIslands\Compiler\IslandCompiler;
 use Livewire\Livewire;
 use MarcoRieser\Livewire\Islands\IslandManager;
 use MarcoRieser\Livewire\Tests\Fixtures\IslandCounter;
+use MarcoRieser\Livewire\Tests\Fixtures\IslandSlotCard;
 use MarcoRieser\Livewire\Tests\Fixtures\LazyPlaceholderCounter;
-use MarcoRieser\Livewire\Tests\TestCase;
-use Symfony\Component\HttpFoundation\Response;
 
 beforeEach(function (): void {
     Livewire::component('island-counter', IslandCounter::class);
@@ -25,23 +22,22 @@ function mountIslands(string $view = 'island-counter'): string
     return antlers('{{ livewire:island-counter view="'.$view.'" }}');
 }
 
-/**
- * @param  array<string, mixed>  $call
- * @return TestResponse<Response>
- */
-function postIslandUpdate(TestCase $testCase, string $html, array $call): TestResponse
-{
-    preg_match('/wire:snapshot="([^"]+)"/', $html, $matches);
-    $snapshot = html_entity_decode($matches[1] ?? '', ENT_QUOTES);
+it('recovers island cache files on island updates after cleared caches', function (): void {
+    $html = mountIslands();
 
-    return $testCase
-        ->withoutMiddleware(PreventRequestForgery::class)
-        ->postJson(Livewire::getUpdateUri(), [
-            'components' => [
-                ['snapshot' => $snapshot, 'updates' => [], 'calls' => [$call]],
-            ],
-        ], ['X-Livewire' => '1']);
-}
+    // Simulate `view:clear` between the page render and the island update.
+    File::deleteDirectory(dirname(IslandCompiler::getCachedPathFromToken('probe')));
+
+    $response = postLivewireUpdate($this, $html, [
+        'method' => 'increment',
+        'params' => [],
+        'metadata' => ['island' => ['name' => 'stats', 'mode' => 'morph']],
+    ]);
+
+    $response->assertOk();
+
+    expect($response->content())->toContain('inside: 1');
+});
 
 it('renders islands with fragment markers on mount', function (): void {
     $html = mountIslands();
@@ -53,7 +49,7 @@ it('renders islands with fragment markers on mount', function (): void {
 });
 
 it('rerenders island content on island-scoped updates', function (): void {
-    $response = postIslandUpdate($this, mountIslands(), [
+    $response = postLivewireUpdate($this, mountIslands(), [
         'method' => 'increment',
         'params' => [],
         'metadata' => ['island' => ['name' => 'stats', 'mode' => 'morph']],
@@ -67,7 +63,7 @@ it('rerenders island content on island-scoped updates', function (): void {
 });
 
 it('skips islands on full component updates', function (): void {
-    $response = postIslandUpdate($this, mountIslands(), ['method' => 'increment', 'params' => []]);
+    $response = postLivewireUpdate($this, mountIslands(), ['method' => 'increment', 'params' => []]);
 
     $response->assertOk();
 
@@ -87,7 +83,7 @@ it('renders a placeholder for lazy islands and loads them on trigger', function 
         ->toContain('wire:intersect.once="__lazyLoadIsland"')
         ->not->toContain('inside: 0');
 
-    $response = postIslandUpdate($this, $html, [
+    $response = postLivewireUpdate($this, $html, [
         'method' => '__lazyLoadIsland',
         'params' => [],
         'metadata' => ['island' => ['name' => 'stats', 'mode' => 'morph']],
@@ -142,7 +138,7 @@ it('renders an empty placeholder for deferred islands without a placeholder bran
 });
 
 it('rerenders always islands on full component updates', function (): void {
-    $response = postIslandUpdate($this, mountIslands('island-counter-always'), ['method' => 'increment', 'params' => []]);
+    $response = postLivewireUpdate($this, mountIslands('island-counter-always'), ['method' => 'increment', 'params' => []]);
 
     $response->assertOk();
 
@@ -160,6 +156,47 @@ it('skips the initial render of skip islands', function (): void {
         ->not->toContain('inside: 0');
 });
 
+it('keeps placeholders with their island and supports tag aliases', function (): void {
+    $html = mountIslands('island-counter-nested-lazy');
+
+    // The outer island renders its content (its alias placeholder stripped),
+    // the inner lazy island renders its own placeholder.
+    expect($html)
+        ->toContain('outer island')
+        ->toContain('inner loading')
+        ->not->toContain('outer loading')
+        ->not->toContain('inner island</span>');
+});
+
+it('merges runtime island data into the island scope', function (): void {
+    $response = postLivewireUpdate($this, mountIslands(), ['method' => 'flash', 'params' => []]);
+
+    $response->assertOk();
+
+    expect($response->content())->toContain('flash: boom');
+});
+
+it('renders slots inside islands', function (): void {
+    Livewire::component('island-slot-card', IslandSlotCard::class);
+
+    $html = antlers('{{ livewire:island-slot-card }}<p>slotted</p>{{ /livewire:island-slot-card }}');
+
+    expect($html)->toContain('<p>slotted</p>');
+
+    $response = postLivewireUpdate($this, $html, [
+        'method' => '$refresh',
+        'params' => [],
+        'metadata' => ['island' => ['name' => 'body', 'mode' => 'morph']],
+    ]);
+
+    $response->assertOk();
+
+    // Slot content lives in the client's DOM: island updates emit a skip
+    // fragment for it, so morphing leaves the slotted markup untouched.
+    expect($response->content())->toContain('name=default|type=slot')
+        ->toContain('mode=skip');
+});
+
 it('renders nested islands', function (): void {
     $html = mountIslands('island-counter-nested');
 
@@ -175,7 +212,7 @@ it('persists captured island scope across island updates', function (): void {
 
     expect($html)->toContain('live: 0 captured: 0');
 
-    $response = postIslandUpdate($this, $html, [
+    $response = postLivewireUpdate($this, $html, [
         'method' => 'increment',
         'params' => [],
         'metadata' => ['island' => ['name' => 'stats', 'mode' => 'morph']],
@@ -197,7 +234,7 @@ it('supports islands in loops via dynamic names and captured scope', function ()
         ->toContain('&quot;name&quot;:&quot;item-1&quot;')
         ->toContain('&quot;name&quot;:&quot;item-2&quot;');
 
-    $response = postIslandUpdate($this, $html, [
+    $response = postLivewireUpdate($this, $html, [
         'method' => '$refresh',
         'params' => [],
         'metadata' => ['island' => ['name' => 'item-2', 'mode' => 'morph']],

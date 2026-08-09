@@ -42,8 +42,8 @@ This documentation covers what the package adds on top of Livewire — it assume
 
 - PHP 8.4+
 - Laravel 13+
-- Statamic 6+
-- Livewire 4+
+- Statamic 6.24+
+- Livewire 4.2+
 
 ## Installation
 

@@ -24,16 +24,28 @@ class SlotsAutoloader
             return;
         }
 
-        $slots = [];
-
-        foreach ($component->getSlots() as $slot) {
-            $slots[$slot->getName()] = $slot->toHtml();
-        }
+        $slots = static::forComponent($component);
 
         if ($slots === []) {
             return;
         }
 
         $view->with(['slots' => $slots]);
+    }
+
+    /**
+     * The component's slot html keyed by slot name.
+     *
+     * @return array<string, string>
+     */
+    public static function forComponent(Component $component): array
+    {
+        $slots = [];
+
+        foreach ($component->getSlots() as $slot) {
+            $slots[$slot->getName()] = $slot->toHtml();
+        }
+
+        return $slots;
     }
 }

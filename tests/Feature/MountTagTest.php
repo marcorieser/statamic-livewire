@@ -47,6 +47,12 @@ it('mounts a component through the tag aliases', function (): void {
         ->and(antlers('{{ wire:counter }}'))->toContain('counter: 0');
 });
 
+it('converts parameters to plain values', function (): void {
+    $html = antlers('{{ livewire:counter :count="value" }}', ['value' => collect([3])->first()]);
+
+    expect($html)->toContain('counter: 3');
+});
+
 it('uses key as the component key instead of passing it as a parameter', function (): void {
     $html = antlers('{{ livewire:counter key="my-key" }}');
 

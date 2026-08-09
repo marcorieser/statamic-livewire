@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Events\RouteMatched;
+use Illuminate\Routing\Route;
 use Livewire\Livewire;
 use MarcoRieser\Livewire\Attributes\Cascade;
 use MarcoRieser\Livewire\Http\Middleware\HydrateCascadeByLivewireUrl;
+use MarcoRieser\Livewire\Tests\Fixtures\CascadeComputedViewer;
 use MarcoRieser\Livewire\Tests\Fixtures\CascadeViewer;
 use MarcoRieser\Livewire\Tests\Fixtures\MissingCascadeKeyViewer;
 use MarcoRieser\Livewire\Tests\Fixtures\SelectiveCascadeViewer;
@@ -35,6 +38,13 @@ it('resolves only the selected cascade keys', function (): void {
         ->and($data['not_in_cascade'])->toBe('fallback-value');
 });
 
+it('resolves dotted cascade keys', function (): void {
+    Statamic\Facades\Cascade::hydrate();
+    Statamic\Facades\Cascade::set('seo', ['title' => 'deep']);
+
+    expect(new Cascade(['seo.title'])->getCascadeData())->toBe(['seo.title' => 'deep']);
+});
+
 it('throws for a non-string cascade key', function (): void {
     new Cascade([123])->getCascadeData();
 })->throws(InvalidArgumentException::class, 'Cascade keys must be strings.');
@@ -43,18 +53,26 @@ it('throws for a selected cascade key that does not exist', function (): void {
     antlers('{{ livewire:missing-cascade-key-viewer }}');
 })->throws(CascadeDataNotFoundException::class);
 
+it('lets computed properties win over cascade data', function (): void {
+    Livewire::component('cascade-computed-viewer', CascadeComputedViewer::class);
+
+    expect(antlers('{{ livewire:cascade-computed-viewer }}'))->toContain('title: from-computed');
+});
+
 it('attaches the cascade middleware to the livewire update route', function (): void {
     $route = resolve('router')->getRoutes()->getByName('default-livewire.update');
 
-    expect($route)->not->toBeNull()
-        ->and($route?->gatherMiddleware())->toContain(HydrateCascadeByLivewireUrl::class);
+    if (! $route instanceof Route) {
+        $this->fail('The livewire update route is not registered.');
+    }
+
+    event(new RouteMatched($route, request()));
+
+    expect($route->gatherMiddleware())->toContain(HydrateCascadeByLivewireUrl::class);
 });
 
 it('rehydrates the cascade from the original url on update requests', function (): void {
     $html = antlers('{{ livewire:cascade-viewer }}');
-
-    preg_match('/wire:snapshot="([^"]+)"/', $html, $matches);
-    $snapshot = html_entity_decode($matches[1] ?? '', ENT_QUOTES);
 
     // In production every request hydrates a fresh cascade; in tests the app
     // persists between the render and the update request, so reset both the
@@ -62,19 +80,7 @@ it('rehydrates the cascade from the original url on update requests', function (
     app()->forgetInstance(Statamic\View\Cascade::class);
     Statamic\Facades\Cascade::clearResolvedInstances();
 
-    $response = $this
-        ->withoutMiddleware(PreventRequestForgery::class)
-        ->postJson(Livewire::getUpdateUri(), [
-            'components' => [
-                [
-                    'snapshot' => $snapshot,
-                    'updates' => [],
-                    'calls' => [
-                        ['method' => '$refresh', 'params' => []],
-                    ],
-                ],
-            ],
-        ], ['X-Livewire' => '1']);
+    $response = postLivewireUpdate($this, $html, ['method' => '$refresh', 'params' => []]);
 
     $response->assertOk();
 

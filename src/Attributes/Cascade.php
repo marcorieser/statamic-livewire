@@ -45,7 +45,7 @@ class Cascade extends LivewireAttribute
                     $key = $default;
                     $default = null;
 
-                    if (! array_key_exists($key, $data)) {
+                    if (! Arr::has($data, $key)) {
                         throw new CascadeDataNotFoundException($key);
                     }
                 }
