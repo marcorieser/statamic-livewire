@@ -1,7 +1,7 @@
 <div>
     {{ items }}
-        {{ livewire:island name="item-{value}" }}
-            <span>island-{{ value }} count-{{ count }}</span>
+        {{ livewire:island name="item-{value}" :item="value" }}
+            <span>island-{{ item }}</span>
         {{ /livewire:island }}
     {{ /items }}
 </div>

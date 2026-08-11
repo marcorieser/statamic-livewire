@@ -207,19 +207,32 @@ it('renders nested islands', function (): void {
         ->toContain('&quot;name&quot;:&quot;inner&quot;');
 });
 
-it('supports islands in loops via dynamic names, without capturing the loop scope', function (): void {
+it('persists captured island scope across island updates', function (): void {
+    $html = mountIslands('island-counter-with');
+
+    expect($html)->toContain('live: 0 captured: 0');
+
+    $response = postLivewireUpdate($this, $html, [
+        'method' => 'increment',
+        'params' => [],
+        'metadata' => ['island' => ['name' => 'stats', 'mode' => 'morph']],
+    ]);
+
+    $response->assertOk();
+
+    // The live property changed while the captured value stays as it was
+    // when the island was defined.
+    expect($response->content())->toContain('live: 1 captured: 0');
+});
+
+it('supports islands in loops via dynamic names and captured scope', function (): void {
     $html = mountIslands('island-counter-loop');
 
-    // Dynamic names resolve fine — they're just a tag param, resolved where
-    // the tag is parsed. The loop's `value` isn't part of the island's own
-    // render scope though (same ceiling as Blade's `@island`): only the
-    // component's own properties (`count`) reach island content.
     expect($html)
+        ->toContain('island-1')
+        ->toContain('island-2')
         ->toContain('&quot;name&quot;:&quot;item-1&quot;')
-        ->toContain('&quot;name&quot;:&quot;item-2&quot;')
-        ->toContain('count-0')
-        ->not->toContain('island-1')
-        ->not->toContain('island-2');
+        ->toContain('&quot;name&quot;:&quot;item-2&quot;');
 
     $response = postLivewireUpdate($this, $html, [
         'method' => '$refresh',
@@ -229,7 +242,9 @@ it('supports islands in loops via dynamic names, without capturing the loop scop
 
     $response->assertOk();
 
-    expect($response->content())->toContain('count-0');
+    expect($response->content())
+        ->toContain('island-2')
+        ->not->toContain('island-1');
 });
 
 it('throws when the island tag is used outside a component view', function (): void {
