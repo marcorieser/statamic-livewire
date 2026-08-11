@@ -17,8 +17,8 @@
     {{ /livewire:island }}
 
     {{ items }}
-        {{ livewire:island name="item-{value}" :item="value" }}
-            <span class="card">item island: {{ item }}</span>
+        {{ livewire:island name="item-{value}" }}
+            <span class="card">item island (count: {{ count }})</span>
         {{ /livewire:island }}
     {{ /items }}
 </div>

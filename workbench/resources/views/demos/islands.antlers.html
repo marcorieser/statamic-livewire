@@ -1,15 +1,17 @@
-<p>Named, always, lazy (with a placeholder), and looped islands with captured scope — each updates
-independently without re-rendering the rest of the component. The addon's <code>livewire:island</code>
-tag piggybacks Livewire's own island pipeline (Blade's <code>&#64;island</code>/<code>&#64;endisland</code>
-directives), so most of this behaves identically either way — except the looped island, see the
-Blade section below.</p>
+<p>Named, always, lazy (with a placeholder), and looped islands — each updates independently
+without re-rendering the rest of the component. The addon's <code>livewire:island</code> tag
+piggybacks Livewire's own island pipeline (Blade's <code>&#64;island</code>/<code>&#64;endisland</code>
+directives), so island content sees the same scope either way: the component's own public and
+computed properties, not the surrounding template's — a loop's per-item value isn't available
+inside an island's own content in Antlers or Blade.</p>
 
 <h2>Antlers</h2>
 {{ livewire:island-dashboard }}
 
 <h2>Blade</h2>
-<p>The looped, captured-scope island is missing here on purpose — Blade's native island directive
-can't do it (its <code>with:</code> expression is re-evaluated in the island's own isolated
-compiled file, with no access to the enclosing loop's variable). Capturing the surrounding scope
-for looped islands is one of the things this addon adds over stock Blade.</p>
+<p>The looped island's name is missing here on purpose — dynamic names resolve eagerly in Antlers
+(the tag's <code>name</code> param is a plain resolved string by the time it reaches Livewire), but
+Blade's <code>&#64;island</code> recompiles its whole directive — including the name argument — in
+the island's own isolated file on every render, with no access to the enclosing loop. That's not a
+captured-scope feature, just how the two template engines evaluate tag arguments.</p>
 {{ livewire:island-dashboard-blade }}
