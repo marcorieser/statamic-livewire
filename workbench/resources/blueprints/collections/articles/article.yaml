@@ -1,0 +1,21 @@
+title: Article
+sections:
+  main:
+    display: Main
+    fields:
+      - handle: title
+        field:
+          type: text
+          required: true
+      - handle: author
+        field:
+          type: text
+          default: Anonymous
+      - handle: topics
+        field:
+          type: terms
+          taxonomies:
+            - topics
+      - handle: content
+        field:
+          type: markdown

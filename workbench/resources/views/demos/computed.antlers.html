@@ -1,0 +1,5 @@
+<p>#[Computed] properties are automatically exposed to Antlers views, wrapped for lazy resolution.</p>
+
+{{ collection:articles limit="1" }}
+    {{ livewire:article-card :article="id" }}
+{{ /collection:articles }}

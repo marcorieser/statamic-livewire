@@ -1,0 +1,24 @@
+<div class="card">
+    <p>outside count: {{ count }}</p>
+
+    {{ livewire:island name="stats" }}
+        <p>inside island: {{ count }}</p>
+    {{ /livewire:island }}
+
+    <button wire:click="increment">Increment (outside)</button>
+
+    {{ livewire:island name="always-stats" always="true" }}
+        <p>always re-renders: {{ count }}</p>
+    {{ /livewire:island }}
+
+    {{ livewire:island name="lazy-stats" lazy="true" }}
+        {{ livewire:placeholder }}<p>island loading…</p>{{ /livewire:placeholder }}
+        <p>lazily mounted: {{ count }}</p>
+    {{ /livewire:island }}
+
+    {{ items }}
+        {{ livewire:island name="item-{value}" :item="value" }}
+            <span class="card">item island: {{ item }}</span>
+        {{ /livewire:island }}
+    {{ /items }}
+</div>

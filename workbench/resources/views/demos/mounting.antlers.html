@@ -1,0 +1,18 @@
+<p>Mount by wildcard, by param, with bound params, dynamically, and in a loop with a wire:key.</p>
+
+<h2>Wildcard mount</h2>
+{{ livewire:counter label="Wildcard mount" }}
+
+<h2>Param mount</h2>
+{{ livewire component="counter" label="Param mount" }}
+
+<h2>Bound param</h2>
+{{ livewire:counter label="Bound count" :count="5" }}
+
+<h2>Dynamic component</h2>
+{{ livewire:component :name="'counter'" label="Dynamic mount" }}
+
+<h2>Loop with :key</h2>
+{{ collection:articles limit="3" }}
+    {{ livewire:article-card :article="id" :key="id" }}
+{{ /collection:articles }}

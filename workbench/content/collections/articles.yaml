@@ -1,0 +1,11 @@
+title: Articles
+route: '/articles/{slug}'
+template: templates.article
+layout: layout
+taxonomies:
+  - topics
+sites:
+  - en
+  - de
+sort_dir: desc
+sort_field: title
