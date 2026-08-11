@@ -73,8 +73,7 @@ class IslandManager
 
         $isPlaceholder = array_key_exists('__placeholder', $scope);
 
-        // Runtime island data from renderIsland()/streamIsland() overrides
-        // the scope captured by the island tag.
+        // Runtime island data from renderIsland()/streamIsland().
         $runtimeWith = $scope['__runtimeWith'] ?? [];
         $runtimeWith = is_array($runtimeWith) ? $runtimeWith : [];
 
@@ -89,7 +88,7 @@ class IslandManager
             $scope['slots'] = $slots;
         }
 
-        $scope = [...$scope, ...$this->islandScope($token, $component), ...$runtimeWith];
+        $scope = [...$scope, ...$runtimeWith];
 
         [$content, $placeholder] = $this->splitPlaceholder($source);
 
@@ -169,28 +168,6 @@ class IslandManager
         }
 
         return [$source, $placeholder];
-    }
-
-    /**
-     * The island's persisted scope values, captured by the island tag.
-     *
-     * @return array<mixed>
-     */
-    protected function islandScope(string $token, mixed $component): array
-    {
-        if (! $component instanceof Component) {
-            return [];
-        }
-
-        foreach ($component->getIslands() as $island) {
-            if (($island['token'] ?? null) === $token) {
-                $with = $island['with'] ?? [];
-
-                return is_array($with) ? $with : [];
-            }
-        }
-
-        return [];
     }
 
     protected function sourcePath(string $token): string
