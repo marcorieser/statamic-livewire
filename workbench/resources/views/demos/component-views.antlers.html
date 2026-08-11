@@ -1,5 +1,11 @@
-<p>This component's view is an Antlers template
-(<code>workbench/resources/views/livewire/counter.antlers.html</code>) instead of Blade — only
-class components support that, single/multi-file components must stay Blade.</p>
+<p>Both components below are mounted the same way, from the same Antlers page. The only difference
+is the component's own <code>render()</code> — one returns an Antlers view, the other a Blade view.
+Only class components support Antlers views; single/multi-file components must stay Blade.</p>
 
+<h2>Antlers view</h2>
+<p><code>workbench/resources/views/livewire/counter.antlers.html</code></p>
 {{ livewire:counter label="Antlers view" }}
+
+<h2>Blade view</h2>
+<p><code>workbench/resources/views/livewire/counter-blade.blade.php</code></p>
+{{ livewire:counter-blade label="Blade view" }}

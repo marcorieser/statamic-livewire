@@ -1,4 +1,15 @@
 <p>Named, always, lazy (with a placeholder), and looped islands with captured scope — each updates
-independently without re-rendering the rest of the component.</p>
+independently without re-rendering the rest of the component. The addon's <code>livewire:island</code>
+tag piggybacks Livewire's own island pipeline (Blade's <code>@island</code>/<code>@endisland</code>
+directives), so most of this behaves identically either way — except the looped island, see the
+Blade section below.</p>
 
+<h2>Antlers</h2>
 {{ livewire:island-dashboard }}
+
+<h2>Blade</h2>
+<p>The looped, captured-scope island is missing here on purpose — Blade's native island directive
+can't do it (its <code>with:</code> expression is re-evaluated in the island's own isolated
+compiled file, with no access to the enclosing loop's variable). Capturing the surrounding scope
+for looped islands is one of the things this addon adds over stock Blade.</p>
+{{ livewire:island-dashboard-blade }}

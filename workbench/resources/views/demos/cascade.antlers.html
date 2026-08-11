@@ -1,9 +1,19 @@
-<p>#[Cascade] exposes the whole cascade (or a selective subset) to the component's Antlers view, and
-it's rehydrated on every Livewire update request — hit refresh and the site/title should stay
-correct for this page's locale.</p>
+<p>#[Cascade] is what this addon adds — Statamic's cascade isn't available in Livewire component
+views at all by default, in Antlers <em>or</em> Blade. Hit refresh and the site/title should stay
+correct for this page's locale on the Antlers side; the Blade side never had it to begin with.</p>
 
-<h2>Whole cascade</h2>
+<h2>Antlers</h2>
+
+<h3>Whole cascade</h3>
 {{ livewire:cascade-badge }}
 
-<h2>Selective cascade</h2>
+<h3>Selective cascade</h3>
 {{ livewire:selective-cascade-badge }}
+
+<h2>Blade</h2>
+
+<h3>Whole cascade</h3>
+{{ livewire:cascade-badge-blade }}
+
+<h3>Selective cascade</h3>
+{{ livewire:selective-cascade-badge-blade }}

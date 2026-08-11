@@ -1,5 +1,12 @@
-<p>The component below is mounted twice. Its custom asset/script pair is deduped, so
-check the page source — the injected script should appear only once.</p>
+<p>Each component below is mounted twice. Its custom asset/script pair is deduped, so check the
+page source — the injected script should appear only once per component.</p>
 
+<h2>Antlers</h2>
 {{ livewire:assets-demo }}
 {{ livewire:assets-demo }}
+
+<h2>Blade</h2>
+<p>Antlers' <code>livewire:assets</code>/<code>livewire:script</code> tags just proxy to Blade's
+native <code>@assets</code>/<code>@script</code> directives, so behavior is identical.</p>
+{{ livewire:assets-demo-blade }}
+{{ livewire:assets-demo-blade }}

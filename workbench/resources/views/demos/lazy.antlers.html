@@ -1,4 +1,10 @@
 <p>Lazy-loaded component — the placeholder() view renders first, then the real component mounts
-on a follow-up request.</p>
+on a follow-up request. Lazy mounting itself is a Livewire feature the mount tag's
+<code>lazy</code>/<code>defer</code> params expose; it works the same regardless of the mounted
+component's own view engine.</p>
 
+<h2>Antlers</h2>
 {{ livewire:revenue lazy="true" }}
+
+<h2>Blade</h2>
+{{ livewire:revenue-blade lazy="true" }}

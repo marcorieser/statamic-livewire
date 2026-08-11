@@ -1,6 +1,15 @@
-<p>Named and default slots passed into a component.</p>
+<p>Named and default slots passed into a component — Livewire-native on the Blade side
+(<code>$slot</code>/<code>$slots</code>); the addon exposes the same data as
+<code>slots:header</code>/<code>slots:default</code> variables for Antlers.</p>
 
+<h2>Antlers</h2>
 {{ livewire:card }}
     {{ livewire:slot name="header" }}Card header{{ /livewire:slot }}
     This is the default slot content.
 {{ /livewire:card }}
+
+<h2>Blade</h2>
+{{ livewire:card-blade }}
+    {{ livewire:slot name="header" }}Card header (blade){{ /livewire:slot }}
+    This is the default slot content (blade).
+{{ /livewire:card-blade }}

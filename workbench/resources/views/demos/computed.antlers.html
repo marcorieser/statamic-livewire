@@ -1,5 +1,13 @@
-<p>#[Computed] properties are automatically exposed to Antlers views, wrapped for lazy resolution.</p>
+<p>#[Computed] properties are Livewire-native — they already work in Blade as method calls
+(<code>$this->entry</code>). The addon's contribution is exposing them as plain Antlers
+variables, wrapped for lazy resolution.</p>
 
+<h2>Antlers</h2>
 {{ collection:articles limit="1" }}
     {{ livewire:article-card :article="id" }}
+{{ /collection:articles }}
+
+<h2>Blade</h2>
+{{ collection:articles limit="1" }}
+    {{ livewire:article-card-blade :article="id" }}
 {{ /collection:articles }}
