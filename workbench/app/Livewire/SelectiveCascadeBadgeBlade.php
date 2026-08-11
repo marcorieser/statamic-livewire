@@ -7,7 +7,7 @@ namespace Workbench\App\Livewire;
 use Illuminate\Contracts\View\View;
 
 /**
- * No #[Cascade] here on purpose — see CascadeBadgeBlade.
+ * No #[Cascade] here — see CascadeBadgeBlade.
  */
 class SelectiveCascadeBadgeBlade extends SelectiveCascadeBadge
 {

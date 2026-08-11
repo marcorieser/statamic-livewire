@@ -1,6 +1,7 @@
-{{-- Same #[Cascade(...)] selection as the antlers view, but it doesn't apply --}}
-{{-- to Blade — nothing below is defined without doing it manually. --}}
+{{-- Same selection + default as the antlers #[Cascade(...)] attribute, --}}
+{{-- native to Blade via @cascade. --}}
+@cascade(['title', 'author' => 'Anonymous'])
 <div class="card">
-    <span>title: {{ $title ?? 'n/a' }}</span>
-    <span>author: {{ $author ?? 'n/a' }}</span>
+    <span>title: {{ $title }}</span>
+    <span>author: {{ $author }}</span>
 </div>

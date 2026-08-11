@@ -7,9 +7,8 @@ namespace Workbench\App\Livewire;
 use Illuminate\Contracts\View\View;
 
 /**
- * No #[Cascade] here on purpose — the attribute only exposes cascade data to
- * Antlers views (see CascadeVariablesAutoloader), so it wouldn't do anything
- * for this Blade view anyway.
+ * No #[Cascade] here — the view uses Statamic's native @cascade Blade
+ * directive instead (see livewire.cascade-badge-blade).
  */
 class CascadeBadgeBlade extends CascadeBadge
 {

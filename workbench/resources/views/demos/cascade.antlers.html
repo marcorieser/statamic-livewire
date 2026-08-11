@@ -1,6 +1,7 @@
-<p>#[Cascade] is what this addon adds — Statamic's cascade isn't available in Livewire component
-views at all by default, in Antlers <em>or</em> Blade. Hit refresh and the site/title should stay
-correct for this page's locale on the Antlers side; the Blade side never had it to begin with.</p>
+<p>Statamic's cascade isn't available in Livewire component views by default — Blade gets there via
+the native <code>&#64;cascade</code> directive, Antlers via this addon's <code>#[Cascade]</code>
+attribute (Antlers has no compiler step to hook a directive into). Hit refresh and the site/title
+should stay correct for this page's locale on both sides.</p>
 
 <h2>Antlers</h2>
 
