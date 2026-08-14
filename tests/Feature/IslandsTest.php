@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\File;
 use Livewire\Features\SupportIslands\Compiler\IslandCompiler;
 use Livewire\Livewire;
 use MarcoRieser\Livewire\Islands\IslandManager;
+use MarcoRieser\Livewire\Tests\Fixtures\BladeIslandCounter;
 use MarcoRieser\Livewire\Tests\Fixtures\IslandCounter;
 use MarcoRieser\Livewire\Tests\Fixtures\IslandSlotCard;
 use MarcoRieser\Livewire\Tests\Fixtures\LazyPlaceholderCounter;
@@ -95,6 +96,16 @@ it('renders a placeholder for lazy islands and loads them on trigger', function 
         ->toContain('inside: 0')
         ->toContain('double: 0')
         ->not->toContain('loading…');
+});
+
+it('does not inject computed properties into blade islands', function (): void {
+    Livewire::component('blade-island-counter', BladeIslandCounter::class);
+
+    $html = antlers('{{ livewire:blade-island-counter }}');
+
+    expect($html)
+        ->toContain('inside: 0')
+        ->toContain('injected: no');
 });
 
 it('throws when the placeholder tag is used outside an island', function (): void {
