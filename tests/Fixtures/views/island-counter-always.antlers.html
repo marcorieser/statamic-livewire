@@ -1,0 +1,7 @@
+<div>
+    <span>outside: {{ count }}</span>
+    {{ livewire:island name="stats" always="true" }}
+        <span>inside: {{ count }}</span>
+    {{ /livewire:island }}
+    <button wire:click="increment">Increment</button>
+</div>

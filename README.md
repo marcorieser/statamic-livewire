@@ -1,260 +1,326 @@
-# Statamic Livewire
+<div align="center">
+    <h1>Statamic Livewire</h1>
+</div>
 
-A third-party [Laravel Livewire](https://laravel-livewire.com/) integration for Statamic. It aims to make it as easy as possible to use Livewire in Statamic.
+<p align="center">
+    <a href="https://packagist.org/packages/marcorieser/statamic-livewire"><img src="https://img.shields.io/packagist/v/marcorieser/statamic-livewire.svg?style=flat-square" alt="Packagist"></a>
+    <a href="https://packagist.org/packages/marcorieser/statamic-livewire"><img src="https://img.shields.io/packagist/php-v/marcorieser/statamic-livewire.svg?style=flat-square" alt="PHP from Packagist"></a>
+    <a href="https://packagist.org/packages/marcorieser/statamic-livewire"><img src="https://badge.laravel.cloud/badge/marcorieser/statamic-livewire?style=flat" alt="Laravel versions"></a>
+    <a href="https://github.com/marcorieser/statamic-livewire/actions"><img alt="GitHub Workflow Status (main)" src="https://img.shields.io/github/actions/workflow/status/marcorieser/statamic-livewire/tests.yml?branch=main&label=Tests&style=flat-square"></a>
+    <a href="https://packagist.org/packages/marcorieser/statamic-livewire"><img src="https://img.shields.io/packagist/dt/marcorieser/statamic-livewire.svg?style=flat-square" alt="Total Downloads"></a>
+</p>
+
+A Laravel Livewire integration for Statamic. Use [Livewire](https://livewire.laravel.com) components in your [Antlers](https://statamic.dev/antlers) templates — including Antlers component views, slots, islands, multi-site support, and static caching compatibility.
+
+This documentation covers what the package adds on top of Livewire — it assumes you know Livewire itself. If you are new to it, work through the [Livewire documentation](https://livewire.laravel.com/docs) first.
+
+> [!NOTE]
+> Version 6 is a rewrite targeting Livewire 4 and Statamic 6 exclusively. For Livewire 3 or Statamic 5, use [version 5](https://github.com/marcorieser/statamic-livewire/tree/5.x). Upgrading? See the [upgrade guide](UPGRADE.md).
 
 ## Table of Contents
-* [Requirements](#requirements)
-* [Installation](#installation)
-* [Upgrade](#upgrade)
-* [Livewire documentation](#livewire-documentation)
-* [Features](#features)
-    + [Blade or Antlers? Yes, please!](#blade-or-antlers--yes--please-)
-    + [Include components](#include-components)
-    + [Passing Initial Parameters](#passing-initial-parameters)
-    + [Keying Components](#keying-components)
-    + [Manually including Livewire's frontend assets](#manually-including-livewire-s-frontend-assets)
-    + [Manually bundling Livewire and Alpine](#manually-bundling-livewire-and-alpine)
-    + [Static caching](#static-caching)
-    + [`@script` and `@assets`](#--script--and---assets-)
-    + [Computed Properties](#computed-properties)
-    + [Cascade](#cascade)
-    + [Multi-Site / Localization](#multi-site---localization)
-    + [Lazy Components](#lazy-components)
-    + [Paginating Data](#paginating-data)
-    + [Synthesizers](#synthesizers)
-    + [Entangle: Sharing State Between Livewire And Alpine](#entangle--sharing-state-between-livewire-and-alpine)
-    + [This: Accessing the Livewire component](#this--accessing-the-livewire-component)
-* [Other Statamic Livewire Packages](#other-statamic-livewire-packages)
-* [Credits](#credits)
-* [Support](#support)
-* [License](#license)
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Using Livewire in Antlers](#using-livewire-in-antlers)
+  - [Mounting components](#mounting-components)
+  - [Component views](#component-views)
+  - [Including the assets](#including-the-assets)
+  - [Custom assets and scripts](#custom-assets-and-scripts)
+  - [Computed properties](#computed-properties)
+  - [Cascade data](#cascade-data)
+  - [Slots](#slots)
+  - [Lazy loading components](#lazy-loading-components)
+  - [Islands](#islands)
+  - [Pagination](#pagination)
+- [Bridging Livewire and Statamic](#bridging-livewire-and-statamic)
+  - [Passing Statamic data to components](#passing-statamic-data-to-components)
+  - [Multi-site](#multi-site)
+  - [Static caching](#static-caching)
 
 ## Requirements
-- PHP 8.2+
-- Laravel 11+
-- Statamic 5+
+
+- PHP 8.4+
+- Laravel 13+
+- Statamic 6.24+
+- Livewire 4.2+
 
 ## Installation
-Install the addon via composer:
+
+You can install the package via Composer:
 
 ```bash
 composer require marcorieser/statamic-livewire
 ```
 
-## Upgrade
-Below is a list with specific upgrade instructions.
+## Configuration
 
-- [Upgrade from v4 to v5](docs/upgrade-4-to-5.md)
-- [Upgrade from v3 to v4](docs/upgrade-3-to-4.md)
-- [Addon ownership transfer (v3)](docs/addon-ownership-transfer.md)
+Optionally, publish the configuration file:
 
-## Livewire documentation
-In general, all Livewire specific information can be found in the official [Livewire Docs](https://livewire.laravel.com/docs/quickstart).
-
-## Features
-
-### Blade or Antlers? Yes, please!
-If creating a Livewire component, you need to render a template file
-
-```php
-namespace App\Http\Livewire;
-
-use Livewire\Component;
-
-class Counter extends Component
-{
-    public function render()
-    {
-        return view('livewire.counter');
-    }
-}
+```bash
+php artisan vendor:publish --tag="statamic-livewire-config"
 ```
 
-Normally your template file would be a blade file, named `counter.blade.php`. Great, but what about Antlers?
-Rename your template to `counter.antlers.html`, use Antlers syntax and do whatever you like. **No need to change** anything inside your component Controller. How cool is that?
+| Key | Default | Description |
+| --- | --- | --- |
+| `localization` | `true` | Resolve the current site and locale from the original page URL on Livewire update requests — see [Multi-site](#multi-site). |
+| `replacers` | both package replacers | The static caching replacers keeping Livewire working on cached pages — see [Static caching](#static-caching). |
 
-More Information: (https://livewire.laravel.com/docs/components)
+## Using Livewire in Antlers
 
-### Include components
-You can create Livewire components as described in the [general documentation](https://livewire.laravel.com/docs/components).
-To include your Livewire component in Antlers, you can use the `livewire` tag:
+Everything Livewire offers in Blade templates, as Antlers tags.
+
+### Mounting components
+
+Use the `livewire` tag (aliases: `lw`, `wire`) to render a Livewire component in any Antlers template:
 
 ```antlers
 {{ livewire:your-component-name }}
 ```
 
-If you want to include a component from a dynamic variable, you can use the `livewire:component` tag:
+Pass parameters like on any other tag — bound parameters (`:param`) resolve from the Antlers context:
 
 ```antlers
-{{ livewire:component :name="variable" }}
+{{ livewire:counter label="Clicks" :count="entry_count" }}
 ```
 
-### Passing Initial Parameters
-You can pass data into a component by passing additional parameters:
-```antlers
-{{ livewire:your-component-name :contact="contact" }}
-```
-
-The [Official Livewire documentation](https://livewire.laravel.com/docs/components#rendering-components) provides more information.
-
-### Keying Components
-Livewire components are automatically keyed by default. If you want to manually key a component, you can use the `key` attribute.
-```antlers
-{{ contacts }}
-    {{ livewire:your-component-name :key="id" }}
-{{ /contacts }}
-```
-The [Official Livewire documentation](https://livewire.laravel.com/docs/components#adding-wirekey-to-foreach-loops) provides more information.
-
-### Manually including Livewire's frontend assets
-By default, Livewire injects the JavaScript and CSS assets it needs into each page that includes a Livewire component.
-If you want more control over this behavior, you can [manually include the assets](https://livewire.laravel.com/docs/installation#manually-including-livewires-frontend-assets) on a page using the following Antlers tags:
+To resolve the component name dynamically, use the `component` method with a `name` parameter:
 
 ```antlers
-<html>
-    <head>
-        {{ livewire:styles }}
-    </head>
-    <body>
-
-        {{ livewire:scripts }}
-    </body>
-</html>
+{{ livewire:component :name="component_name" }}
 ```
 
-### Manually bundling Livewire and Alpine
-If you need to include some custom Alpine plugins, you need to [manually bundle the Livewire and Alpine assets](https://livewire.laravel.com/docs/installation#manually-bundling-livewire-and-alpine) and disable the automatic injection by using the following Antlers tag.
-Remember to include the Livewire styles as well.
+When rendering components in a loop, give each instance a [key](https://livewire.laravel.com/docs/components#adding-wirekey-to-foreach-loops):
 
 ```antlers
-<html>
-    <head>
-        {{ livewire:styles }}
-    </head>
-    <body>
-
-        {{ livewire:scriptConfig }}
-    </body>
-</html>
+{{ items }}
+    {{ livewire:item-card :item="id" :key="id" }}
+{{ /items }}
 ```
 
-### Static caching
-This addon adds an `AssetsReplacer` class to make Livewire compatible with half and full static caching. You may customize the replacers in the config of this addon:
+### Component views
+
+Class components can render an Antlers view instead of a Blade view — reference the view by name, without the `.antlers.html` extension:
 
 ```php
-'replacers' => [
-    \MarcoRieser\Livewire\Replacers\AssetsReplacer::class,
-],
-```
+class Counter extends Component
+{
+    public int $count = 0;
 
-If you are using full measure static caching, and you're manually bundling Livewire and Alpine as per the instructions above, you need to make sure to only start Livewire once the CSRF token has been replaced.
-
-```js
-if (window.livewireScriptConfig?.csrf === 'STATAMIC_CSRF_TOKEN') {
-    document.addEventListener('statamic:csrf.replaced', () => Livewire.start());
-} else {
-    Livewire.start();
+    public function render(): View
+    {
+        return view('livewire.counter'); // resources/views/livewire/counter.antlers.html
+    }
 }
 ```
 
-### `@script` and `@assets`
-Antlers versions of [@script](https://livewire.laravel.com/docs/javascript#executing-scripts) and [@assets](https://livewire.laravel.com/docs/javascript#loading-assets) are provided:
+Public properties are available as Antlers variables:
 
 ```antlers
-<body>
-    {{ livewire:script }}
-	<script>console.log('hello')</script>
-    {{ /livewire:script }}
-</body>
+<div>
+    <span>{{ count }}</span>
+    <button wire:click="increment">Increment</button>
+</div>
 ```
+
+Livewire's own component formats — class components with Blade views, [single-file components, and multi-file components](https://livewire.laravel.com/docs/components) — all work with the mount tag as well.
+
+> [!IMPORTANT]
+> Antlers views are only supported for class components. Single-file and multi-file component templates must be Blade, since they run through Livewire's compiler.
+
+### Including the assets
+
+Livewire's assets are injected automatically. To control their placement — or when [auto-injection is disabled](https://livewire.laravel.com/docs/installation#manually-bundling-livewire-and-alpine) — use the Antlers equivalents of Livewire's Blade directives:
 
 ```antlers
+<html>
+<head>
+    {{ livewire:styles }}
+</head>
 <body>
-    {{ livewire:assets }}
-	<script src="some-javascript-library.js"></script>
-    {{ /livewire:assets }}
+    {{ livewire:counter }}
+    {{ livewire:scripts }}
 </body>
+</html>
 ```
 
-### Computed Properties
-When using Antlers, the computed properties are loaded automatically and only resolve when accessed. 
-Simply access them as you would access a regular variable in the cascade.
-Read more about [Computed Properties in the Livewire Docs](https://livewire.laravel.com/docs/computed-properties).
+When bundling Livewire manually, output the script configuration instead:
+
+```antlers
+{{ livewire:scriptConfig }}
+```
+
+### Custom assets and scripts
+
+The Antlers equivalents of Livewire's [`@assets` and `@script` directives](https://livewire.laravel.com/docs/javascript):
+
+```antlers
+{{ livewire:assets }}
+    <script src="https://cdn.example.com/chart.js" defer></script>
+{{ /livewire:assets }}
+
+{{ livewire:script }}
+    <script>
+        console.log('Component initialized');
+    </script>
+{{ /livewire:script }}
+```
+
+`{{ livewire:assets }}` loads an asset once per page, no matter how many components use it, and also works outside of component views. `{{ livewire:script }}` runs a script when its component initializes and must be used inside a component view.
+
+### Computed properties
+
+[Computed properties](https://livewire.laravel.com/docs/computed-properties) are available as variables in Antlers component views — no need to call them like methods:
 
 ```php
-#[Computed]
-public function entries() {
-    return Entry::all();
+class ShowPost extends Component
+{
+    #[Computed]
+    public function post(): array
+    {
+        return Entry::find($this->postId)->toAugmentedArray();
+    }
 }
 ```
+
 ```antlers
-{{ entries }}
-    {{ title }}
-{{ /entries }}
+<div>
+    {{ post:title }}
+</div>
 ```
 
-### Cascade
-Normally all the variables in the Cascade are only available on initial render and get lost between Livewire requests. This means you'd need pass in the required ones into the component yourself.
-To make our lives a bit easier, you can add the `#[Cascade]` attribute to your component. <br> This is only needed for Antlers views and mirrors the logic of Blade's [`@cascade`](https://statamic.dev/blade#cascade-directive) directive.
+Each computed property is resolved lazily: it only executes when the view actually uses it.
+
+### Cascade data
+
+Statamic's [cascade](https://statamic.dev/cascade) is not available in Livewire component views by default. Add the `#[Cascade]` attribute to a component to expose it to the component's Antlers view:
 
 ```php
-use Livewire\Component;
 use MarcoRieser\Livewire\Attributes\Cascade;
 
 #[Cascade]
 class ShowArticle extends Component
 {
-    ...
+    //
 }
 ```
 
-Now you can access the variables from the Cascade directly in your Antlers view, even on subsequent renders:
-
 ```antlers
-<h1>{{ title }}</h1>
-{{ seo_title }}
+<div>
+    {{ title }} on {{ site:name }}
+</div>
 ```
 
-You can also limit which cascade keys are exposed (and provide defaults):
+To keep the view scope clean and make the component's dependencies explicit, select only the keys you need. String keys define a fallback for when the key is absent from the cascade; selecting a missing key without a fallback throws an exception:
 
 ```php
-#[Cascade([
-    'title',
-    'seo_title' => 'Fallback title',
-])]
-class ShowArticle extends Component {}
+#[Cascade(['title', 'author' => 'Anonymous'])]
 ```
 
-For subsequent requests, the addon restores the Cascade using the original Livewire URL, so site, request, and content data resolve as expected.
+The package also keeps the cascade consistent across component updates: on Livewire requests, the cascade is rebuilt as if the original page URL was requested — including the site, request, and page content.
 
-### Multi-Site / Localization
-By default, your current site is persisted between Livewire requests automatically.  
-In case you want to implement your own logic, you can disable `localization` in your published `config/statamic-livewire.php` config.
+### Slots
 
-### Lazy Components
-Livewire allows you to [lazy load components](https://livewire.laravel.com/docs/lazy) that would otherwise slow down the initial page load. For this you can simply pass `lazy="true"` as argument to your component tag.
+Pass content into a component with a tag pair — the content becomes the [default slot](https://livewire.laravel.com/docs/slots). Named slots are defined with nested `{{ livewire:slot }}` pairs:
 
 ```antlers
-{{ livewire:your-component-name :contact="contact" lazy="true" }}
+{{ livewire:card }}
+    {{ livewire:slot name="header" }}
+        <h1>{{ title }}</h1>
+    {{ /livewire:slot }}
+
+    <p>This becomes the default slot.</p>
+{{ /livewire:card }}
 ```
 
-### Paginating Data
-You can paginate results by using the WithPagination trait.
+In the component's Antlers view, render slots by name:
 
-#### Blade
-To use pagination with Blade, please use the `Livewire\WithPagination` namespace for your trait as described in the [Livewire docs](https://livewire.laravel.com/docs/pagination#basic-usage).
-
-### Antlers
-Pagination with Antlers does work similarly. Make sure to use the `MarcoRieser\Livewire\WithPagination` namespace for your trait if working with Antlers.
-
-In your Livewire component view:
 ```antlers
-{{ entries }}
-    ...
-{{ /entries }}
-
-{{ links }}
+<div>
+    <header>{{ slots:header }}</header>
+    <main>{{ slots:default }}</main>
+</div>
 ```
+
+Slots can be rendered conditionally — a slot that wasn't provided is empty:
+
+```antlers
+{{ if slots:header }}
+    <header>{{ slots:header }}</header>
+{{ /if }}
+```
+
+Slot content is parsed in the context of the surrounding template, and Livewire persists it across component updates. In Blade component views, use Livewire's native `{{ $slot }}` / `{{ $slots }}` syntax instead.
+
+### Lazy loading components
+
+Components can be [lazy loaded](https://livewire.laravel.com/docs/lazy) through the mount tag — `lazy="true"` loads the component when it is scrolled into view, `defer="true"` right after the page load:
+
+```antlers
+{{ livewire:revenue lazy="true" }}
+```
+
+The loading state is defined in PHP, with a [`placeholder()` method](https://livewire.laravel.com/docs/lazy#custom-placeholders) on the component class (just like class-based components in Blade):
+
+```php
+class Revenue extends Component
+{
+    public function placeholder(): string
+    {
+        return '<div>Loading…</div>';
+    }
+}
+```
+
+To lazy load only a part of a component, use an [island](#islands) instead.
+
+### Islands
+
+[Islands](https://livewire.laravel.com/docs/islands) isolate a region of a component view so it can re-render independently of the rest of the component. In Antlers component views, define them with the `{{ livewire:island }}` tag pair:
+
+```antlers
+<div>
+    {{ livewire:island name="stats" }}
+        <span>{{ count }}</span>
+    {{ /livewire:island }}
+
+    <button wire:click="increment">Increment</button>
+</div>
+```
+
+Actions triggered from inside an island only re-render that island; full component updates leave island DOM untouched. To re-render an island together with its component, mark it as `always`:
+
+```antlers
+{{ livewire:island name="stats" always="true" }}
+```
+
+Islands can be [loaded lazily](https://livewire.laravel.com/docs/islands#lazy-loading) — `lazy` loads when scrolled into view, `defer` right after the page load, and `skip` only when triggered explicitly. Until loaded, lazy islands show their placeholder, defined with the `{{ livewire:placeholder }}` tag pair (only available inside islands):
+
+```antlers
+{{ livewire:island name="stats" lazy="true" }}
+    {{ livewire:placeholder }}
+        <span>Loading…</span>
+    {{ /livewire:placeholder }}
+
+    <span>{{ count }}</span>
+{{ /livewire:island }}
+```
+
+Islands can be nested, and island content sees the component's scope (its public and computed properties). To bring additional variables into an island — for example loop values — pass them as parameters. Their values are captured when the island is defined and persist across island updates:
+
+```antlers
+{{ items }}
+    {{ livewire:island name="item-{id}" :item="id" }}
+        <span>{{ item }}</span>
+    {{ /livewire:island }}
+{{ /items }}
+```
+
+Every island needs a `name` that is unique within its component — in loops, make it dynamic like above. Captured values are stored in the component's payload, so keep them small and JSON-serializable (ids, not entries).
+
+### Pagination
+
+For [pagination](https://livewire.laravel.com/docs/pagination) in Antlers component views, use this package's `WithPagination` trait instead of Livewire's (Blade views keep using Livewire's own trait). The `withPagination()` helper turns a paginator into view data — the items as a loopable variable and the rendered pagination links:
 
 ```php
 use MarcoRieser\Livewire\WithPagination;
@@ -263,106 +329,112 @@ class ShowArticles extends Component
 {
     use WithPagination;
 
-    protected function entries()
+    public function render(): View
     {
         $entries = Entry::query()
             ->where('collection', 'articles')
             ->paginate(3);
 
-        return $this->withPagination('entries', $entries);
-    }
-
-    public function render()
-    {
-        return view('livewire.blog-entries', $this->entries());
+        return view('livewire.show-articles')
+            ->with($this->withPagination('entries', $entries));
     }
 }
 ```
 
-### Synthesizers
-You can use the built-in Synthesizers to make your Livewire components aware of Statamic specific data types.
+```antlers
+<div>
+    {{ entries }}
+        <h2>{{ title }}</h2>
+    {{ /entries }}
+
+    {{ links }}
+</div>
+```
+
+When using [multiple paginators](https://livewire.laravel.com/docs/pagination#multiple-paginators) in one component, give each one its own links key:
 
 ```php
-use Statamic\Entries\Entry;
+$this->withPagination('articles', $articles, linksKey: 'articles_links')
+```
 
-class Foo extends Component
+## Bridging Livewire and Statamic
+
+Engine-agnostic integration between the two worlds — these apply to Blade component views just as much as to Antlers.
+
+### Passing Statamic data to components
+
+Don't store Statamic objects like entries in component properties — they would be serialized into the Livewire payload on every request, and the component would work with stale, client-round-tripped data. Pass an id instead, and resolve the object in a [computed property](#computed-properties):
+
+```antlers
+{{ livewire:show-article :article="id" }}
+```
+
+```php
+class ShowArticle extends Component
 {
-    public Entry $entries;
+    public string $article;
+
+    #[Computed]
+    public function entry(): ?Entry
+    {
+        return Entry::find($this->article);
+    }
 }
 ```
 
-Currently, the following types are supported:
-- `Statamic\Entries\EntryCollection`;
-- `Statamic\Entries\Entry`;
-- `Statamic\Fields\Field`;
-- `Statamic\Fields\Fieldtype`;
-- `Statamic\Fields\Value`;
-
-To make it work, you need to enable that feature first.
-
-1. Run `php artisan vendor:publish`
-2. Select `statamic-livewire` in the list
-3. Enable synthesizers
-
-#### Augmentation
-By default, the Synthesizers augment the data before it gets passed into the antlers view. You can disable this by setting `synthesizers.augmentation` to `false` in your published `config/statamic-livewire.php` config.
-
-### Entangle: Sharing State Between Livewire And Alpine
-It's worth mentioning that, since Livewire v3 now builds on top of Alpine, the `@entangle` directive is not documented anymore. Instead, it's possible to entangle the data via [the `$wire` object](https://livewire.laravel.com/docs/javascript#the-wire-object).
 ```antlers
-<div x-data="{ open: $wire.entangle('showDropdown', true) }">
+<div>
+    <h1>{{ entry:title }}</h1>
+    {{ entry:content }}
+</div>
 ```
 
-In case you want to share state between Livewire and Alpine, there is a Blade directive called `@entangle`. To be usable with Antlers, the addon provides a dedicated tag:
-```antlers
-<div x-data="{ open: {{ livewire:entangle property='showDropdown' modifier='live' }} }">
+This keeps the payload small and guarantees fresh content on every update — the computed property is only fetched when the view uses it, and only once per request.
+
+> [!NOTE]
+> Version 5's opt-in property synthesizers were removed in favor of this pattern.
+
+### Multi-site
+
+On [multi-site](https://statamic.dev/multi-site) installations, the current site and its locale are resolved from the original page URL on Livewire update requests — components keep rendering in the site context of the page they live on. This is enabled by default and can be turned off in the config:
+
+```php
+'localization' => false,
 ```
 
-### This: Accessing the Livewire component
-It's worth mentioning that, since Livewire v3 now builds on top of Alpine, the `@this` directive is not used widely anymore. Instead, it's possible to [access and manipulate the state directly via JavaScript](https://livewire.laravel.com/docs/properties#accessing-properties-from-javascript) / [the `$wire` object](https://livewire.laravel.com/docs/javascript#the-wire-object).
-```antlers
-<script>
-    document.addEventListener('livewire:initialized', function () {
-        // `{{ livewire:this }}` returns the instance of the current component
-        {{ livewire:this }}.set('name', 'Jack')
-    })
-</script>
+### Static caching
+
+Livewire works on [statically cached](https://statamic.dev/static-caching) pages out of the box. Two replacers are registered automatically:
+
+- Livewire's assets (and any `{{ livewire:assets }}` content) are baked into cached responses, since asset injection normally happens after the response is prepared for caching.
+- Livewire's back/forward-cache protection headers (`Cache-Control: no-store`, …) are restored on cached pages containing components, so browsers don't restore stale component snapshots when navigating back.
+
+The replacers can be adjusted in the config:
+
+```php
+'replacers' => [
+    \MarcoRieser\Livewire\Replacers\AssetsReplacer::class,
+    \MarcoRieser\Livewire\Replacers\DisableBackButtonCacheReplacer::class,
+],
 ```
 
-You can access and perform actions on the Livewire component like this:
+## Changelog
 
-```antlers
-<script>
-    document.addEventListener('livewire:initialized', function () {
-        // With Antlers
-        {{ livewire:this set="('name', 'Jack')" }}
+Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
-        // With Blade
-        @this.set('name', 'Jack')
-    })
-</script>
-```
+## Contributing
 
-## Other Statamic Livewire Packages
-If using Livewire, those packages might be interesting for you as well:
-- [Livewire Forms](https://statamic.com/addons/aerni/livewire-forms)
-- [Livewire Filters](https://statamic.com/addons/reach/statamic-livewire-filters)
-- [Antlers Components](https://statamic.com/addons/stillat/antlers-components)
-- [Live Search](https://statamic.com/addons/marcorieser/live-search)
+Thank you for considering contributing to Statamic Livewire! Please review our [contributing guide](.github/CONTRIBUTING.md) to get started.
 
-Did I miss a link? Let me know!
+## Security Vulnerabilities
+
+Please review [our security policy](.github/SECURITY.md) on how to report security vulnerabilities.
 
 ## Credits
 
-Thanks to:
-- [Jonas Siewertsen](https://jonassiewertsen.com/) for building the addon and give me the permission to take it over
-- [Caleb](https://github.com/calebporzio) and the community for building [Livewire](https://laravel-livewire.com/)
-- [Austenc](https://github.com/austenc) for the Statamic marketplace preview image
+- [Marco Rieser](https://github.com/marcorieser)
+- [All Contributors](../../contributors)
 
-# Support
-I love to share with the community. Nevertheless, it does take a lot of work, time and effort.
+## License
 
-[Sponsor me on GitHub](https://github.com/sponsors/marcorieser/) to support my work and the support for this addon.
-
-# License
-This plugin is published under the MIT license. Feel free to use it and remember to spread love.
+Statamic Livewire is open-sourced software licensed under the [MIT license](LICENSE.md).

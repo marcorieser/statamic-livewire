@@ -1,0 +1,34 @@
+<?php
+
+namespace Statamic\Facades;
+
+use Illuminate\Support\Facades\Facade;
+
+/**
+ * @method static array<string, mixed> toArray()
+ * @method static \Statamic\View\Cascade withRequest(\Illuminate\Http\Request $request)
+ * @method static \Statamic\View\Cascade withSite(\Statamic\Sites\Site $site)
+ * @method static \Statamic\View\Cascade withContent(mixed $content)
+ * @method static \Statamic\View\Cascade hydrate()
+ */
+class Cascade extends Facade {}
+
+/**
+ * @method static \Statamic\Sites\Site current()
+ */
+class Site extends Facade {}
+
+namespace Statamic\Sites;
+
+class Site {}
+
+namespace Statamic\View;
+
+class Cascade
+{
+    /** @return array<string, mixed> */
+    public function toArray() {}
+
+    /** @return $this */
+    public function hydrate() {}
+}

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MarcoRieser\Livewire\Http\Middleware;
 
 use Closure;
@@ -11,13 +13,14 @@ use Symfony\Component\HttpFoundation\Response;
 class ResolveCurrentSiteByLivewireUrl
 {
     /**
-     * Handle an incoming request.
+     * Resolve the current site from the original page URL instead of the
+     * Livewire update endpoint URL.
      *
-     * @param  Closure(Request): (Response)  $next
+     * @param  Closure(Request): Response  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        Site::resolveCurrentUrlUsing(fn () => Livewire::originalUrl());
+        Site::resolveCurrentUrlUsing(fn (): string => Livewire::originalUrl());
 
         return $next($request);
     }

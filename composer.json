@@ -1,66 +1,130 @@
 {
+    "$schema": "https://getcomposer.org/schema.json",
     "name": "marcorieser/statamic-livewire",
     "description": "A Laravel Livewire integration for Statamic.",
-    "keywords": [
-        "Statamic",
-        "Addon",
-        "Laravel",
-        "Livewire"
-    ],
-    "license": "MIT",
     "type": "statamic-addon",
+    "keywords": [
+        "laravel",
+        "livewire",
+        "statamic",
+        "statamic-addon",
+        "marcorieser",
+        "statamic-livewire"
+    ],
+    "homepage": "https://github.com/marcorieser/statamic-livewire",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marco Rieser",
+            "email": "marco@rieser.dev",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.4",
+        "laravel/framework": "^13.0",
+        "livewire/livewire": "^4.2",
+        "statamic/cms": "^6.24"
+    },
+    "require-dev": {
+        "driftingly/rector-laravel": "^2.2",
+        "larastan/larastan": "^3.9",
+        "laravel/pao": "^1.0",
+        "laravel/pint": "^1.29",
+        "orchestra/testbench": "^11.0",
+        "pestphp/pest": "^5.0",
+        "pestphp/pest-plugin-laravel": "^5.0",
+        "pestphp/pest-plugin-phpstan": "^5.0",
+        "pestphp/pest-plugin-rector": "^5.0",
+        "pestphp/pest-plugin-type-coverage": "^5.0",
+        "phpstan/extension-installer": "^1.4",
+        "rector/rector": "^2.0",
+        "spatie/laravel-ray": "^1.43"
+    },
     "autoload": {
         "psr-4": {
-            "MarcoRieser\\Livewire\\": "src"
+            "MarcoRieser\\Livewire\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "MarcoRieser\\Livewire\\Tests\\": "tests"
+            "MarcoRieser\\Livewire\\PhpStan\\": "phpstan/",
+            "MarcoRieser\\Livewire\\Tests\\": "tests/",
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
         }
     },
-    "authors": [
-        {
-            "name": "Marco Rieser",
-            "homepage": "https://rieser.dev"
-        },
-        {
-            "name": "Jonas Siewertsen",
-            "homepage": "https://jonassiewertsen.com"
-        }
-    ],
-    "support": {
-        "issues": "https://github.com/marcorieser/statamic-livewire/issues",
-        "docs": "https://github.com/marcorieser/statamic-livewire"
-    },
-    "require": {
-        "php": "^8.2",
-        "laravel/framework": "^11.0 || ^12.0 || ^13.0",
-        "statamic/cms": "^5.73.0 || ^6.0",
-        "livewire/livewire": "^3.6.4 || ^4.0"
+    "scripts": {
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare"
+        ],
+        "prepare": [
+            "@php vendor/bin/testbench package:discover --ansi"
+        ],
+        "build": [
+            "@php vendor/bin/testbench workbench:build --ansi"
+        ],
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@build",
+            "@php vendor/bin/testbench serve --ansi"
+        ],
+        "lint": [
+            "vendor/bin/pint --parallel"
+        ],
+        "lint:check": [
+            "vendor/bin/pint --parallel --test"
+        ],
+        "analyse": [
+            "vendor/bin/phpstan analyse"
+        ],
+        "refactor": [
+            "vendor/bin/rector process"
+        ],
+        "refactor:check": [
+            "vendor/bin/rector process --dry-run"
+        ],
+        "test:coverage": [
+            "@putenv XDEBUG_MODE=coverage",
+            "vendor/bin/pest --parallel --coverage --min=100"
+        ],
+        "test:types": [
+            "vendor/bin/pest --type-coverage --min=100"
+        ],
+        "test:unit": [
+            "vendor/bin/pest --parallel"
+        ],
+        "test": [
+            "@analyse",
+            "@lint:check",
+            "@refactor:check",
+            "@test:types",
+            "@test:unit"
+        ],
+        "clear": [
+            "@php vendor/bin/testbench package:purge-skeleton --ansi"
+        ]
     },
     "extra": {
-        "statamic": {
-            "name": "Livewire",
-            "description": "A Laravel Livewire integration for Statamic."
-        },
         "laravel": {
             "providers": [
                 "MarcoRieser\\Livewire\\ServiceProvider"
             ]
+        },
+        "statamic": {
+            "name": "Livewire",
+            "description": "A Laravel Livewire integration for Statamic."
         }
     },
     "config": {
+        "sort-packages": true,
         "allow-plugins": {
-            "pixelfear/composer-dist-plugin": true
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
         }
     },
-    "require-dev": {
-        "laravel/pint": "^1.21",
-        "orchestra/testbench": "^9.0 || ^10.0 || ^11.0",
-        "phpunit/phpunit": "^10.5|^11.0|^12.0",
-        "spatie/laravel-ray": "^1.0"
-    },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }
