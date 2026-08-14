@@ -1,0 +1,12 @@
+title: Page
+sections:
+  main:
+    display: Main
+    fields:
+      - handle: title
+        field:
+          type: text
+          required: true
+      - handle: content
+        field:
+          type: markdown

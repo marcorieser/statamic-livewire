@@ -1,0 +1,20 @@
+<p>Statamic's cascade isn't available in Livewire component views by default — Blade gets there via
+the native <code>&#64;cascade</code> directive, Antlers via this addon's <code>#[Cascade]</code>
+attribute (Antlers has no compiler step to hook a directive into). Hit refresh and the site/title
+should stay correct for this page's locale on both sides.</p>
+
+<h2>Antlers</h2>
+
+<h3>Whole cascade</h3>
+{{ livewire:cascade-badge }}
+
+<h3>Selective cascade</h3>
+{{ livewire:selective-cascade-badge }}
+
+<h2>Blade</h2>
+
+<h3>Whole cascade</h3>
+{{ livewire:cascade-badge-blade }}
+
+<h3>Selective cascade</h3>
+{{ livewire:selective-cascade-badge-blade }}

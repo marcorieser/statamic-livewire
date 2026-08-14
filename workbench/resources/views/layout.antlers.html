@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="{{ locale }}">
+<head>
+    <meta charset="utf-8">
+    <title>{{ title }} — Statamic Livewire Playground</title>
+    {{ livewire:styles }}
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 46rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+        nav a { margin-right: .75rem; }
+        button { cursor: pointer; }
+        .card { border: 1px solid #ccc; border-radius: .5rem; padding: 1rem; margin: .5rem 0; }
+    </style>
+</head>
+<body>
+    <nav data-testid="nav">
+        <a href="/">EN</a>
+        <a href="/de/">DE</a>
+        |
+        <a href="/mounting">Mounting</a>
+        <a href="/component-views">Component Views</a>
+        <a href="/assets">Assets</a>
+        <a href="/computed">Computed</a>
+        <a href="/cascade">Cascade</a>
+        <a href="/slots">Slots</a>
+        <a href="/lazy">Lazy</a>
+        <a href="/islands">Islands</a>
+        <a href="/pagination">Pagination</a>
+        <a href="/static-caching">Static Caching</a>
+    </nav>
+    <h1>{{ title }}</h1>
+    {{ template_content }}
+    {{ livewire:scripts }}
+</body>
+</html>
