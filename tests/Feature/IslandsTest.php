@@ -93,6 +93,7 @@ it('renders a placeholder for lazy islands and loads them on trigger', function 
 
     expect($response->content())
         ->toContain('inside: 0')
+        ->toContain('double: 0')
         ->not->toContain('loading…');
 });
 
