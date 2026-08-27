@@ -7,6 +7,7 @@ use Illuminate\Testing\TestResponse;
 use Livewire\Livewire;
 use MarcoRieser\Livewire\ServiceProvider;
 use MarcoRieser\Livewire\Tests\TestCase;
+use Statamic\Facades\Cascade;
 use Statamic\Facades\Parse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -32,6 +33,16 @@ function addonProvider(): ServiceProvider
 function antlers(string $template, array $context = []): string
 {
     return (string) Parse::template($template, $context, [], true);
+}
+
+/**
+ * Seed the cascade the way Statamic's Antlers\Engine::get() does as a side
+ * effect of rendering any view, without actually hydrating it. Simulates
+ * another component having rendered Antlers first in the same request.
+ */
+function seedUnhydratedCascadeViewsKey(): void
+{
+    Cascade::set('views', []);
 }
 
 /**

@@ -27,7 +27,11 @@ class Cascade extends LivewireAttribute
      */
     public function getCascadeData(): array
     {
-        if (($data = CascadeFacade::toArray()) === []) {
+        $data = CascadeFacade::toArray();
+
+        // hydration only sets 'current_url', unlike `views`, which Antlers
+        // writes as a side effect of rendering any view.
+        if (! Arr::has($data, 'current_url')) {
             $data = CascadeFacade::hydrate()->toArray();
         }
 

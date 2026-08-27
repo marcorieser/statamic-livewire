@@ -53,6 +53,27 @@ it('throws for a selected cascade key that does not exist', function (): void {
     antlers('{{ livewire:missing-cascade-key-viewer }}');
 })->throws(CascadeDataNotFoundException::class);
 
+it('resolves cascade keys even when another component rendered antlers first in the same request', function (): void {
+    seedUnhydratedCascadeViewsKey();
+
+    expect(antlers('{{ livewire:selective-cascade-viewer }}'))
+        ->toContain('url: http://localhost')
+        ->toContain('fallback: fallback-value');
+});
+
+it('resolves the whole cascade even when another component rendered antlers first in the same request', function (): void {
+    seedUnhydratedCascadeViewsKey();
+
+    expect(antlers('{{ livewire:cascade-viewer }}'))->toContain('url: http://localhost');
+});
+
+it('prefers the real cascade value over a key default when another component rendered antlers first in the same request', function (): void {
+    seedUnhydratedCascadeViewsKey();
+
+    expect(new Cascade(['current_url' => 'fallback-value'])->getCascadeData())
+        ->toBe(['current_url' => 'http://localhost']);
+});
+
 it('lets computed properties win over cascade data', function (): void {
     Livewire::component('cascade-computed-viewer', CascadeComputedViewer::class);
 
