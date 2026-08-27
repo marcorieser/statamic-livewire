@@ -1,5 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
+use MarcoRieser\Livewire\Replacers\AssetsReplacer;
+use MarcoRieser\Livewire\Replacers\DisableBackButtonCacheReplacer;
+
 return [
 
     /*
@@ -7,9 +12,9 @@ return [
     | Localization
     |--------------------------------------------------------------------------
     |
-    | When enabled, the Localize Middleware from Statamic gets applied to
-    | Livewire requests, and the configured locales per site are handled
-    | automatically.
+    | When enabled, the current site is resolved from the original page URL
+    | on Livewire update requests and Statamic's Localize middleware is
+    | applied, so multi-site locales are handled automatically.
     |
     */
 
@@ -17,41 +22,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Synthesizers
-    |--------------------------------------------------------------------------
-    |
-    | Synthesizers allow adding custom types to Livewire, which can
-    | can be used to make Livewire aware of Statamic classes that you want
-    | to work with, as it might make things easier.
-    |
-    */
-
-    'synthesizers' => [
-
-        'enabled' => false,
-
-        'classes' => [
-            \MarcoRieser\Livewire\Synthesizers\EntryCollectionSynthesizer::class,
-            \MarcoRieser\Livewire\Synthesizers\EntrySynthesizer::class,
-            \MarcoRieser\Livewire\Synthesizers\FieldSynthesizer::class,
-            \MarcoRieser\Livewire\Synthesizers\FieldtypeSynthesizer::class,
-            \MarcoRieser\Livewire\Synthesizers\ValueSynthesizer::class,
-        ],
-
-        'augmentation' => true,
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Replacers
     |--------------------------------------------------------------------------
     |
-    | Define the replacers that will be used when static caching is enabled
-    | to dynamically replace content within the response.
+    | Replacers keep Livewire working on statically cached pages: they bake
+    | the assets into cached responses and restore the back/forward-cache
+    | protection headers on cached pages containing components.
     |
     */
 
     'replacers' => [
-        \MarcoRieser\Livewire\Replacers\AssetsReplacer::class,
+        AssetsReplacer::class,
+        DisableBackButtonCacheReplacer::class,
     ],
+
 ];

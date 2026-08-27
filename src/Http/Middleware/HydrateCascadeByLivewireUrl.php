@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MarcoRieser\Livewire\Http\Middleware;
 
 use Closure;
@@ -14,9 +16,11 @@ use Symfony\Component\HttpFoundation\Response;
 class HydrateCascadeByLivewireUrl
 {
     /**
-     * Handle an incoming request.
+     * Rebuild the Statamic cascade for Livewire update requests as if the
+     * original page URL was requested, so cascade data stays consistent
+     * across component updates.
      *
-     * @param  Closure(Request): (Response)  $next
+     * @param  Closure(Request): Response  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -39,6 +43,6 @@ class HydrateCascadeByLivewireUrl
 
     protected function hydrateContent(): void
     {
-        Cascade::withContent(fn () => Data::findByRequestUrl(Livewire::originalUrl()) ?? collect());
+        Cascade::withContent(fn () => Data::findByRequestUrl(Livewire::originalUrl()));
     }
 }

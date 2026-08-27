@@ -1,98 +1,116 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MarcoRieser\Livewire;
 
-use Illuminate\Routing\Route;
-use Illuminate\Routing\Router;
-use Livewire\Livewire;
-use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
+use Illuminate\Routing\Events\RouteMatched;
+use Illuminate\Support\Facades\Event;
+use Livewire\Component;
 use MarcoRieser\Livewire\Hooks\CascadeVariablesAutoloader;
 use MarcoRieser\Livewire\Hooks\ComputedPropertiesAutoloader;
-use MarcoRieser\Livewire\Hooks\SynthesizerAugmentor;
+use MarcoRieser\Livewire\Hooks\SlotsAutoloader;
 use MarcoRieser\Livewire\Http\Middleware\HydrateCascadeByLivewireUrl;
 use MarcoRieser\Livewire\Http\Middleware\ResolveCurrentSiteByLivewireUrl;
+use MarcoRieser\Livewire\Islands\IslandManager;
+use MarcoRieser\Livewire\Tags\Livewire;
+use Override;
 use Statamic\Http\Middleware\Localize;
 use Statamic\Providers\AddonServiceProvider;
 
+use function Livewire\on;
+
 class ServiceProvider extends AddonServiceProvider
 {
-    protected array $middlewares = [];
-
     protected $tags = [
-        'MarcoRieser\Livewire\Tags\Livewire',
+        Livewire::class,
     ];
 
+    #[Override]
     public function register(): void
     {
         parent::register();
 
-        $this->registerSynthesizerAugmentation();
-        $this->registerComputedPropertiesAutoloader();
-        $this->registerCascadeVariablesAutoloader();
+        // Order matters: later hooks win on name collisions, giving
+        // public properties > computed properties > cascade data.
+        \Livewire\Livewire::componentHook(CascadeVariablesAutoloader::class);
+        \Livewire\Livewire::componentHook(ComputedPropertiesAutoloader::class);
     }
 
+    #[Override]
     public function bootAddon(): void
     {
-        $this->bootLocalization();
-        $this->bootCascadeRestoration();
-        $this->bootReplacers();
-        $this->bootSynthesizers();
-        $this->bootMiddlewares();
+        $this->bootUpdateRouteMiddleware();
+        $this->bootStaticCachingReplacers();
+        $this->bootSlotsAutoloader();
+        $this->bootIslandFileRecovery();
     }
 
-    protected function bootLocalization(): void
+    protected function bootIslandFileRecovery(): void
     {
-        if (! config()->boolean('statamic-livewire.localization', true)) {
-            return;
+        // Livewire regenerates missing island cache files by recompiling the
+        // component's Blade view — which cannot restore Antlers island files.
+        // Restore them before the island renders instead.
+        on('call', function (Component $component, string $method, array $params, mixed $componentContext, mixed $returnEarly, mixed $metadata): void {
+            if (is_array($metadata) && isset($metadata['island'])) {
+                resolve(IslandManager::class)->ensureIslandFiles($component);
+            }
+        });
+    }
+
+    /**
+     * @return list<class-string>
+     */
+    public function updateRouteMiddleware(): array
+    {
+        $middleware = [];
+
+        if (config()->boolean('statamic-livewire.localization', true)) {
+            $middleware[] = ResolveCurrentSiteByLivewireUrl::class;
+            $middleware[] = Localize::class;
         }
 
-        $this->middlewares[] = ResolveCurrentSiteByLivewireUrl::class;
-        $this->middlewares[] = Localize::class;
+        $middleware[] = HydrateCascadeByLivewireUrl::class;
+
+        return $middleware;
     }
 
-    protected function bootCascadeRestoration(): void
+    protected function bootSlotsAutoloader(): void
     {
-        $this->middlewares[] = HydrateCascadeByLivewireUrl::class;
+        // Registered as a plain render listener instead of a component hook,
+        // so it runs after Livewire's own slot support and can replace the
+        // Blade-only slot proxy for Antlers views.
+        on('render', new SlotsAutoloader);
     }
 
-    protected function bootReplacers(): void
+    protected function bootStaticCachingReplacers(): void
     {
-        config()->set('statamic.static_caching.replacers', array_merge(
-            config()->array('statamic-livewire.replacers', []),
-            config()->array('statamic.static_caching.replacers', [])
-        ));
+        config()->set('statamic.static_caching.replacers', [
+            ...config()->array('statamic-livewire.replacers', []),
+            ...config()->array('statamic.static_caching.replacers', []),
+        ]);
     }
 
-    protected function bootSynthesizers(): void
+    protected function bootUpdateRouteMiddleware(): void
     {
-        if (! config('statamic-livewire.synthesizers.enabled', false)) {
-            return;
-        }
+        // The middleware is attached to the matched route instance instead of
+        // the route registry: cached routes are rebuilt from the cache on
+        // every request, so registry mutations would be lost under
+        // `route:cache`.
+        Event::listen(RouteMatched::class, function (RouteMatched $event): void {
+            if (! $event->route->named('*livewire.update')) {
+                return;
+            }
 
-        collect(config()->array('statamic-livewire.synthesizers.classes', []))
-            ->filter(fn (string $synthesizer) => is_subclass_of($synthesizer, Synth::class))
-            ->each(fn (string $synthesizer) => Livewire::propertySynthesizer($synthesizer));
-    }
+            $middleware = $this->updateRouteMiddleware();
 
-    protected function registerSynthesizerAugmentation(): void
-    {
-        Livewire::componentHook(SynthesizerAugmentor::class);
-    }
+            // Guard against the raw middleware list — gatherMiddleware()
+            // would memoize the list before the addition.
+            if (array_intersect($middleware, $event->route->middleware()) !== []) {
+                return;
+            }
 
-    protected function registerComputedPropertiesAutoloader(): void
-    {
-        Livewire::componentHook(ComputedPropertiesAutoloader::class);
-    }
-
-    protected function registerCascadeVariablesAutoloader(): void
-    {
-        Livewire::componentHook(CascadeVariablesAutoloader::class);
-    }
-
-    protected function bootMiddlewares(): void
-    {
-        collect($this->app->make(Router::class)->getRoutes()->getRoutes())
-            ->filter(fn (Route $route) => $route->named('*livewire.update'))
-            ->each(fn (Route $route) => $route->middleware($this->middlewares));
+            $event->route->middleware($middleware);
+        });
     }
 }

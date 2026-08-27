@@ -1,8 +1,11 @@
+/vendor
+/build
+/.phpunit.cache
+/.phpunit.result.cache
+/coverage
+composer.lock
+.phpunit.cache
+.phpunit.result.cache
 .DS_Store
 .idea
-build
-composer.lock
-vendor
-coverage
-/node_modules/
-.phpunit.result.cache
+.vscode

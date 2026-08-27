@@ -1,0 +1,16 @@
+parameters:
+    level: max
+    paths:
+        - src
+        - config
+        - tests
+    excludePaths:
+        # Single-file and multi-file Livewire component fixtures are compiler
+        # input, not standalone-valid PHP.
+        - tests/Fixtures/components
+    stubFiles:
+        # Type declarations for untyped Livewire and Statamic internals the
+        # package relies on.
+        - phpstan/stubs/livewire.stub
+        - phpstan/stubs/statamic.stub
+    tmpDir: build/phpstan

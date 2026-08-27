@@ -1,57 +1,179 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MarcoRieser\Livewire\Tags;
 
+use InvalidArgumentException;
+use Livewire\Component;
 use Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets;
 use Livewire\Mechanisms\FrontendAssets\FrontendAssets;
-use Statamic\Support\Str;
+use MarcoRieser\Livewire\Islands\IslandManager;
+use RuntimeException;
 use Statamic\Tags\Tags;
 
 use function Livewire\store;
 
 class Livewire extends Tags
 {
+    /** @var list<string> */
     protected static $aliases = ['lw', 'wire'];
 
     /**
-     * This will load your Livewire component in the Antlers view
+     * All tag names this tag responds to.
+     *
+     * @return list<string>
+     */
+    public static function handles(): array
+    {
+        return ['livewire', ...static::$aliases];
+    }
+
+    /**
+     * Named slots collected per component tag pair currently being parsed.
+     *
+     * @var list<array<string, string>>
+     */
+    protected static array $slotStack = [];
+
+    /**
+     * Mount a Livewire component.
      *
      * {{ livewire:your-component-name }}
      */
-    public function wildcard($expression)
+    public function wildcard(string $expression): string
     {
-        if (Str::startsWith($expression, 'computed:')) {
-            $this->params->put('property', Str::after($expression, 'computed:'));
-
-            return $this->computed();
-        }
-
         $this->params->put('component', $expression);
 
         return $this->index();
     }
 
     /**
-     * This will load your Livewire component in the Antlers view
+     * Mount a Livewire component by parameter.
      *
      * {{ livewire component="your-component-name" }}
      */
-    public function index()
+    public function index(): string
     {
-        if (! ($component = $this->params->get('component'))) {
-            return null;
+        $component = $this->params->get('component');
+
+        if (! is_string($component) || $component === '') {
+            throw new InvalidArgumentException('The {{ livewire }} tag requires a component name.');
         }
 
-        $params = $this->params->except(['key', 'component']);
-        $params = config()->boolean('statamic-livewire.synthesizers.enabled', false) ? $params->all() : $params->toArray();
+        // Parameters are deep-converted through toArray() so augmentable Statamic
+        // objects reach the component as plain values.
+        $params = $this->params->except(['key', 'component'])->toArray();
 
-        return \Livewire\Livewire::mount($component, $params, $this->params->only('key')->first());
+        return \Livewire\Livewire::mount($component, $params, $this->params->get('key'), $this->slots());
     }
 
     /**
-     * This will load your Livewire component in the Antlers view
+     * Define a named slot inside a component tag pair.
      *
-     * {{ livewire:component name="my-component" }}
+     * {{ livewire:slot name="header" }} ... {{ /livewire:slot }}
+     */
+    public function slot(): void
+    {
+        if (self::$slotStack === []) {
+            throw new RuntimeException('The {{ livewire:slot }} tag must be used inside a Livewire component tag pair.');
+        }
+
+        $name = $this->params->get('name');
+
+        if (! is_string($name) || $name === '') {
+            throw new InvalidArgumentException('The {{ livewire:slot }} tag requires a name.');
+        }
+
+        self::$slotStack[array_key_last(self::$slotStack)][$name] = trim((string) $this->parse());
+    }
+
+    /**
+     * Antlers implementation of @island.
+     *
+     * {{ livewire:island name="stats" }} ... {{ /livewire:island }}
+     */
+    public function island(): string
+    {
+        $component = $this->context->value('__livewire');
+
+        if (! $component instanceof Component) {
+            throw new RuntimeException('The {{ livewire:island }} tag must be used inside a Livewire component view.');
+        }
+
+        $name = $this->params->get('name');
+
+        if (! is_string($name) || $name === '') {
+            throw new InvalidArgumentException('The {{ livewire:island }} tag requires a name.');
+        }
+
+        $manager = resolve(IslandManager::class);
+
+        $token = $manager->token($component->getName(), $name);
+
+        $manager->store($token, (string) $this->content);
+
+        // Any other parameters become the island's scope. Unlike Blade's
+        // with:, the values are captured here — with the surrounding template
+        // context available — and persisted through the component memo, so
+        // island updates can re-render with them.
+        $with = $this->params->except(['name', 'lazy', 'defer', 'always', 'skip'])->toArray();
+
+        $this->registerIsland($component, $name, $token, $with);
+
+        $html = $component->renderIslandDirective(
+            name: $name,
+            token: $token,
+            lazy: $this->boolParam('lazy'),
+            defer: $this->boolParam('defer'),
+            always: $this->boolParam('always'),
+            skip: $this->boolParam('skip'),
+        );
+
+        // renderIslandDirective() registers the island again while mounting —
+        // drop that duplicate in favor of the entry carrying the scope.
+        $this->registerIsland($component, $name, $token, $with);
+
+        return $html;
+    }
+
+    /**
+     * @param  array<mixed>  $with
+     */
+    protected function registerIsland(Component $component, string $name, string $token, array $with): void
+    {
+        $component->setIslands(collect($component->getIslands())
+            ->reject(fn (array $island): bool => ($island['name'] ?? null) === $name)
+            ->values()
+            ->push(array_filter([
+                'name' => $name,
+                'token' => $token,
+                'with' => $with,
+            ], fn (mixed $value): bool => $value !== []))
+            ->all());
+    }
+
+    /**
+     * The loading state of a lazy island. Handled by the IslandManager while
+     * rendering island sources — reaching this method means the pair was
+     * used outside of an island.
+     *
+     * {{ livewire:placeholder }} ... {{ /livewire:placeholder }}
+     */
+    public function placeholder(): never
+    {
+        throw new RuntimeException('The {{ livewire:placeholder }} tag must be used inside a {{ livewire:island }} tag pair.');
+    }
+
+    protected function boolParam(string $key): bool
+    {
+        return filter_var($this->params->get($key, false), FILTER_VALIDATE_BOOL);
+    }
+
+    /**
+     * Mount a dynamically resolved Livewire component.
+     *
+     * {{ livewire:component :name="component_name" }}
      */
     public function component(): string
     {
@@ -61,7 +183,7 @@ class Livewire extends Tags
     }
 
     /**
-     * Antlers implementation of @livewireStyles
+     * Antlers implementation of @livewireStyles.
      *
      * {{ livewire:styles }}
      */
@@ -71,7 +193,7 @@ class Livewire extends Tags
     }
 
     /**
-     * Antlers implementation of @livewireScripts
+     * Antlers implementation of @livewireScripts.
      *
      * {{ livewire:scripts }}
      */
@@ -81,7 +203,7 @@ class Livewire extends Tags
     }
 
     /**
-     * Antlers implementation of @livewireScriptConfig
+     * Antlers implementation of @livewireScriptConfig.
      *
      * {{ livewire:scriptConfig }}
      */
@@ -91,80 +213,79 @@ class Livewire extends Tags
     }
 
     /**
-     * Antlers implementation of @assets - https://livewire.laravel.com/docs/javascript#loading-assets
+     * Antlers implementation of @assets.
      *
-     * {{ livewire:assets }}...{{ /livewire:assets }}
+     * {{ livewire:assets }} ... {{ /livewire:assets }}
      */
     public function assets(): void
     {
         $html = (string) $this->parse();
 
-        $key = md5($html);
+        // Not a security context: the hash only serves as a short,
+        // content-derived deduplication key inside the Livewire payload.
+        $key = hash('xxh3', $html);
 
-        if (in_array($key, SupportScriptsAndAssets::$alreadyRunAssetKeys)) {
-            // Skip it...
-        } else {
-            SupportScriptsAndAssets::$alreadyRunAssetKeys[] = $key;
-            store($this->context['__livewire'])->push('assets', $html, $key);
+        // Only load an asset once per request, no matter how often it is used.
+        if (in_array($key, SupportScriptsAndAssets::$alreadyRunAssetKeys, true)) {
+            return;
         }
+
+        SupportScriptsAndAssets::$alreadyRunAssetKeys[] = $key;
+
+        $component = $this->context->value('__livewire');
+
+        if ($component instanceof Component) {
+            store($component)->push('assets', $html, $key);
+
+            return;
+        }
+
+        SupportScriptsAndAssets::$nonLivewireAssets[$key] = $html;
     }
 
     /**
-     * Antlers implementation of @script - https://livewire.laravel.com/docs/javascript#executing-scripts
+     * Antlers implementation of @script.
      *
-     * {{ livewire:script }}...{{ /livewire:script }}
+     * {{ livewire:script }} ... {{ /livewire:script }}
      */
     public function script(): void
     {
+        $component = $this->context->value('__livewire');
+
+        if (! $component instanceof Component) {
+            throw new RuntimeException('The {{ livewire:script }} tag must be used inside a Livewire component view.');
+        }
+
         $html = trim((string) $this->parse());
 
-        $key = md5($html);
-
-        store($this->context['__livewire'])->push('scripts', $html, $key);
+        store($component)->push('scripts', $html, hash('xxh3', $html));
     }
 
     /**
-     * Antlers implementation of @this
+     * Parse the tag pair content into the component's slots: nested
+     * {{ livewire:slot }} pairs become named slots, the remaining
+     * content becomes the default slot.
      *
-     * {{ livewire:this }}
-     * {{ livewire:this set="('name', 'Jack')" }}
-     *
-     * @deprecated
+     * @return array<string, string>
      */
-    public function this(): string
+    protected function slots(): array
     {
-        $instanceId = $this->context['__livewire']->getId();
-
-        if (! count($this->params)) {
-            return "window.Livewire.find('$instanceId')";
+        if (! $this->isPair) {
+            return [];
         }
 
-        $action = $this->params->take(1)->toArray();
-        $method = key($action);
-        $parameters = reset($action);
+        self::$slotStack[] = [];
 
-        return "window.Livewire.find('$instanceId').$method$parameters";
-    }
-
-    /**
-     * Antlers implementation of @entangle
-     *
-     * {{ livewire:entangle property="showDropdown" modifier="live" }}
-     *
-     * @deprecated
-     */
-    public function entangle(): string
-    {
-        $property = $this->params->get('property');
-        $modifier = $this->params->get('modifier');
-        $instanceId = $this->context['__livewire']->getId();
-
-        $expression = ".entangle('$property')";
-
-        if ($modifier) {
-            $expression .= ".$modifier";
+        try {
+            $default = trim((string) $this->parse());
+        } finally {
+            $slots = array_pop(self::$slotStack);
         }
 
-        return "window.Livewire.find('$instanceId')$expression";
+        if ($default !== '') {
+            $slots['default'] = $default;
+        }
+
+        return $slots;
     }
 }

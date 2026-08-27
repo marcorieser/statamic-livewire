@@ -1,0 +1,10 @@
+<div>
+    {{ livewire:island name="outer" }}
+        {{ wire:placeholder }}<span>outer loading</span>{{ /wire:placeholder }}
+        <span>outer island</span>
+        {{ livewire:island name="inner" lazy="true" }}
+            {{ livewire:placeholder }}<span>inner loading</span>{{ /livewire:placeholder }}
+            <span>inner island</span>
+        {{ /livewire:island }}
+    {{ /livewire:island }}
+</div>

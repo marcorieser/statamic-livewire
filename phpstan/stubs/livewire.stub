@@ -1,0 +1,187 @@
+<?php
+
+namespace Livewire;
+
+use MarcoRieser\Livewire\PhpStan\LivewireStore;
+
+/**
+ * @param  object|null  $instance
+ * @return LivewireStore
+ */
+function store($instance = null) {}
+
+namespace MarcoRieser\Livewire\PhpStan;
+
+/**
+ * Static type for the anonymous store object returned by \Livewire\store().
+ * Only exists for analysis; has no runtime counterpart.
+ */
+interface LivewireStore
+{
+    /**
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function get($key, $default = null);
+
+    /**
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return void
+     */
+    public function set($key, $value);
+
+    /**
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  array-key|null  $iKey
+     * @return void
+     */
+    public function push($key, $value, $iKey = null);
+
+    /**
+     * @param  string  $key
+     * @param  array-key|null  $iKey
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function find($key, $iKey = null, $default = null);
+
+    /**
+     * @param  string  $key
+     * @param  array-key|null  $iKey
+     * @return bool
+     */
+    public function has($key, $iKey = null);
+
+    /**
+     * @param  string  $key
+     * @param  array-key|null  $iKey
+     * @return void
+     */
+    public function unset($key, $iKey = null);
+}
+
+namespace Livewire;
+
+use Illuminate\Support\Facades\Facade;
+
+abstract class Component
+{
+    /** @return iterable<int, \Livewire\Features\SupportAttributes\Attribute> */
+    public function getAttributes() {}
+
+    /** @return iterable<int, \Livewire\Features\SupportSlots\Slot> */
+    public function getSlots() {}
+
+    /** @return string */
+    public function getName() {}
+
+    /** @return list<array<string, mixed>> */
+    public function getIslands() {}
+
+    /**
+     * @param  array<int, array<string, mixed>>  $islands
+     * @return void
+     */
+    public function setIslands($islands) {}
+
+    /** @return bool */
+    public function islandIsMounting() {}
+
+    /**
+     * @param  string|null  $name
+     * @param  string|null  $token
+     * @param  bool  $lazy
+     * @param  bool  $defer
+     * @param  bool  $always
+     * @param  bool  $skip
+     * @param  array<string, mixed>  $with
+     * @return string
+     */
+    public function renderIslandDirective($name = null, $token = null, $lazy = false, $defer = false, $always = false, $skip = false, $with = []) {}
+}
+
+/**
+ * @method static void component(string $name, ?string $class = null)
+ * @method static string mount(string $name, array<mixed> $params = [], mixed $key = null, array<string, string> $slots = [])
+ * @method static \Livewire\Features\SupportTesting\Testable test(string|object $name, array<string, mixed> $params = [])
+ * @method static string getUpdateUri()
+ * @method static string originalUrl()
+ * @method static string originalMethod()
+ * @method static void componentHook(string|object $hook)
+ * @method static void addLocation(?string $viewPath = null, ?string $classNamespace = null)
+ * @method static bool isLivewireRequest()
+ */
+class Livewire extends Facade {}
+
+abstract class ComponentHook
+{
+    /** @var Component */
+    protected $component;
+}
+
+namespace Livewire\Features\SupportSlots;
+
+class Slot
+{
+    public function getName(): string {}
+
+    public function toHtml(): string {}
+}
+
+namespace Livewire\Features\SupportTesting;
+
+class Testable {}
+
+namespace Livewire\Features\SupportAttributes;
+
+abstract class Attribute
+{
+    /** @return string */
+    public function getName() {}
+}
+
+namespace Livewire\Mechanisms\FrontendAssets;
+
+class FrontendAssets
+{
+    /**
+     * @param  array<string, mixed>  $options
+     * @return string
+     */
+    public static function styles($options = []) {}
+
+    /**
+     * @param  array<string, mixed>  $options
+     * @return string
+     */
+    public static function scripts($options = []) {}
+
+    /**
+     * @param  array<string, mixed>  $options
+     * @return string
+     */
+    public static function scriptConfig($options = []) {}
+}
+
+namespace Livewire\Features\SupportScriptsAndAssets;
+
+class SupportScriptsAndAssets
+{
+    /** @var list<string> */
+    public static $alreadyRunAssetKeys = [];
+
+    /** @var array<string, string> */
+    public static $renderedAssets = [];
+
+    /** @var array<string, string> */
+    public static $nonLivewireAssets = [];
+
+    /** @return array<string, string> */
+    public static function getAssets() {}
+
+    /** @return void */
+    public static function processNonLivewireAssets() {}
+}

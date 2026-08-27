@@ -1,38 +1,55 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MarcoRieser\Livewire\Attributes;
 
+use Attribute;
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 use Livewire\Features\SupportAttributes\Attribute as LivewireAttribute;
 use Statamic\Exceptions\CascadeDataNotFoundException;
 use Statamic\Facades\Cascade as CascadeFacade;
 
-#[\Attribute]
+#[Attribute]
 class Cascade extends LivewireAttribute
 {
+    /**
+     * @param  array<int|string, mixed>  $keys  Cascade keys to expose. An empty
+     *                                          array exposes the whole cascade.
+     *                                          String keys map to a default value
+     *                                          for when the cascade key is absent.
+     */
     public function __construct(public array $keys = []) {}
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getCascadeData(): array
     {
         $data = CascadeFacade::toArray();
 
-        // 'current_url' only set by hydration, unlike 'views', which Antlers
+        // hydration only sets 'current_url', unlike `views`, which Antlers
         // writes as a side effect of rendering any view.
-        if (! array_key_exists('current_url', $data)) {
+        if (! Arr::has($data, 'current_url')) {
             $data = CascadeFacade::hydrate()->toArray();
         }
 
-        if (! $this->keys) {
+        if ($this->keys === []) {
             return $data;
         }
 
         return collect($this->keys)
-            ->mapWithKeys(function ($default, $key) use ($data) {
-                if (is_numeric($key)) {
+            ->mapWithKeys(function (mixed $default, int|string $key) use ($data): array {
+                if (is_int($key)) {
+                    if (! is_string($default)) {
+                        throw new InvalidArgumentException('Cascade keys must be strings.');
+                    }
+
                     $key = $default;
                     $default = null;
 
-                    if (! array_key_exists($key, $data)) {
+                    if (! Arr::has($data, $key)) {
                         throw new CascadeDataNotFoundException($key);
                     }
                 }
