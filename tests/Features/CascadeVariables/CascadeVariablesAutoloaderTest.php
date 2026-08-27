@@ -8,6 +8,7 @@ use Livewire\Livewire;
 use MarcoRieser\Livewire\Attributes\Cascade;
 use MarcoRieser\Livewire\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Cascade as CascadeFacade;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 class CascadeVariablesAutoloaderTest extends TestCase
@@ -57,6 +58,35 @@ class CascadeVariablesAutoloaderTest extends TestCase
         $component = $this->getInvalidLivewireComponent();
 
         Livewire::test($component);
+    }
+
+    #[Test]
+    public function cascade_variables_are_autoloaded_even_when_another_component_rendered_antlers_first_in_the_same_request()
+    {
+        // What Antlers\Engine::get() does as a side effect of rendering any
+        // view. A cascade holding only this key is not actually hydrated yet.
+        CascadeFacade::set('views', []);
+
+        $component = $this->getAntlersLivewireComponent();
+
+        $testable = Livewire::test($component);
+
+        $testable->assertViewHas('homepage', '/');
+        $testable->assertViewHas('environment', 'testing');
+    }
+
+    #[Test]
+    public function cascade_variables_are_autoloaded_selectively_even_when_another_component_rendered_antlers_first_in_the_same_request()
+    {
+        CascadeFacade::set('views', []);
+
+        $component = $this->getSelectedLivewireComponent();
+
+        $testable = Livewire::test($component);
+
+        $testable->assertViewHas('homepage', '/');
+        $testable->assertViewHas('my_global', true);
+        $testable->assertViewMissing('environment');
     }
 
     #[Test]
