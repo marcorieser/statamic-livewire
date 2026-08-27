@@ -306,17 +306,17 @@ Islands can be [loaded lazily](https://livewire.laravel.com/docs/islands#lazy-lo
 {{ /livewire:island }}
 ```
 
-Islands can be nested, and island content sees the component's scope (its public and computed properties). To bring additional variables into an island — for example loop values — pass them as parameters. Their values are captured when the island is defined and persist across island updates:
+Islands can be nested, and island content sees the component's scope (its public and computed properties) — not the surrounding template's, so loop values aren't available inside an island's own content, same as Blade's `@island`. In a loop, give each island a dynamic `name` (resolved where the tag is parsed, so this part does see the loop):
 
 ```antlers
 {{ items }}
-    {{ livewire:island name="item-{id}" :item="id" }}
-        <span>{{ item }}</span>
+    {{ livewire:island name="item-{id}" }}
+        <span>{{ count }}</span>
     {{ /livewire:island }}
 {{ /items }}
 ```
 
-Every island needs a `name` that is unique within its component — in loops, make it dynamic like above. Captured values are stored in the component's payload, so keep them small and JSON-serializable (ids, not entries).
+Every island needs a `name` that is unique within its component — in loops, make it dynamic like above.
 
 ### Pagination
 
