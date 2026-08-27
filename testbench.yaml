@@ -1,7 +1,12 @@
 laravel: '@testbench'
 
 providers:
-  # - Workbench\App\Providers\WorkbenchServiceProvider
+  # Testbench's package discovery only covers actual dependencies, not the
+  # package under development — see AddonTestCase's $addonServiceProvider
+  # property for the same problem on the test side. Register it explicitly
+  # so the workbench (composer serve) gets the addon's tags/hooks/middleware.
+  - MarcoRieser\Livewire\ServiceProvider
+  - Workbench\App\Providers\WorkbenchServiceProvider
 
 migrations:
   - workbench/database/migrations
@@ -9,24 +14,38 @@ migrations:
 seeders:
   - Workbench\Database\Seeders\DatabaseSeeder
 
+env:
+  # APP_URL is intentionally NOT set here: this `env:` block applies to every
+  # Testbench-booted app, including the ordinary Pest suite (tests/TestCase.php
+  # extends AddonTestCase, no WithWorkbench) — overriding it there breaks tests
+  # that assert on the default `http://localhost` request URL. It's set for
+  # the workbench alone in workbench/.env.example instead, which only loads
+  # for genuine `testbench` commands (serve, build, ...), never for tests.
+  - STATAMIC_PRO_ENABLED=true
+  - STATAMIC_STACHE_WATCHER=true
+  - CACHE_STORE=file
+
 workbench:
   start: '/'
   install: true
   health: false
   discovers:
+    config: true
     web: true
     api: true
     commands: true
     components: false
     factories: true
-    views: false
+    views: true
   build:
     - asset-publish
     - create-sqlite-db
     - db-wipe
     - migrate-fresh
+    - statamic:stache:clear
   assets:
     - laravel-assets
+    - statamic-cp
   sync:
     - from: storage
       to: workbench/storage

@@ -1,0 +1,8 @@
+title: Pages
+structure:
+  root: true
+route: '{parent_uri}/{slug}'
+layout: layout
+sites:
+  - en
+  - de

@@ -1,0 +1,8 @@
+<p>This page is safe to statically cache. The AssetsReplacer bakes Livewire's styles/scripts/assets
+into the cached response, and DisableBackButtonCacheReplacer restores the no-store/Pragma/Expires
+headers on cached pages that contain components.</p>
+
+<p>Try it: <code>STATAMIC_STATIC_CACHING_STRATEGY=half composer serve</code>, load this page twice,
+then <code>curl -I</code> it — it should still respond with the back/forward-cache-busting headers.</p>
+
+{{ livewire:counter label="Cached counter" }}

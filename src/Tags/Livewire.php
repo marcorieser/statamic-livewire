@@ -113,15 +113,7 @@ class Livewire extends Tags
 
         $manager->store($token, (string) $this->content);
 
-        // Any other parameters become the island's scope. Unlike Blade's
-        // with:, the values are captured here — with the surrounding template
-        // context available — and persisted through the component memo, so
-        // island updates can re-render with them.
-        $with = $this->params->except(['name', 'lazy', 'defer', 'always', 'skip'])->toArray();
-
-        $this->registerIsland($component, $name, $token, $with);
-
-        $html = $component->renderIslandDirective(
+        return $component->renderIslandDirective(
             name: $name,
             token: $token,
             lazy: $this->boolParam('lazy'),
@@ -129,28 +121,6 @@ class Livewire extends Tags
             always: $this->boolParam('always'),
             skip: $this->boolParam('skip'),
         );
-
-        // renderIslandDirective() registers the island again while mounting —
-        // drop that duplicate in favor of the entry carrying the scope.
-        $this->registerIsland($component, $name, $token, $with);
-
-        return $html;
-    }
-
-    /**
-     * @param  array<mixed>  $with
-     */
-    protected function registerIsland(Component $component, string $name, string $token, array $with): void
-    {
-        $component->setIslands(collect($component->getIslands())
-            ->reject(fn (array $island): bool => ($island['name'] ?? null) === $name)
-            ->values()
-            ->push(array_filter([
-                'name' => $name,
-                'token' => $token,
-                'with' => $with,
-            ], fn (mixed $value): bool => $value !== []))
-            ->all());
     }
 
     /**

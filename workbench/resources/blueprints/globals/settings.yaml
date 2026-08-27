@@ -1,0 +1,8 @@
+title: Settings
+sections:
+  main:
+    display: Main
+    fields:
+      - handle: tagline
+        field:
+          type: text

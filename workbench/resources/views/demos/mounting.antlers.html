@@ -1,0 +1,41 @@
+<p>Mount by wildcard, by param, with bound params, dynamically, and in a loop with a wire:key.
+The mounting tag itself is always written in Antlers — what differs below is only whether the
+<em>mounted component's own view</em> is Antlers or Blade.</p>
+
+<h2>Antlers</h2>
+
+<h3>Wildcard mount</h3>
+{{ livewire:counter label="Wildcard mount" }}
+
+<h3>Param mount</h3>
+{{ livewire component="counter" label="Param mount" }}
+
+<h3>Bound param</h3>
+{{ livewire:counter label="Bound count" :count="5" }}
+
+<h3>Dynamic component</h3>
+{{ livewire:component :name="'counter'" label="Dynamic mount" }}
+
+<h3>Loop with :key</h3>
+{{ collection:articles limit="3" }}
+    {{ livewire:article-card :article="id" :key="id" }}
+{{ /collection:articles }}
+
+<h2>Blade</h2>
+
+<h3>Wildcard mount</h3>
+{{ livewire:counter-blade label="Wildcard mount (blade)" }}
+
+<h3>Param mount</h3>
+{{ livewire component="counter-blade" label="Param mount (blade)" }}
+
+<h3>Bound param</h3>
+{{ livewire:counter-blade label="Bound count (blade)" :count="5" }}
+
+<h3>Dynamic component</h3>
+{{ livewire:component :name="'counter-blade'" label="Dynamic mount (blade)" }}
+
+<h3>Loop with :key</h3>
+{{ collection:articles limit="3" }}
+    {{ livewire:article-card-blade :article="id" :key="id" }}
+{{ /collection:articles }}

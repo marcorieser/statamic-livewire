@@ -1,0 +1,5 @@
+<div class="card">
+    <span>Custom assets/script pair — mounted twice on this page but only injected once.</span>
+    {{ livewire:assets }}<script>window.customAssetLoaded = true;</script>{{ /livewire:assets }}
+    {{ livewire:script }}console.log('AssetsDemo script executed once per component instance');{{ /livewire:script }}
+</div>

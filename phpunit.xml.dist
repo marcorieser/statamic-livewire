@@ -25,6 +25,14 @@
     </testsuites>
     <php>
         <env name="APP_KEY" value="base64:HSJZZ0K4NXBOG7yQx8lVQEnpMYK0eNRoy0hQeQ8Ov6E="/>
+        <!-- `laravel: '@testbench'` makes every Testbench app — including this
+             plain Pest suite — share the disposable skeleton base path with the
+             workbench. A `composer serve` run leaves that skeleton's `.env`
+             (copied from workbench/.env.example, APP_URL=http://127.0.0.1:8000)
+             behind until the next `composer clear`. Dotenv doesn't overwrite
+             already-set env vars, so pinning it here keeps the test suite's
+             `http://localhost` assumptions immune to leftover workbench state. -->
+        <env name="APP_URL" value="http://localhost"/>
     </php>
     <source>
         <include>
