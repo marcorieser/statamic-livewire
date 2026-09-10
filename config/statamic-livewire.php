@@ -1,5 +1,12 @@
 <?php
 
+use MarcoRieser\Livewire\Replacers\AssetsReplacer;
+use MarcoRieser\Livewire\Synthesizers\EntryCollectionSynthesizer;
+use MarcoRieser\Livewire\Synthesizers\EntrySynthesizer;
+use MarcoRieser\Livewire\Synthesizers\FieldSynthesizer;
+use MarcoRieser\Livewire\Synthesizers\FieldtypeSynthesizer;
+use MarcoRieser\Livewire\Synthesizers\ValueSynthesizer;
+
 return [
 
     /*
@@ -31,11 +38,11 @@ return [
         'enabled' => false,
 
         'classes' => [
-            \MarcoRieser\Livewire\Synthesizers\EntryCollectionSynthesizer::class,
-            \MarcoRieser\Livewire\Synthesizers\EntrySynthesizer::class,
-            \MarcoRieser\Livewire\Synthesizers\FieldSynthesizer::class,
-            \MarcoRieser\Livewire\Synthesizers\FieldtypeSynthesizer::class,
-            \MarcoRieser\Livewire\Synthesizers\ValueSynthesizer::class,
+            EntryCollectionSynthesizer::class,
+            EntrySynthesizer::class,
+            FieldSynthesizer::class,
+            FieldtypeSynthesizer::class,
+            ValueSynthesizer::class,
         ],
 
         'augmentation' => true,
@@ -52,6 +59,6 @@ return [
     */
 
     'replacers' => [
-        \MarcoRieser\Livewire\Replacers\AssetsReplacer::class,
+        AssetsReplacer::class,
     ],
 ];
