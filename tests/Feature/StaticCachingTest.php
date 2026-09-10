@@ -149,6 +149,40 @@ it('ignores empty responses', function (): void {
         ->and($response->headers->has('Pragma'))->toBeFalse();
 });
 
+it('marks livewire scripts as already rendered when a cache hit already contains them', function (): void {
+    $content = '<html><head></head><body>'
+        .'<script src="/livewire/livewire.min.js" data-module-url="/livewire" data-update-uri="/livewire/update"></script>'
+        .'</body></html>';
+
+    (new AssetsReplacer)->replaceInCachedResponse(new Response($content));
+
+    expect(resolve(FrontendAssets::class)->hasRenderedScripts)->toBeTrue()
+        ->and(FrontendAssets::scripts())->toBeEmpty();
+});
+
+it('marks livewire styles as already rendered when a cache hit already contains them', function (): void {
+    $content = '<html><head><!-- Livewire Styles --><style>[wire\:loading]{}</style></head><body></body></html>';
+
+    (new AssetsReplacer)->replaceInCachedResponse(new Response($content));
+
+    expect(resolve(FrontendAssets::class)->hasRenderedStyles)->toBeTrue()
+        ->and(FrontendAssets::styles())->toBeEmpty();
+});
+
+it('leaves the render flags untouched on cache hits without baked-in livewire assets', function (): void {
+    (new AssetsReplacer)->replaceInCachedResponse(new Response('<html><body><div wire:id="abc">component</div></body></html>'));
+
+    expect(resolve(FrontendAssets::class)->hasRenderedScripts)->toBeFalse()
+        ->and(resolve(FrontendAssets::class)->hasRenderedStyles)->toBeFalse();
+});
+
+it('ignores empty responses on cache hits', function (): void {
+    (new AssetsReplacer)->replaceInCachedResponse(new Response(''));
+
+    expect(resolve(FrontendAssets::class)->hasRenderedScripts)->toBeFalse()
+        ->and(resolve(FrontendAssets::class)->hasRenderedStyles)->toBeFalse();
+});
+
 it('has no effect on the counterpart replacer phases', function (): void {
     $content = '<html><body><div wire:id="abc">x</div></body></html>';
     $response = new Response($content);

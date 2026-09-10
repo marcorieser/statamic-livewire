@@ -58,9 +58,28 @@ class AssetsReplacer implements Replacer
         );
     }
 
+    /**
+     * NoCacheReplacer can re-render a `{{ nocache }}` component live on a
+     * cache hit, flipping Livewire's render-tracking state even though its
+     * assets are already baked into the cached HTML.
+     */
     public function replaceInCachedResponse(Response $response): void
     {
-        //
+        $content = $response->getContent();
+
+        if ($content === false || $content === '') {
+            return;
+        }
+
+        $assets = resolve(FrontendAssets::class);
+
+        if (str_contains($content, 'data-module-url=')) {
+            $assets->hasRenderedScripts = true;
+        }
+
+        if (str_contains($content, '<!-- Livewire Styles -->')) {
+            $assets->hasRenderedStyles = true;
+        }
     }
 
     protected function shouldInjectLivewireAssets(): bool
