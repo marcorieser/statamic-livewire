@@ -19,19 +19,18 @@ jobs:
           ref: ${{ github.head_ref }}
           persist-credentials: true
 
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v47
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          files: |
-            **.php
+          php-version: 8.4
+          tools: composer:v2
+          coverage: none
 
-      - name: "laravel-pint"
-        uses: aglipanci/laravel-pint-action@v2
-        with:
-          preset: laravel
-          verboseMode: true
-          onlyDirty: true
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Fix code style
+        run: vendor/bin/pint -v
 
       - name: Commit linted files
         uses: stefanzweifel/git-auto-commit-action@v7

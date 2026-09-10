@@ -31,7 +31,7 @@ A third-party [Laravel Livewire](https://laravel-livewire.com/) integration for 
 
 ## Requirements
 - PHP 8.2+
-- Laravel 11+
+- Laravel 12+
 - Statamic 5+
 
 ## Installation
