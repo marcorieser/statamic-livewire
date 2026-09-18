@@ -11,6 +11,7 @@ use Livewire\Livewire;
 use Livewire\Mechanisms\FrontendAssets\FrontendAssets;
 use MarcoRieser\Livewire\Replacers\AssetsReplacer;
 use MarcoRieser\Livewire\Replacers\DisableBackButtonCacheReplacer;
+use MarcoRieser\Livewire\ServiceProvider;
 use MarcoRieser\Livewire\Tests\Fixtures\Counter;
 use Statamic\StaticCaching\Middleware\Cache;
 
@@ -73,6 +74,20 @@ it('registers the replacers for static caching', function (): void {
     expect(config('statamic.static_caching.replacers'))
         ->toContain(AssetsReplacer::class)
         ->toContain(DisableBackButtonCacheReplacer::class);
+});
+
+it('does not duplicate replacers when the addon boots more than once', function (): void {
+    // `artisan config:cache` boots a second application instance internally,
+    // running the addon's boot logic again against the same config values.
+    new ServiceProvider(app())->bootAddon();
+    new ServiceProvider(app())->bootAddon();
+
+    /** @var list<class-string> $configured */
+    $configured = config('statamic.static_caching.replacers');
+    $replacers = collect($configured);
+
+    expect($replacers->filter(fn (string $replacer): bool => $replacer === AssetsReplacer::class))->toHaveCount(1)
+        ->and($replacers->filter(fn (string $replacer): bool => $replacer === DisableBackButtonCacheReplacer::class))->toHaveCount(1);
 });
 
 it('bakes the livewire assets into responses prepared for caching', function (): void {
