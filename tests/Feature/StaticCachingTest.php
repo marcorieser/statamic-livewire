@@ -7,6 +7,7 @@ use Livewire\Features\SupportAutoInjectedAssets\SupportAutoInjectedAssets;
 use Livewire\Features\SupportScriptsAndAssets\SupportScriptsAndAssets;
 use Livewire\Mechanisms\FrontendAssets\FrontendAssets;
 use MarcoRieser\Livewire\Replacers\AssetsReplacer;
+use MarcoRieser\Livewire\ServiceProvider;
 use MarcoRieser\Livewire\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -27,6 +28,22 @@ class StaticCachingTest extends TestCase
     public function registers_the_replacer_for_static_caching()
     {
         $this->assertContains(AssetsReplacer::class, config('statamic.static_caching.replacers'));
+    }
+
+    #[Test]
+    public function does_not_duplicate_the_replacer_when_the_addon_boots_more_than_once()
+    {
+        // `artisan config:cache` boots a second application instance internally,
+        // running the addon's boot logic again against the same config values.
+        (new ServiceProvider($this->app))->bootAddon();
+        (new ServiceProvider($this->app))->bootAddon();
+
+        $replacers = array_filter(
+            config('statamic.static_caching.replacers'),
+            fn ($replacer) => $replacer === AssetsReplacer::class
+        );
+
+        $this->assertCount(1, $replacers);
     }
 
     #[Test]
