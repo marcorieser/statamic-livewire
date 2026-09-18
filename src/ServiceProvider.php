@@ -85,10 +85,13 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootStaticCachingReplacers(): void
     {
-        config()->set('statamic.static_caching.replacers', [
+        /** @var list<class-string> $replacers */
+        $replacers = [
             ...config()->array('statamic-livewire.replacers', []),
             ...config()->array('statamic.static_caching.replacers', []),
-        ]);
+        ];
+
+        config()->set('statamic.static_caching.replacers', array_values(array_unique($replacers)));
     }
 
     protected function bootUpdateRouteMiddleware(): void
