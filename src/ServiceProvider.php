@@ -57,10 +57,10 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootReplacers(): void
     {
-        config()->set('statamic.static_caching.replacers', array_merge(
+        config()->set('statamic.static_caching.replacers', array_values(array_unique(array_merge(
             config()->array('statamic-livewire.replacers', []),
             config()->array('statamic.static_caching.replacers', [])
-        ));
+        ))));
     }
 
     protected function bootSynthesizers(): void
