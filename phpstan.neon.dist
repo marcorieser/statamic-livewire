@@ -13,4 +13,11 @@ parameters:
         # package relies on.
         - phpstan/stubs/livewire.stub
         - phpstan/stubs/statamic.stub
+    ignoreErrors:
+        -
+            # $view is switched between multiple Antlers views across the island
+            # test suite, so it can never be a compile-time-known literal for
+            # larastan's view-string check to verify.
+            message: '#expects view-string, string given#'
+            path: tests/Fixtures/IslandCounter.php
     tmpDir: build/phpstan
