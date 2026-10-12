@@ -9,7 +9,7 @@ Full rewrite targeting Livewire 4 and Statamic 6 exclusively. See the [upgrade g
 ### Added
 
 - Slots for Antlers views, including named slots (`{{ livewire:slot }}`)
-- Islands for Antlers views (`{{ livewire:island }}`) with lazy, defer, always and skip modes, placeholders (`{{ livewire:placeholder }}`), captured scope, and loops via dynamic names
+- Islands for Antlers views (`{{ livewire:island }}`) with lazy, defer, always and skip modes, placeholders (`{{ livewire:placeholder }}`), and loops via dynamic names
 - Lazy and deferred component loading through the mount tag (`lazy="true"` / `defer="true"`)
 - `{{ livewire:assets }}` works outside of component views
 - Back/forward-cache protection headers are restored on statically cached pages ([#30](https://github.com/marcorieser/statamic-livewire/issues/30))
