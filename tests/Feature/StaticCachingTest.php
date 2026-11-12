@@ -88,7 +88,19 @@ class StaticCachingTest extends TestCase
     public function marks_livewire_scripts_as_already_rendered_when_a_cache_hit_already_contains_them()
     {
         $content = '<html><head></head><body>'
-            .'<script src="/livewire/livewire.min.js" data-module-url="/livewire" data-update-uri="/livewire/update"></script>'
+            .'<script src="/livewire/livewire.min.js" data-csrf="STATAMIC_CSRF_TOKEN" data-update-uri="/livewire/update"></script>'
+            .'</body></html>';
+
+        (new AssetsReplacer)->replaceInCachedResponse(new Response($content));
+
+        $this->assertTrue(app(FrontendAssets::class)->hasRenderedScripts);
+    }
+
+    #[Test]
+    public function marks_livewire_scripts_as_already_rendered_when_a_cache_hit_contains_the_script_config()
+    {
+        $content = '<html><head></head><body>'
+            .'<script data-navigate-once="true">window.livewireScriptConfig = {"csrf":"STATAMIC_CSRF_TOKEN"};</script>'
             .'</body></html>';
 
         (new AssetsReplacer)->replaceInCachedResponse(new Response($content));
