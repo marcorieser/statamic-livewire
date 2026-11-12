@@ -17,6 +17,8 @@ class AssetsReplacer implements Replacer
     /**
      * Bake Livewire's auto-injected assets into the cached response, since
      * asset injection happens after the response was prepared for caching.
+     * Runs before Statamic's replacers, so CsrfTokenReplacer swaps the
+     * token in the baked script tag for its placeholder.
      */
     public function prepareResponseToCache(Response $response, Response $initial): void
     {
@@ -59,28 +61,12 @@ class AssetsReplacer implements Replacer
     }
 
     /**
-     * NoCacheReplacer can re-render a `{{ nocache }}` component live on a
-     * cache hit, flipping Livewire's render-tracking state even though its
-     * assets are already baked into the cached HTML.
+     * Cache hits are handled by CachedAssetsReplacer, which has to run after
+     * Statamic's replacers while this one has to run before them.
      */
     public function replaceInCachedResponse(Response $response): void
     {
-        $content = $response->getContent();
-
-        if ($content === false || $content === '') {
-            return;
-        }
-
-        $assets = resolve(FrontendAssets::class);
-
-        // `{{ livewire:scripts }}` and `{{ livewire:scriptConfig }}` respectively.
-        if (str_contains($content, 'data-module-url=') || str_contains($content, 'window.livewireScriptConfig')) {
-            $assets->hasRenderedScripts = true;
-        }
-
-        if (str_contains($content, '<!-- Livewire Styles -->')) {
-            $assets->hasRenderedStyles = true;
-        }
+        //
     }
 
     protected function shouldInjectLivewireAssets(): bool
