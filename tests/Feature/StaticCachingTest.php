@@ -175,6 +175,16 @@ it('marks livewire scripts as already rendered when a cache hit already contains
         ->and(FrontendAssets::scripts())->toBeEmpty();
 });
 
+it('marks livewire scripts as already rendered when a cache hit contains the script config', function (): void {
+    $content = '<html><head></head><body>'
+        .'<script data-navigate-once="true">window.livewireScriptConfig = {"csrf":"STATAMIC_CSRF_TOKEN"};</script>'
+        .'</body></html>';
+
+    (new AssetsReplacer)->replaceInCachedResponse(new Response($content));
+
+    expect(resolve(FrontendAssets::class)->hasRenderedScripts)->toBeTrue();
+});
+
 it('marks livewire styles as already rendered when a cache hit already contains them', function (): void {
     $content = '<html><head><!-- Livewire Styles --><style>[wire\:loading]{}</style></head><body></body></html>';
 

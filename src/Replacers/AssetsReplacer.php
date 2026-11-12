@@ -73,7 +73,8 @@ class AssetsReplacer implements Replacer
 
         $assets = resolve(FrontendAssets::class);
 
-        if (str_contains($content, 'data-module-url=')) {
+        // `{{ livewire:scripts }}` and `{{ livewire:scriptConfig }}` respectively.
+        if (str_contains($content, 'data-module-url=') || str_contains($content, 'window.livewireScriptConfig')) {
             $assets->hasRenderedScripts = true;
         }
 
