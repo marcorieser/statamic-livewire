@@ -139,7 +139,9 @@ Remember to include the Livewire styles as well.
 ```
 
 ### Static caching
-This addon adds an `AssetsReplacer` class to make Livewire compatible with half and full static caching. You may customize the replacers in the config of this addon:
+This addon adds an `AssetsReplacer` class to make Livewire compatible with half and full static caching. A second replacer, `CachedAssetsReplacer`, is always appended after Statamic's own replacers. It keeps Livewire from injecting its assets a second time when a `{{ nocache }}` region renders a component on a cache hit.
+
+The configurable replacers run before Statamic's own. You may customize them in the config of this addon:
 
 ```php
 'replacers' => [

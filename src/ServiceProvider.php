@@ -11,6 +11,7 @@ use MarcoRieser\Livewire\Hooks\ComputedPropertiesAutoloader;
 use MarcoRieser\Livewire\Hooks\SynthesizerAugmentor;
 use MarcoRieser\Livewire\Http\Middleware\HydrateCascadeByLivewireUrl;
 use MarcoRieser\Livewire\Http\Middleware\ResolveCurrentSiteByLivewireUrl;
+use MarcoRieser\Livewire\Replacers\CachedAssetsReplacer;
 use Statamic\Http\Middleware\Localize;
 use Statamic\Providers\AddonServiceProvider;
 
@@ -57,10 +58,15 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootReplacers(): void
     {
-        config()->set('statamic.static_caching.replacers', array_values(array_unique(array_merge(
+        $replacers = array_unique(array_merge(
             config()->array('statamic-livewire.replacers', []),
             config()->array('statamic.static_caching.replacers', [])
-        ))));
+        ));
+
+        // CachedAssetsReplacer must run last, after NoCacheReplacer.
+        $replacers = array_diff($replacers, [CachedAssetsReplacer::class]);
+
+        config()->set('statamic.static_caching.replacers', [...array_values($replacers), CachedAssetsReplacer::class]);
     }
 
     protected function bootSynthesizers(): void
