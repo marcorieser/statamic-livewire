@@ -409,7 +409,9 @@ Livewire works on [statically cached](https://statamic.dev/static-caching) pages
 - Livewire's assets (and any `{{ livewire:assets }}` content) are baked into cached responses, since asset injection normally happens after the response is prepared for caching.
 - Livewire's back/forward-cache protection headers (`Cache-Control: no-store`, …) are restored on cached pages containing components, so browsers don't restore stale component snapshots when navigating back.
 
-The replacers can be adjusted in the config:
+A third replacer, `CachedAssetsReplacer`, is always appended after Statamic's own replacers. It keeps Livewire from injecting its assets a second time when a `{{ nocache }}` region renders a component on a cache hit.
+
+The configurable replacers run before Statamic's own and can be adjusted in the config:
 
 ```php
 'replacers' => [

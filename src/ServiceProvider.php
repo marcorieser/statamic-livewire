@@ -13,6 +13,7 @@ use MarcoRieser\Livewire\Hooks\SlotsAutoloader;
 use MarcoRieser\Livewire\Http\Middleware\HydrateCascadeByLivewireUrl;
 use MarcoRieser\Livewire\Http\Middleware\ResolveCurrentSiteByLivewireUrl;
 use MarcoRieser\Livewire\Islands\IslandManager;
+use MarcoRieser\Livewire\Replacers\CachedAssetsReplacer;
 use MarcoRieser\Livewire\Tags\Livewire;
 use Override;
 use Statamic\Http\Middleware\Localize;
@@ -91,7 +92,10 @@ class ServiceProvider extends AddonServiceProvider
             ...config()->array('statamic.static_caching.replacers', []),
         ];
 
-        config()->set('statamic.static_caching.replacers', array_values(array_unique($replacers)));
+        // CachedAssetsReplacer must run last, after NoCacheReplacer.
+        $replacers = array_diff(array_unique($replacers), [CachedAssetsReplacer::class]);
+
+        config()->set('statamic.static_caching.replacers', [...array_values($replacers), CachedAssetsReplacer::class]);
     }
 
     protected function bootUpdateRouteMiddleware(): void
