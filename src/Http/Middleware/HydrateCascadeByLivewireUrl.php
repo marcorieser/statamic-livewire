@@ -38,7 +38,9 @@ class HydrateCascadeByLivewireUrl
 
     protected function hydrateRequest(): void
     {
-        Cascade::withRequest(RequestFacade::create(uri: Livewire::originalUrl(), method: Livewire::originalMethod()));
+        // A component dehydrated while a livewire/update request was failing (e.g. an error
+        // page rendered for an expired session) carries a null memo path and method.
+        Cascade::withRequest(RequestFacade::create(uri: Livewire::originalUrl(), method: Livewire::originalMethod() ?? 'GET'));
     }
 
     protected function hydrateContent(): void

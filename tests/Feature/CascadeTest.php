@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Routing\Route;
 use Livewire\Livewire;
@@ -110,4 +111,25 @@ it('rehydrates the cascade from the original url on update requests', function (
     expect($response->content())
         ->toContain('url: http:\/\/localhost')
         ->not->toContain('livewire\/update');
+});
+
+it('hydrates the cascade when the snapshot has a null path and method', function (): void {
+    // Components dehydrated while a livewire/update request was failing (e.g. an
+    // error page rendered for an expired session) carry a null memo path and method.
+    $snapshot = json_encode([
+        'data' => [],
+        'memo' => ['id' => 'abc', 'name' => 'test', 'path' => null, 'method' => null],
+        'checksum' => 'irrelevant',
+    ]);
+
+    $request = Request::create('/livewire/update', 'POST', [
+        'components' => [['snapshot' => $snapshot, 'updates' => [], 'calls' => []]],
+    ]);
+    $request->headers->set('X-Livewire', 'true');
+    app()->instance('request', $request);
+
+    new HydrateCascadeByLivewireUrl()->handle($request, fn () => new Response);
+    Statamic\Facades\Cascade::hydrate();
+
+    expect(Statamic\Facades\Cascade::get('current_url'))->toBe('http://localhost');
 });

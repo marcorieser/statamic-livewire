@@ -114,7 +114,7 @@ it('throws when the placeholder tag is used outside an island', function (): voi
     try {
         mountIslands('island-counter-stray-placeholder');
     } finally {
-        unlink(__DIR__.'/../Fixtures/views/island-counter-stray-placeholder.antlers.html');
+        File::delete(__DIR__.'/../Fixtures/views/island-counter-stray-placeholder.antlers.html');
     }
 })->throws(RuntimeException::class, 'The {{ livewire:placeholder }} tag must be used inside a {{ livewire:island }} tag pair.');
 
@@ -269,7 +269,7 @@ it('throws when an island has no name', function (): void {
     try {
         mountIslands('island-counter-nameless');
     } finally {
-        unlink(__DIR__.'/../Fixtures/views/island-counter-nameless.antlers.html');
+        File::delete(__DIR__.'/../Fixtures/views/island-counter-nameless.antlers.html');
     }
 })->throws(InvalidArgumentException::class, 'The {{ livewire:island }} tag requires a name.');
 

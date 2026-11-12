@@ -109,7 +109,7 @@ abstract class Component
  * @method static \Livewire\Features\SupportTesting\Testable test(string|object $name, array<string, mixed> $params = [])
  * @method static string getUpdateUri()
  * @method static string originalUrl()
- * @method static string originalMethod()
+ * @method static ?string originalMethod()
  * @method static void componentHook(string|object $hook)
  * @method static void addLocation(?string $viewPath = null, ?string $classNamespace = null)
  * @method static bool isLivewireRequest()
